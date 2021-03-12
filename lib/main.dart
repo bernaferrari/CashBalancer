@@ -1,10 +1,9 @@
 import 'package:animations/animations.dart';
-import 'package:cash_balancer/tailwind_colors.dart';
-import 'package:cash_balancer/widgets/circle_percentage_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'details_page.dart';
+import 'tailwind_colors.dart';
 import 'util/row_column_spacer.dart';
 
 void main() {
@@ -55,22 +54,16 @@ const localStock = AssetGroup('Monetus', 'rose', [
   AssetData("CDB 120% CDI", "CDB", 1, 102),
   AssetData("CDB 100% CDI", "CDB", 1, 200),
   AssetData("Ether", "Crypto", 1, 600),
-  AssetData("B3SA3", "Crypto", 1, 100),
-  AssetData("BBDC4", "Crypto", 1, 100),
-  AssetData("BPAC11", "Crypto", 1, 100),
-  AssetData("CSAN3", "Crypto", 1, 100),
-  AssetData("CSNA3", "Crypto", 1, 100),
-  AssetData("JBBS3", "Crypto", 1, 125),
-  AssetData("KLBN11", "Crypto", 1, 100),
-  AssetData("PRIO3", "Crypto", 1, 100),
-  AssetData("VALE3", "Crypto", 1, 125),
-  AssetData("VVAR3", "Crypto", 1, 50),
+  AssetData("XRP", "Crypto", 1, 150),
+  AssetData("Bitcoin", "Crypto", 1, 120),
+  AssetData("Cadarno", "Crypto", 1, 100),
+  AssetData("Dogcoin", "Crypto", 1, 90),
 ]);
 
 const crypto = AssetGroup('Crypto', 'red', [
-  AssetData("Bitcoin", "crypto", 1, 180412),
-  AssetData("Ether", "crypto", 1, 48121),
-  AssetData("XRP", "crypto", 1, 403),
+  AssetData("Bitcoin", "Crypto", 1, 180412),
+  AssetData("Ether", "Crypto", 1, 48121),
+  AssetData("XRP", "Crypto", 1, 403),
 ]);
 
 class HomePage extends StatelessWidget {
@@ -81,7 +74,7 @@ class HomePage extends StatelessWidget {
       crypto,
     ];
 
-    return DetailsPage(data[0].name, data[0].data);
+    // return DetailsPage(data[0].name, data[0].data);
 
     return Scaffold(
       appBar: AppBar(
@@ -102,7 +95,8 @@ class HomePage extends StatelessWidget {
                 closedColor: Colors.transparent,
                 openColor: Colors.transparent,
                 closedBuilder: (context, action) {
-                  return HomeScreenCard(d.name, d.colorTheme, d.data, action);
+                  print("data is ${d.data}");
+                  return HomeScreenCard(d.name, d.data, d.colorTheme, action);
                 },
               );
             }),
@@ -147,10 +141,18 @@ class HomeScreenCard extends StatelessWidget {
   final List<AssetData> data;
   final VoidCallback onClicked;
 
-  const HomeScreenCard(this.title, this.colorTheme, this.data, this.onClicked);
+  const HomeScreenCard(this.title, this.data, this.colorTheme, this.onClicked);
 
   @override
   Widget build(BuildContext context) {
+    final List<AssetData> sortedData = [...data]..sort((a, b) {
+        return (b.price * b.quantity).compareTo((a.price * a.quantity));
+      });
+
+    final Map<String, List<AssetData>> groupedData = groupBy(sortedData);
+
+    final colors = getColorByQuantile(groupedData, sortedData);
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
@@ -188,23 +190,27 @@ class HomeScreenCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: HorizontalProgressBar(
-                  data: data,
+                  data: sortedData,
+                  colors: colors,
                   isProportional: false,
                 ),
               ),
               SizedBox(height: 10),
               Container(
                 width: double.infinity,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: spaceRow(
-                    20,
-                    [
-                      for (int i = 0; i < data.length; i++)
-                        MiniName(data[i].name, Colors.red[200 + i * 100]!)
-                    ],
+                child: ClipRect(
+                  clipBehavior: Clip.antiAlias,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: spaceRow(
+                      20,
+                      [
+                        for (int i = 0; i < sortedData.length; i++)
+                          MiniName(sortedData[i].name, colors[sortedData[i]] ?? Colors.red)
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -231,10 +237,15 @@ List<double> retrieveSpacedList(List<AssetData> data, double maxSize) {
 
 class HorizontalProgressBar extends StatelessWidget {
   final List<AssetData> data;
+  final Map<AssetData, Color> colors;
+
   final bool isProportional;
 
-  const HorizontalProgressBar(
-      {required this.data, required this.isProportional});
+  const HorizontalProgressBar({
+    required this.data,
+    required this.colors,
+    required this.isProportional,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -252,7 +263,7 @@ class HorizontalProgressBar extends StatelessWidget {
               Container(
                 width: spacedList[i],
                 height: double.infinity,
-                color: Colors.red[200 + i * 100],
+                color: colors[data[i]],
               ),
           ]),
         );

@@ -86,15 +86,17 @@ Map<AssetData, Color> getColorByQuantile(
     final quartile75 = q75(arr);
 
     for (int i = 0; i < data.length; i++) {
-      final colorType = assetKinds[data[i].kind]!.color;
-      if (data[i].price <= quartile25) {
-        colors[data[i]] = getColor(colorType)[200]!;
-      } else if (data[i].price <= quartile50) {
-        colors[data[i]] = getColor(colorType)[300]!;
-      } else if (data[i].price <= quartile75) {
-        colors[data[i]] = getColor(colorType)[400]!;
+      final currentData = data[i];
+
+      final colorType = assetKinds[currentData.kind]!.color;
+      if (currentData.price <= quartile25) {
+        colors[currentData] = getColor(colorType)[200]!;
+      } else if (currentData.price <= quartile50) {
+        colors[currentData] = getColor(colorType)[300]!;
+      } else if (currentData.price <= quartile75) {
+        colors[currentData] = getColor(colorType)[400]!;
       } else {
-        colors[data[i]] = getColor(colorType)[500]!;
+        colors[currentData] = getColor(colorType)[500]!;
       }
     }
   }
@@ -316,19 +318,42 @@ class CardButton extends StatelessWidget {
       ),
       onPressed: () {},
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: spaceRow(
           10.0,
           [
-            MiniNameDetails(data.name, color),
-            Text(
-              "R\$ ${data.price * data.quantity}",
-              style: Theme.of(context).textTheme.bodyText2,
+            Expanded(child: MiniNameDetails(data.name, color)),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "R\$ ${data.price * data.quantity}",
+                  style: Theme.of(context).textTheme.bodyText2,
+                ),
+                SizedBox(width: 8),
+                if (false)
+                  Stack(
+                    children: [
+                      Text(
+                        "// ${(data.price * data.quantity / totalValue * 100).toStringAsFixed(2)}%",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText2
+                            ?.copyWith(color: Colors.white.withOpacity(0.6)),
+                      ),
+                      Opacity(
+                        opacity: 0,
+                        child: Text(
+                          "// 99.99%",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText2
+                              ?.copyWith(color: Colors.white.withOpacity(0.6)),
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
             ),
-            // Text(
-            //   "${(data.price * data.quantity / totalValue * 100).toStringAsFixed(2)}%",
-            //   style: Theme.of(context).textTheme.bodyText2,
-            // ),
           ],
         ),
       ),
@@ -345,9 +370,6 @@ class MiniNameDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           width: 15,
@@ -358,9 +380,12 @@ class MiniNameDetails extends StatelessWidget {
           ),
         ),
         SizedBox(width: 10),
-        Text(
-          title,
-          style: Theme.of(context).textTheme.bodyText2,
+        Expanded(
+          child: Text(
+            title,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodyText2,
+          ),
         ),
       ],
     );
