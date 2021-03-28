@@ -74,7 +74,7 @@ class HomePage extends StatelessWidget {
       crypto,
     ];
 
-    // return DetailsPage(data[0].name, data[0].data);
+    return DetailsPage(data[0].name, data[0].data);
 
     return Scaffold(
       appBar: AppBar(

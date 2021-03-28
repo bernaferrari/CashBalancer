@@ -22,50 +22,34 @@ class DetailsPage extends StatelessWidget {
 
     final colors = getColorByQuantile(groupedData, sortedData);
 
-    return Container(
-      color: Colors.black,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Color(0xff121212),
-          // gradient: LinearGradient(
-          //   begin: Alignment.centerLeft,
-          //   end: Alignment.centerRight,
-          //   colors: [
-          //     Color(0xff331e00),
-          //     Color(0xff33011c),
-          //   ],
-          // ),
-        ),
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            title: Text(name),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Text(name),
+      ),
+      body: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: double.infinity,
+            margin: EdgeInsets.all(20),
+            width: 30,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: VerticalProgressBar(
+              data: sortedData,
+              colors: colors,
+              isProportional: false,
+            ),
           ),
-          body: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                height: double.infinity,
-                margin: EdgeInsets.all(20),
-                width: 30,
-                clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: VerticalProgressBar(
-                  data: sortedData,
-                  colors: colors,
-                  isProportional: false,
-                ),
-              ),
-              SingleChildScrollView(
-                child: CardGroupDetails(sortedData, groupedData, colors),
-              ),
-            ],
+          SingleChildScrollView(
+            child: CardGroupDetails(sortedData, groupedData, colors),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -124,17 +108,20 @@ class VerticalProgressBar extends StatelessWidget {
 
         return Column(
           mainAxisSize: MainAxisSize.min,
-          children: spaceColumn(2, [
-            for (int i = 0; i < data.length; i++)
-              Tooltip(
-                message: "${data[i].name}",
-                child: Container(
-                  width: double.infinity,
-                  height: spacedList[i],
-                  color: colors[data[i]]!,
+          children: spaceColumn(
+            2,
+            [
+              for (int i = 0; i < data.length; i++)
+                Tooltip(
+                  message: "${data[i].name}",
+                  child: Container(
+                    width: double.infinity,
+                    height: spacedList[i],
+                    color: colors[data[i]]!,
+                  ),
                 ),
-              ),
-          ]),
+            ],
+          ),
         );
       },
     );
@@ -287,7 +274,7 @@ class IndividualItem extends StatelessWidget {
                 ],
               ),
             ),
-            for (int i = 0; i < data.length; i++)
+            for (int i = 0; i < data.length; i++) ...[
               SizedBox(
                 width: double.infinity,
                 child: CardButton(
@@ -296,6 +283,12 @@ class IndividualItem extends StatelessWidget {
                   totalValue,
                 ),
               ),
+              if (i < data.length - 1)
+                Container(
+                  height: 1,
+                  color: Colors.white.withOpacity(0.10),
+                ),
+            ],
           ],
         ),
       ),
@@ -318,45 +311,71 @@ class CardButton extends StatelessWidget {
       ),
       onPressed: () {},
       child: Row(
-        children: spaceRow(
-          10.0,
-          [
-            Expanded(child: MiniNameDetails(data.name, color)),
-            Row(
-              mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 15,
+            height: 15,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: color,
+            ),
+          ),
+          SizedBox(width: 10),
+          Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  data.name,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.subtitle2,
+                ),
                 Text(
                   "R\$ ${data.price * data.quantity}",
                   style: Theme.of(context).textTheme.bodyText2,
                 ),
-                SizedBox(width: 8),
-                if (false)
-                  Stack(
-                    children: [
-                      Text(
-                        "// ${(data.price * data.quantity / totalValue * 100).toStringAsFixed(2)}%",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText2
-                            ?.copyWith(color: Colors.white.withOpacity(0.6)),
-                      ),
-                      Opacity(
-                        opacity: 0,
-                        child: Text(
-                          "// 99.99%",
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText2
-                              ?.copyWith(color: Colors.white.withOpacity(0.6)),
-                        ),
-                      ),
-                    ],
-                  ),
               ],
             ),
-          ],
-        ),
+          ),
+          Spacer(),
+          Text(
+            "${(100 * data.price * data.quantity / totalValue).toStringAsFixed(2)} %",
+            style: Theme.of(context).textTheme.bodyText2,
+          ),
+        ],
       ),
+      // Row(
+      //   mainAxisSize: MainAxisSize.min,
+      //   children: [
+      //     // Text(
+      //     //   "R\$ ${data.price * data.quantity}",
+      //     //   style: Theme.of(context).textTheme.bodyText2,
+      //     // ),
+      //     SizedBox(width: 8),
+      //     if (false)
+      //       Stack(
+      //         children: [
+      //           Text(
+      //             "// ${(data.price * data.quantity / totalValue * 100).toStringAsFixed(2)}%",
+      //             style: Theme.of(context)
+      //                 .textTheme
+      //                 .bodyText2
+      //                 ?.copyWith(color: Colors.white.withOpacity(0.6)),
+      //           ),
+      //           Opacity(
+      //             opacity: 0,
+      //             child: Text(
+      //               "// 99.99%",
+      //               style: Theme.of(context)
+      //                   .textTheme
+      //                   .bodyText2
+      //                   ?.copyWith(color: Colors.white.withOpacity(0.6)),
+      //             ),
+      //           ),
+      //         ],
+      //       ),
+      //   ],
+      // ),
     );
   }
 }
@@ -370,6 +389,7 @@ class MiniNameDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           width: 15,
@@ -380,12 +400,10 @@ class MiniNameDetails extends StatelessWidget {
           ),
         ),
         SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            title,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodyText2,
-          ),
+        Text(
+          title,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.bodyText2,
         ),
       ],
     );
