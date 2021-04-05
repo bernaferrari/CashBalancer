@@ -25,9 +25,19 @@ dependencies:
   flutter:
     sdk: flutter
   animations: ^2.0.0
+  equatable: ^2.0.0
   google_fonts: ^2.0.0
+  moor: 4.2.1
+  moor_flutter: ^4.0.0
+  sqlite3_flutter_libs: ^0.4.1
+  path_provider: ^2.0.1
+  path: ^1.8.0
+  rxdart: ^0.26.0
+  flutter_bloc: ^7.0.0
 
 dev_dependencies:
+  moor_generator: 4.2.1
+  build_runner: 1.12.2
   flutter_test:
     sdk: flutter
 

@@ -1,21 +1,24 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'blocs/data_bloc.dart';
+import 'database/database.dart';
 import 'details_page.dart';
 import 'tailwind_colors.dart';
 import 'util/row_column_spacer.dart';
+import 'widgets/input_dialog_group.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Cash Balancer',
       theme: ThemeData(
         visualDensity: VisualDensity.standard,
         typography: Typography.material2018(),
@@ -28,7 +31,13 @@ class MyApp extends StatelessWidget {
           headline6: GoogleFonts.rubik(),
         ),
       ),
-      home: HomePage(),
+      home: RepositoryProvider<Database>(
+        create: (context) => constructDb(),
+        child: BlocProvider<DataBloc>(
+          create: (context) => DataBloc(),
+          child: HomePage(),
+        ),
+      ),
     );
   }
 }
@@ -40,10 +49,10 @@ const assetKinds = {
 };
 
 const localStock = AssetGroup('Monetus', 'rose', [
-  AssetData("B3SA3", "Stock", 1, 100),
-  AssetData("BBDC4", "Stock", 1, 100),
-  AssetData("BPAC11", "Stock", 1, 100),
-  AssetData("CSAN3", "Stock", 1, 100),
+  AssetData("B3SA3", "Stock", 1, 100, 0.3),
+  AssetData("BBDC4", "Stock", 1, 100, 0.2),
+  AssetData("BPAC11", "Stock", 1, 100, 0.1),
+  AssetData("CSAN3", "Stock", 1, 100, 0.05),
   AssetData("CSNA3", "Stock", 1, 100),
   AssetData("JBBS3", "Stock", 1, 125),
   AssetData("KLBN11", "Stock", 1, 100),
@@ -53,9 +62,9 @@ const localStock = AssetGroup('Monetus', 'rose', [
   AssetData("CDB 140% CDI", "CDB", 1, 102),
   AssetData("CDB 120% CDI", "CDB", 1, 102),
   AssetData("CDB 100% CDI", "CDB", 1, 200),
-  AssetData("Ether", "Crypto", 1, 600),
-  AssetData("XRP", "Crypto", 1, 150),
-  AssetData("Bitcoin", "Crypto", 1, 120),
+  AssetData("Ether", "Crypto", 1, 600, 0.20),
+  AssetData("XRP", "Crypto", 1, 150, 0.50),
+  AssetData("Bitcoin", "Crypto", 1, 120, 0.30),
   AssetData("Cadarno", "Crypto", 1, 100),
   AssetData("Dogcoin", "Crypto", 1, 90),
 ]);
@@ -74,38 +83,87 @@ class HomePage extends StatelessWidget {
       crypto,
     ];
 
-    return DetailsPage(data[0].name, data[0].data);
+    Future<dynamic>.delayed(Duration(milliseconds: 500)).then<dynamic>(
+      (dynamic value) => showDialog<dynamic>(
+        context: context,
+        builder: (_) => InputDialogGroup(),
+      ),
+    );
 
     return Scaffold(
       appBar: AppBar(
         title: Text("Cash Balancer"),
       ),
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            ...data.map((d) {
-              return OpenContainer<bool>(
-                transitionType: ContainerTransitionType.fadeThrough,
-                openBuilder: (context, _) {
-                  return DetailsPage(d.name, d.data);
-                },
-                onClosed: (_) {},
-                closedColor: Colors.transparent,
-                openColor: Colors.transparent,
-                closedBuilder: (context, action) {
-                  print("data is ${d.data}");
-                  return HomeScreenCard(d.name, d.data, d.colorTheme, action);
-                },
-              );
-            }),
-            // HomeScreenCard("Local Stocks", "", () {}),
-            // HomeScreenCard("Global Stocks", "", () {}),
-            // HomeScreenCard("Crypto", "", () {}),
-          ],
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog<dynamic>(
+            context: context,
+            builder: (_) => InputDialogGroup(
+              onSavePressed: (text) {
+                // Preserve the Bloc's context.
+                BlocProvider.of<DataBloc>(context).db.createGroup(text);
+              },
+            ),
+          );
+        },
+        child: Icon(Icons.add),
       ),
+      backgroundColor: Theme.of(context).colorScheme.background,
+      body: StreamBuilder<Object>(
+          stream: BlocProvider.of<DataBloc>(context).db.getGroup().watch(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final listData = snapshot.data as List<Group>;
+
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    ...listData.map((d) {
+                      return OpenContainer<bool>(
+                        transitionType: ContainerTransitionType.fadeThrough,
+                        openBuilder: (context, _) {
+                          return DetailsPage(d.name, data[0].data);
+                        },
+                        onClosed: (_) {},
+                        closedColor: Colors.transparent,
+                        openColor: Colors.transparent,
+                        closedBuilder: (context, action) {
+                          print("data is ${d}");
+                          return HomeScreenCard(
+                              d.name, data[0].data, data[0].colorTheme, action);
+                        },
+                      );
+                    }),
+
+                    // ...data.map((d) {
+                    //   return OpenContainer<bool>(
+                    //     transitionType: ContainerTransitionType.fadeThrough,
+                    //     openBuilder: (context, _) {
+                    //       return DetailsPage(d.name, d.data);
+                    //     },
+                    //     onClosed: (_) {},
+                    //     closedColor: Colors.transparent,
+                    //     openColor: Colors.transparent,
+                    //     closedBuilder: (context, action) {
+                    //       print("data is ${d.data}");
+                    //       return HomeScreenCard(
+                    //           d.name, d.data, d.colorTheme, action);
+                    //     },
+                    //   );
+                    // }),
+                    // HomeScreenCard("Local Stocks", "", () {}),
+                    // HomeScreenCard("Global Stocks", "", () {}),
+                    // HomeScreenCard("Crypto", "", () {}),
+                  ],
+                ),
+              );
+            } else if (snapshot.hasError) {
+              return Text("Error is ${snapshot.error}");
+            } else {
+              return Text("Loading...");
+            }
+          }),
     );
   }
 }
@@ -131,8 +189,15 @@ class AssetData {
   final String kind;
   final double quantity;
   final double price;
+  final double targetPercent;
 
-  const AssetData(this.name, this.kind, this.quantity, this.price);
+  const AssetData(
+    this.name,
+    this.kind,
+    this.quantity,
+    this.price, [
+    this.targetPercent = 0,
+  ]);
 }
 
 class HomeScreenCard extends StatelessWidget {
@@ -208,7 +273,8 @@ class HomeScreenCard extends StatelessWidget {
                       20,
                       [
                         for (int i = 0; i < sortedData.length; i++)
-                          MiniName(sortedData[i].name, colors[sortedData[i]] ?? Colors.red)
+                          MiniName(sortedData[i].name,
+                              colors[sortedData[i]] ?? Colors.red)
                       ],
                     ),
                   ),

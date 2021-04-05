@@ -1,10 +1,17 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'main.dart';
 import 'tailwind_colors.dart';
 import 'util/quartile.dart';
 import 'util/row_column_spacer.dart';
 import 'widgets/circle_percentage_painter.dart';
+
+extension Percent on double {
+  String toPercent() => (this * 100).toStringAsFixed(0);
+}
 
 class DetailsPage extends StatelessWidget {
   final String name;
@@ -302,6 +309,136 @@ class CardButton extends StatelessWidget {
   final double totalValue;
 
   const CardButton(this.data, this.color, this.totalValue);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      style: TextButton.styleFrom(
+        padding: EdgeInsets.all(10.0),
+        backgroundColor: color.withOpacity(0.05),
+      ),
+      onPressed: () {},
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              right: 8,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 4,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  data.name,
+                  style: GoogleFonts.firaSans(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "R\$ ${data.price} (${(data.price / totalValue).toPercent()}%)",
+                      style: GoogleFonts.firaSans(
+                        color: Color(0xbfffffff),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (data.targetPercent > 0)
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      "${(data.price / totalValue).toPercent()}%",
+                      style: GoogleFonts.firaSans(
+                        color: Colors.white.withOpacity(0.50),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      child: Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 16,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.50),
+                      ),
+                    ),
+                    Text(
+                      "${data.targetPercent.toPercent()}%",
+                      style: GoogleFonts.firaSans(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        fontFeatures: [
+                          FontFeature.enable('calc'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  "${data.targetPercent > data.price / totalValue ? "↑" : "↓"} R\$ ${(totalValue * data.targetPercent - data.price).toStringAsFixed(0)} (${(data.targetPercent - data.price / totalValue).toPercent()}%)",
+                  style: GoogleFonts.firaSans(
+                    color: data.targetPercent > data.price / totalValue
+                        ? Color(0xff77d874)
+                        : Color(0xffff5a74),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class CardButton2 extends StatelessWidget {
+  final AssetData data;
+  final Color color;
+  final double totalValue;
+
+  const CardButton2(this.data, this.color, this.totalValue);
 
   @override
   Widget build(BuildContext context) {
