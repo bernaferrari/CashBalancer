@@ -1,38 +1,49 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'main.dart';
-import 'tailwind_colors.dart';
-import 'util/quartile.dart';
+import 'blocs/data_bloc.dart';
+import 'database/database.dart';
+import 'util/retrieve_spaced_list.dart';
 import 'util/row_column_spacer.dart';
+import 'util/tailwind_colors.dart';
 import 'widgets/circle_percentage_painter.dart';
+import 'widgets/input_dialog_group.dart';
 
 extension Percent on double {
   String toPercent() => (this * 100).toStringAsFixed(0);
 }
 
 class DetailsPage extends StatelessWidget {
-  final String name;
-  final List<AssetData> data;
+  final FullDataExtended data;
+  final int id;
 
-  const DetailsPage(this.name, this.data);
+  const DetailsPage(this.id, this.data);
 
   @override
   Widget build(BuildContext context) {
-    final List<AssetData> sortedData = [...data]..sort((a, b) {
-        return (b.price * b.quantity).compareTo((a.price * a.quantity));
-      });
-
-    final Map<String, List<AssetData>> groupedData = groupBy(sortedData);
-
-    final colors = getColorByQuantile(groupedData, sortedData);
-
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text(name),
+        title: Text('Name'),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          showDialog<dynamic>(
+            context: context,
+            builder: (_) => InputDialogGroup(
+              onSavePressed: (text) {
+                // Preserve the Bloc's context.
+                BlocProvider.of<DataBloc>(context).db.createGroup(text);
+              },
+            ),
+          );
+        },
+        label: Text("Add Group"),
+        // TODO add Savings icon when available.
+        icon: Icon(Icons.account_balance),
       ),
       body: Row(
         mainAxisSize: MainAxisSize.min,
@@ -48,13 +59,12 @@ class DetailsPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: VerticalProgressBar(
-              data: sortedData,
-              colors: colors,
+              data: data,
               isProportional: false,
             ),
           ),
           SingleChildScrollView(
-            child: CardGroupDetails(sortedData, groupedData, colors),
+            child: CardGroupDetails(data),
           ),
         ],
       ),
@@ -62,47 +72,12 @@ class DetailsPage extends StatelessWidget {
   }
 }
 
-Map<AssetData, Color> getColorByQuantile(
-  Map<String, List<AssetData>> groupedData,
-  List<AssetData> data,
-) {
-  final Map<AssetData, Color> colors = {};
-
-  for (var element in groupedData.entries) {
-    final List<double> arr =
-        element.value.map((e) => e.quantity * e.price).toList();
-
-    final quartile25 = q25(arr);
-    final quartile50 = q50(arr);
-    final quartile75 = q75(arr);
-
-    for (int i = 0; i < data.length; i++) {
-      final currentData = data[i];
-
-      final colorType = assetKinds[currentData.kind]!.color;
-      if (currentData.price <= quartile25) {
-        colors[currentData] = getColor(colorType)[200]!;
-      } else if (currentData.price <= quartile50) {
-        colors[currentData] = getColor(colorType)[300]!;
-      } else if (currentData.price <= quartile75) {
-        colors[currentData] = getColor(colorType)[400]!;
-      } else {
-        colors[currentData] = getColor(colorType)[500]!;
-      }
-    }
-  }
-
-  return colors;
-}
-
 class VerticalProgressBar extends StatelessWidget {
-  final List<AssetData> data;
-  final Map<AssetData, Color> colors;
+  final FullDataExtended data;
   final bool isProportional;
 
   const VerticalProgressBar({
     required this.data,
-    required this.colors,
     required this.isProportional,
   });
 
@@ -111,20 +86,20 @@ class VerticalProgressBar extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final List<double> spacedList =
-            retrieveSpacedList(data, constraints.maxHeight);
+            retrieveSpacedList(data.fullData, constraints.maxHeight);
 
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: spaceColumn(
             2,
             [
-              for (int i = 0; i < data.length; i++)
+              for (int i = 0; i < data.fullData.length; i++)
                 Tooltip(
-                  message: "${data[i].name}",
+                  message: "${data.fullData[i].item.name}",
                   child: Container(
                     width: double.infinity,
                     height: spacedList[i],
-                    color: colors[data[i]]!,
+                    color: data.colors[i],
                   ),
                 ),
             ],
@@ -135,32 +110,15 @@ class VerticalProgressBar extends StatelessWidget {
   }
 }
 
-Map<String, List<AssetData>> groupBy(List<AssetData> data) {
-  final groupedList = <String, List<AssetData>>{};
-
-  for (int i = 0; i < data.length; i++) {
-    final groupPosition = groupedList[data[i].kind];
-    if (groupPosition != null) {
-      groupPosition.add(data[i]);
-    } else {
-      groupedList[data[i].kind] = [data[i]];
-    }
-  }
-
-  return groupedList;
-}
-
 class CardGroupDetails extends StatelessWidget {
-  final List<AssetData> flatData;
-  final Map<String, List<AssetData>> groupedData;
-  final Map<AssetData, Color> colors;
+  final FullDataExtended data;
 
-  const CardGroupDetails(this.flatData, this.groupedData, this.colors);
+  const CardGroupDetails(this.data);
 
   @override
   Widget build(BuildContext context) {
-    final double totalValue = flatData
-        .map((d) => d.price * d.quantity)
+    final double totalValue = data.fullData
+        .map((d) => d.item.price * d.item.quantity)
         .fold(0.0, (previous, current) => previous + current);
 
     return Padding(
@@ -171,17 +129,17 @@ class CardGroupDetails extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: spaceColumn(
             20,
-            groupedData.entries.map(
+            data.groupedData.entries.map(
               (e) => IndividualItem(
                 e.key,
                 e.value
                   ..sort(
-                    (a, b) =>
-                        (b.price * a.quantity).compareTo(a.price * a.quantity),
+                    (a, b) => (b.item.price * a.item.quantity)
+                        .compareTo(a.item.price * a.item.quantity),
                   ),
                 totalValue,
-                assetKinds[e.key]!.color,
-                colors,
+                data.fullData[e.key].kind.color,
+                data.colors,
               ),
             ),
           ),
@@ -196,11 +154,11 @@ Map<int, Color> getColor(String colorType) {
 }
 
 class IndividualItem extends StatelessWidget {
-  final String kind;
-  final List<AssetData> data;
+  final int kind;
+  final List<FullData> data;
   final double totalValue;
   final String colorType;
-  final Map<AssetData, Color> colors;
+  final Map<FullData, Color> colors;
 
   const IndividualItem(
     this.kind,
@@ -213,7 +171,7 @@ class IndividualItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double totalLocalPrice = data
-        .map((e) => e.price * e.quantity)
+        .map((e) => e.item.price * e.item.quantity)
         .fold(0.0, (previous, current) => previous + current);
 
     final double totalLocalPercent = 100.0 * totalLocalPrice / totalValue;
@@ -243,7 +201,8 @@ class IndividualItem extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(kind, style: Theme.of(context).textTheme.headline5),
+                      Text('kind',
+                          style: Theme.of(context).textTheme.headline5),
                       Text(
                         "Total: R\$$totalLocalPrice",
                         style: Theme.of(context).textTheme.overline,
@@ -304,7 +263,7 @@ class IndividualItem extends StatelessWidget {
 }
 
 class CardButton extends StatelessWidget {
-  final AssetData data;
+  final FullData data;
   final Color color;
   final double totalValue;
 
@@ -350,7 +309,7 @@ class CardButton extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  data.name,
+                  data.item.name,
                   style: GoogleFonts.firaSans(
                     color: Colors.white,
                     fontSize: 18,
@@ -363,7 +322,7 @@ class CardButton extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "R\$ ${data.price} (${(data.price / totalValue).toPercent()}%)",
+                      "R\$ ${data.item.price} (${(data.item.price / totalValue).toPercent()}%)",
                       style: GoogleFonts.firaSans(
                         color: Color(0xbfffffff),
                         fontSize: 12,
@@ -375,7 +334,7 @@ class CardButton extends StatelessWidget {
               ],
             ),
           ),
-          if (data.targetPercent > 0)
+          if (data.item.targetPercent > 0)
             Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -384,7 +343,7 @@ class CardButton extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      "${(data.price / totalValue).toPercent()}%",
+                      "${(data.item.price / totalValue).toPercent()}%",
                       style: GoogleFonts.firaSans(
                         color: Colors.white.withOpacity(0.50),
                         fontSize: 18,
@@ -403,7 +362,7 @@ class CardButton extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "${data.targetPercent.toPercent()}%",
+                      "${data.item.targetPercent.toPercent()}%",
                       style: GoogleFonts.firaSans(
                         color: Colors.white,
                         fontSize: 18,
@@ -416,11 +375,12 @@ class CardButton extends StatelessWidget {
                   ],
                 ),
                 Text(
-                  "${data.targetPercent > data.price / totalValue ? "↑" : "↓"} R\$ ${(totalValue * data.targetPercent - data.price).toStringAsFixed(0)} (${(data.targetPercent - data.price / totalValue).toPercent()}%)",
+                  "${data.item.targetPercent > data.item.price / totalValue ? "↑" : "↓"} R\$ ${(totalValue * data.item.targetPercent - data.item.price).toStringAsFixed(0)} (${(data.item.targetPercent - data.item.price / totalValue).toPercent()}%)",
                   style: GoogleFonts.firaSans(
-                    color: data.targetPercent > data.price / totalValue
-                        ? Color(0xff77d874)
-                        : Color(0xffff5a74),
+                    color:
+                        data.item.targetPercent > data.item.price / totalValue
+                            ? Color(0xff77d874)
+                            : Color(0xffff5a74),
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
@@ -433,116 +393,116 @@ class CardButton extends StatelessWidget {
   }
 }
 
-class CardButton2 extends StatelessWidget {
-  final AssetData data;
-  final Color color;
-  final double totalValue;
+// class CardButton2 extends StatelessWidget {
+//   final AssetData data;
+//   final Color color;
+//   final double totalValue;
+//
+//   const CardButton2(this.data, this.color, this.totalValue);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return TextButton(
+//       style: TextButton.styleFrom(
+//         padding: EdgeInsets.all(10.0),
+//       ),
+//       onPressed: () {},
+//       child: Row(
+//         children: [
+//           Container(
+//             width: 15,
+//             height: 15,
+//             decoration: BoxDecoration(
+//               borderRadius: BorderRadius.circular(5),
+//               color: color,
+//             ),
+//           ),
+//           SizedBox(width: 10),
+//           Center(
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Text(
+//                   data.name,
+//                   overflow: TextOverflow.ellipsis,
+//                   style: Theme.of(context).textTheme.subtitle2,
+//                 ),
+//                 Text(
+//                   "R\$ ${data.price * data.quantity}",
+//                   style: Theme.of(context).textTheme.bodyText2,
+//                 ),
+//               ],
+//             ),
+//           ),
+//           Spacer(),
+//           Text(
+//             "${(100 * data.price * data.quantity / totalValue).toStringAsFixed(2)} %",
+//             style: Theme.of(context).textTheme.bodyText2,
+//           ),
+//         ],
+//       ),
+//       // Row(
+//       //   mainAxisSize: MainAxisSize.min,
+//       //   children: [
+//       //     // Text(
+//       //     //   "R\$ ${data.price * data.quantity}",
+//       //     //   style: Theme.of(context).textTheme.bodyText2,
+//       //     // ),
+//       //     SizedBox(width: 8),
+//       //     if (false)
+//       //       Stack(
+//       //         children: [
+//       //           Text(
+//       //             "// ${(data.price * data.quantity / totalValue * 100).toStringAsFixed(2)}%",
+//       //             style: Theme.of(context)
+//       //                 .textTheme
+//       //                 .bodyText2
+//       //                 ?.copyWith(color: Colors.white.withOpacity(0.6)),
+//       //           ),
+//       //           Opacity(
+//       //             opacity: 0,
+//       //             child: Text(
+//       //               "// 99.99%",
+//       //               style: Theme.of(context)
+//       //                   .textTheme
+//       //                   .bodyText2
+//       //                   ?.copyWith(color: Colors.white.withOpacity(0.6)),
+//       //             ),
+//       //           ),
+//       //         ],
+//       //       ),
+//       //   ],
+//       // ),
+//     );
+//   }
+// }
 
-  const CardButton2(this.data, this.color, this.totalValue);
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton(
-      style: TextButton.styleFrom(
-        padding: EdgeInsets.all(10.0),
-      ),
-      onPressed: () {},
-      child: Row(
-        children: [
-          Container(
-            width: 15,
-            height: 15,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              color: color,
-            ),
-          ),
-          SizedBox(width: 10),
-          Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  data.name,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.subtitle2,
-                ),
-                Text(
-                  "R\$ ${data.price * data.quantity}",
-                  style: Theme.of(context).textTheme.bodyText2,
-                ),
-              ],
-            ),
-          ),
-          Spacer(),
-          Text(
-            "${(100 * data.price * data.quantity / totalValue).toStringAsFixed(2)} %",
-            style: Theme.of(context).textTheme.bodyText2,
-          ),
-        ],
-      ),
-      // Row(
-      //   mainAxisSize: MainAxisSize.min,
-      //   children: [
-      //     // Text(
-      //     //   "R\$ ${data.price * data.quantity}",
-      //     //   style: Theme.of(context).textTheme.bodyText2,
-      //     // ),
-      //     SizedBox(width: 8),
-      //     if (false)
-      //       Stack(
-      //         children: [
-      //           Text(
-      //             "// ${(data.price * data.quantity / totalValue * 100).toStringAsFixed(2)}%",
-      //             style: Theme.of(context)
-      //                 .textTheme
-      //                 .bodyText2
-      //                 ?.copyWith(color: Colors.white.withOpacity(0.6)),
-      //           ),
-      //           Opacity(
-      //             opacity: 0,
-      //             child: Text(
-      //               "// 99.99%",
-      //               style: Theme.of(context)
-      //                   .textTheme
-      //                   .bodyText2
-      //                   ?.copyWith(color: Colors.white.withOpacity(0.6)),
-      //             ),
-      //           ),
-      //         ],
-      //       ),
-      //   ],
-      // ),
-    );
-  }
-}
-
-class MiniNameDetails extends StatelessWidget {
-  final String title;
-  final Color color;
-
-  const MiniNameDetails(this.title, this.color);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 15,
-          height: 15,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            color: color,
-          ),
-        ),
-        SizedBox(width: 10),
-        Text(
-          title,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.bodyText2,
-        ),
-      ],
-    );
-  }
-}
+// class MiniNameDetails extends StatelessWidget {
+//   final String title;
+//   final Color color;
+//
+//   const MiniNameDetails(this.title, this.color);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       mainAxisSize: MainAxisSize.min,
+//       children: [
+//         Container(
+//           width: 15,
+//           height: 15,
+//           decoration: BoxDecoration(
+//             borderRadius: BorderRadius.circular(5),
+//             color: color,
+//           ),
+//         ),
+//         SizedBox(width: 10),
+//         Text(
+//           title,
+//           overflow: TextOverflow.ellipsis,
+//           style: Theme.of(context).textTheme.bodyText2,
+//         ),
+//       ],
+//     );
+//   }
+// }

@@ -1,0 +1,13 @@
+{
+    "mainFAB": "Add Wallet",
+    "mainEmptyTitle": "Add your first wallet.",
+    "mainEmptySubtitle": "Tap the + to add an account, where you'll be able to add your cash.",
+    "mainDialogTitle":"Add a Wallet",
+    "mainDialogValidator":"Please enter some text",
+    "mainDialogLabel":"Type the name...",
+    "mainDialogSave":"SAVE",
+    "mainDialogCancel":"CANCEL",
+    "@counterAppBarTitle": {
+        "description": "Text shown in the AppBar of the Counter Page"
+    }
+}

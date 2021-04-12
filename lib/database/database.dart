@@ -1,26 +1,17 @@
 // don't import moor_web.dart or moor_flutter/moor_flutter.dart in shared code
+import 'dart:ui';
+
+import 'package:cash_balancer/util/get_color_by_quantile.dart';
 import 'package:moor/moor.dart';
 import 'package:moor_flutter/moor_flutter.dart';
+import 'package:rxdart/rxdart.dart';
 
 export 'database/shared.dart';
 
 part 'database.g.dart';
 
-// @DataClassName('TodoEntry')
-// class Todos extends Table {
-//   IntColumn get id => integer().autoIncrement()();
-//
-//   TextColumn get content => text()();
-//
-//   DateTimeColumn get targetDate => dateTime().nullable()();
-//
-//   IntColumn get category => integer()
-//       .nullable()
-//       .customConstraint('NULLABLE REFERENCES categories(id)')();
-// }
-
-@DataClassName('Kind')
-class AssetKind extends Table {
+@DataClassName('AssetKind')
+class AssetKindTable extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   TextColumn get name => text()();
@@ -28,18 +19,18 @@ class AssetKind extends Table {
   TextColumn get color => text()();
 }
 
-@DataClassName('Group')
-class AssetGroup extends Table {
+@DataClassName('AssetGroup')
+class AssetGroupTable extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   TextColumn get name => text()();
 }
 
-@DataClassName('Data')
-class AssetData extends Table {
+@DataClassName('AssetItem')
+class AssetItemTable extends Table {
   IntColumn get id => integer().autoIncrement()();
 
-  IntColumn get typeId => integer()();
+  IntColumn get kindId => integer()();
 
   IntColumn get groupId => integer()();
 
@@ -52,44 +43,48 @@ class AssetData extends Table {
   RealColumn get targetPercent => real()();
 }
 
-// @DataClassName('Category')
-// class Categories extends Table {
-//   IntColumn get id => integer().autoIncrement()();
-//
-//   TextColumn get description => text().named('desc')();
-// }
+class FullData extends FullDataNullable {
+  const FullData(
+    AssetGroup group,
+    this.item,
+    this.kind,
+  ) : super(group);
 
-// class CategoryWithCount {
-//   CategoryWithCount(this.category, this.count);
-//
-//   // can be null, in which case we count how many entries don't have a category
-//   final Category category;
-//   final int count; // amount of entries in this category
-// }
-//
-// class EntryWithCategory {
-//   EntryWithCategory(this.entry, this.category);
-//
-//   final TodoEntry entry;
-//   final Category category;
-// }
+  final AssetItem item;
+  final AssetKind kind;
+}
+
+class ItemKindData {
+  const ItemKindData(
+    this.item,
+    this.kind,
+  );
+
+  final AssetItem item;
+  final AssetKind kind;
+}
+
+class FullDataNullable {
+  const FullDataNullable(this.group);
+
+  final AssetGroup group;
+}
+
+class FullDataExtended {
+  const FullDataExtended(this.groupedData, this.colors, this.fullData);
+
+  final Map<int, List<FullData>> groupedData;
+  final List<FullData> fullData;
+  final Map<FullData, Color> colors;
+}
 
 @UseMoor(
-  tables: [AssetKind, AssetGroup, AssetData],
+  tables: [AssetKindTable, AssetGroupTable, AssetItemTable],
   queries: {
     '_resetCategory': 'UPDATE todos SET category = NULL WHERE category = ?',
-    'getGroup': 'SELECT * FROM asset_group',
-    'getKind': 'SELECT * FROM asset_kind,',
-    'getData': 'SELECT * FROM asset_data',
-    // '_categoriesWithCount': '''
-    //  SELECT
-    //    c.id,
-    //    c.desc,
-    //    (SELECT COUNT(*) FROM todos WHERE category = c.id) AS amount
-    //  FROM categories c
-    //  UNION ALL
-    //  SELECT null, null, (SELECT COUNT(*) FROM todos WHERE category IS NULL)
-    //  ''',
+    'getGroup': 'SELECT * FROM asset_group_table',
+    'getKind': 'SELECT * FROM asset_kind_table,',
+    'getData': 'SELECT * FROM asset_item_table',
   },
 )
 class Database extends _$Database {
@@ -101,10 +96,10 @@ class Database extends _$Database {
   @override
   MigrationStrategy get migration {
     return MigrationStrategy(
-      onCreate: (Migrator m) {
+      onCreate: (m) {
         return m.createAll();
       },
-      onUpgrade: (Migrator m, int from, int to) async {
+      onUpgrade: (m, from, to) async {
         // if (from == 1) {
         //   await m.addColumn(todos, todos.targetDate);
         // }
@@ -146,26 +141,160 @@ class Database extends _$Database {
 //
 // /// Watches all entries in the given [category]. If the category is null, all
 // /// entries will be shown instead.
-// Stream<List<EntryWithCategory>> watchEntriesInCategory(Category category) {
-//   final query = select(todos).join(
-//       [leftOuterJoin(categories, categories.id.equalsExp(todos.category))]);
-//
-//   if (category != null) {
-//     query.where(categories.id.equals(category.id));
-//   } else {
-//     query.where(categories.id.isNull());
-//   }
-//
-//   return query.watch().map((rows) {
-//     // read both the entry and the associated category for each row
-//     return rows.map((row) {
-//       return EntryWithCategory(
-//         row.readTable(todos),
-//         row.readTable(categories),
-//       );
-//     }).toList();
-//   });
-// }
+
+  Stream<Map<AssetGroup, List<ItemKindData>>> watchGroups() {
+    final groupQuery = select(assetGroupTable);
+
+    // These can be empty.
+    final itemsQuery = select(assetItemTable)
+        .join([
+          leftOuterJoin(
+            assetKindTable,
+            assetKindTable.id.equalsExp(assetItemTable.kindId),
+          ),
+        ])
+        .watch()
+        .map(
+          (rows) => rows
+              .map(
+                (row) => ItemKindData(
+                  row.readTable(assetItemTable),
+                  row.readTable(assetKindTable),
+                ),
+              )
+              .toList(),
+        );
+
+    return Rx.combineLatest2(groupQuery.watch(), itemsQuery,
+        // ignore: avoid_types_on_closure_parameters
+        (List<AssetGroup> a, List<ItemKindData> b) {
+      final map = <AssetGroup, List<ItemKindData>>{};
+
+      for (final group in a) {
+        map[group] =
+            b.where((element) => element.item.groupId == group.id).toList();
+      }
+
+      return map;
+    });
+  }
+
+  Stream<List<FullData>> watchItems() {
+    final query2 = select(assetItemTable).join([
+      leftOuterJoin(
+        assetGroupTable,
+        assetGroupTable.id.equalsExp(assetItemTable.groupId),
+      ),
+      leftOuterJoin(
+        assetKindTable,
+        assetKindTable.id.equalsExp(assetItemTable.kindId),
+      ),
+    ]);
+
+    query2.get().then((value) {
+      print("query2: ${value}");
+    });
+
+    final query3 = select(assetGroupTable);
+
+    query3.get().then((value) {
+      print("query3: ${value}");
+    });
+
+    final query = select(assetItemTable).join([
+      leftOuterJoin(
+        assetGroupTable,
+        assetGroupTable.id.equalsExp(assetItemTable.groupId),
+      ),
+      leftOuterJoin(
+        assetKindTable,
+        assetKindTable.id.equalsExp(assetItemTable.kindId),
+      ),
+    ]);
+
+    return query.watch().map((rows) {
+      // read both the entry and the associated category for each row
+      return rows.map((row) {
+        return FullData(
+          row.readTable(assetGroupTable),
+          row.readTable(assetItemTable),
+          row.readTable(assetKindTable),
+        );
+      }).toList();
+    });
+  }
+
+  // Stream<FullDataExtended> watchItemsGroupedHome() {
+  //   return watchGroups().map((data) {
+  //     final List<FullDataNullable> sortedData = [...data]..sort((a, b) {
+  //         return (b.item.price * b.item.quantity)
+  //             .compareTo((a.item.price * a.item.quantity));
+  //       });
+  //
+  //     final Map<int, List<FullData>> groupedData = groupByKind(sortedData);
+  //
+  //     final Map<FullData, Color> colors =
+  //         getColorByQuantile(groupedData, sortedData);
+  //
+  //     return FullDataExtended(groupedData, colors, sortedData);
+  //   });
+  // }
+
+  Stream<FullDataExtended> watchItemsGrouped() {
+    return watchItems().map((data) {
+      final List<FullData> sortedData = [...data]..sort((a, b) {
+          return (b.item.price * b.item.quantity)
+              .compareTo((a.item.price * a.item.quantity));
+        });
+
+      final Map<int, List<FullData>> groupedData = groupByKind(sortedData);
+
+      final Map<FullData, Color> colors =
+          getColorByQuantile(groupedData, sortedData);
+
+      return FullDataExtended(groupedData, colors, sortedData);
+    });
+  }
+
+  Map<int, List<FullData>> groupByKind(List<FullData> data) {
+    final groupedList = <int, List<FullData>>{};
+
+    for (int i = 0; i < data.length; i++) {
+      final groupPosition = groupedList[data[i].item.kindId];
+      if (groupPosition != null) {
+        groupPosition.add(data[i]);
+      } else {
+        groupedList[data[i].item.kindId] = [data[i]];
+      }
+    }
+
+    return groupedList;
+  }
+
+  Stream<List<FullData>> watchMainGroups() {
+    final query = select(assetGroupTable).join([
+      leftOuterJoin(
+        assetItemTable,
+        assetGroupTable.id.equalsExp(assetItemTable.groupId),
+      ),
+      leftOuterJoin(
+        assetKindTable,
+        assetKindTable.id.equalsExp(assetItemTable.kindId),
+      ),
+    ]);
+
+    return query.watch().map((rows) {
+      // read both the entry and the associated category for each row
+      return rows.map((row) {
+        return FullData(
+          row.readTable(assetGroupTable),
+          row.readTable(assetItemTable),
+          row.readTable(assetKindTable),
+        );
+      }).toList();
+    });
+  }
+
 //
 // Future createEntry(TodosCompanion entry) {
 //   return into(todos).insert(entry);
@@ -186,9 +315,14 @@ class Database extends _$Database {
 //       .insert(CategoriesCompanion(description: Value(description)));
 // }
   Future<int> createGroup(String description) {
-    return into(assetGroup)
-        .insert(AssetGroupCompanion.insert(name: description));
+    return into(assetGroupTable)
+        .insert(AssetGroupTableCompanion.insert(name: description));
   }
+
+  Future<bool> editGroup(AssetGroup group) {
+    return update(assetGroupTable).replace(group);
+  }
+
 //
 // Future deleteCategory(Category category) {
 //   return transaction<dynamic>(() async {

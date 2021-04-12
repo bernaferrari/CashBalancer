@@ -1,5 +1,30 @@
 import 'dart:ui';
 
+final tailwindColorsNames = [
+  'rose',
+  'pink',
+  'fuchsia',
+  'purple',
+  'violet',
+  'indigo',
+  'blue',
+  'lightBlue',
+  'cyan',
+  'teal',
+  'emerald',
+  'green',
+  'lime',
+  'yellow',
+  'amber',
+  'orange',
+  'red',
+  'warmGray',
+  'trueGray',
+  'gray',
+  'coolGray',
+  'blueGray',
+];
+
 const tailwindColors = <String, Map<int, Color>>{
   'rose': {
     50: Color(0xfffff1f2),

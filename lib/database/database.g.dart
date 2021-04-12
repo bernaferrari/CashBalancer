@@ -7,17 +7,17 @@ part of 'database.dart';
 // **************************************************************************
 
 // ignore_for_file: unnecessary_brace_in_string_interps, unnecessary_this
-class Kind extends DataClass implements Insertable<Kind> {
+class AssetKind extends DataClass implements Insertable<AssetKind> {
   final int id;
   final String name;
   final String color;
-  Kind({required this.id, required this.name, required this.color});
-  factory Kind.fromData(Map<String, dynamic> data, GeneratedDatabase db,
+  AssetKind({required this.id, required this.name, required this.color});
+  factory AssetKind.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String? prefix}) {
     final effectivePrefix = prefix ?? '';
     final intType = db.typeSystem.forDartType<int>();
     final stringType = db.typeSystem.forDartType<String>();
-    return Kind(
+    return AssetKind(
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
       name: stringType.mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
       color:
@@ -33,18 +33,18 @@ class Kind extends DataClass implements Insertable<Kind> {
     return map;
   }
 
-  AssetKindCompanion toCompanion(bool nullToAbsent) {
-    return AssetKindCompanion(
+  AssetKindTableCompanion toCompanion(bool nullToAbsent) {
+    return AssetKindTableCompanion(
       id: Value(id),
       name: Value(name),
       color: Value(color),
     );
   }
 
-  factory Kind.fromJson(Map<String, dynamic> json,
+  factory AssetKind.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= moorRuntimeOptions.defaultSerializer;
-    return Kind(
+    return AssetKind(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       color: serializer.fromJson<String>(json['color']),
@@ -60,14 +60,14 @@ class Kind extends DataClass implements Insertable<Kind> {
     };
   }
 
-  Kind copyWith({int? id, String? name, String? color}) => Kind(
+  AssetKind copyWith({int? id, String? name, String? color}) => AssetKind(
         id: id ?? this.id,
         name: name ?? this.name,
         color: color ?? this.color,
       );
   @override
   String toString() {
-    return (StringBuffer('Kind(')
+    return (StringBuffer('AssetKind(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('color: $color')
@@ -81,28 +81,28 @@ class Kind extends DataClass implements Insertable<Kind> {
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
-      (other is Kind &&
+      (other is AssetKind &&
           other.id == this.id &&
           other.name == this.name &&
           other.color == this.color);
 }
 
-class AssetKindCompanion extends UpdateCompanion<Kind> {
+class AssetKindTableCompanion extends UpdateCompanion<AssetKind> {
   final Value<int> id;
   final Value<String> name;
   final Value<String> color;
-  const AssetKindCompanion({
+  const AssetKindTableCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.color = const Value.absent(),
   });
-  AssetKindCompanion.insert({
+  AssetKindTableCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     required String color,
   })   : name = Value(name),
         color = Value(color);
-  static Insertable<Kind> custom({
+  static Insertable<AssetKind> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? color,
@@ -114,9 +114,9 @@ class AssetKindCompanion extends UpdateCompanion<Kind> {
     });
   }
 
-  AssetKindCompanion copyWith(
+  AssetKindTableCompanion copyWith(
       {Value<int>? id, Value<String>? name, Value<String>? color}) {
-    return AssetKindCompanion(
+    return AssetKindTableCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       color: color ?? this.color,
@@ -140,7 +140,7 @@ class AssetKindCompanion extends UpdateCompanion<Kind> {
 
   @override
   String toString() {
-    return (StringBuffer('AssetKindCompanion(')
+    return (StringBuffer('AssetKindTableCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('color: $color')
@@ -149,10 +149,11 @@ class AssetKindCompanion extends UpdateCompanion<Kind> {
   }
 }
 
-class $AssetKindTable extends AssetKind with TableInfo<$AssetKindTable, Kind> {
+class $AssetKindTableTable extends AssetKindTable
+    with TableInfo<$AssetKindTableTable, AssetKind> {
   final GeneratedDatabase _db;
   final String? _alias;
-  $AssetKindTable(this._db, [this._alias]);
+  $AssetKindTableTable(this._db, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedIntColumn id = _constructId();
@@ -186,13 +187,13 @@ class $AssetKindTable extends AssetKind with TableInfo<$AssetKindTable, Kind> {
   @override
   List<GeneratedColumn> get $columns => [id, name, color];
   @override
-  $AssetKindTable get asDslTable => this;
+  $AssetKindTableTable get asDslTable => this;
   @override
-  String get $tableName => _alias ?? 'asset_kind';
+  String get $tableName => _alias ?? 'asset_kind_table';
   @override
-  final String actualTableName = 'asset_kind';
+  final String actualTableName = 'asset_kind_table';
   @override
-  VerificationContext validateIntegrity(Insertable<Kind> instance,
+  VerificationContext validateIntegrity(Insertable<AssetKind> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -217,27 +218,27 @@ class $AssetKindTable extends AssetKind with TableInfo<$AssetKindTable, Kind> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Kind map(Map<String, dynamic> data, {String? tablePrefix}) {
+  AssetKind map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
-    return Kind.fromData(data, _db, prefix: effectivePrefix);
+    return AssetKind.fromData(data, _db, prefix: effectivePrefix);
   }
 
   @override
-  $AssetKindTable createAlias(String alias) {
-    return $AssetKindTable(_db, alias);
+  $AssetKindTableTable createAlias(String alias) {
+    return $AssetKindTableTable(_db, alias);
   }
 }
 
-class Group extends DataClass implements Insertable<Group> {
+class AssetGroup extends DataClass implements Insertable<AssetGroup> {
   final int id;
   final String name;
-  Group({required this.id, required this.name});
-  factory Group.fromData(Map<String, dynamic> data, GeneratedDatabase db,
+  AssetGroup({required this.id, required this.name});
+  factory AssetGroup.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String? prefix}) {
     final effectivePrefix = prefix ?? '';
     final intType = db.typeSystem.forDartType<int>();
     final stringType = db.typeSystem.forDartType<String>();
-    return Group(
+    return AssetGroup(
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
       name: stringType.mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
     );
@@ -250,17 +251,17 @@ class Group extends DataClass implements Insertable<Group> {
     return map;
   }
 
-  AssetGroupCompanion toCompanion(bool nullToAbsent) {
-    return AssetGroupCompanion(
+  AssetGroupTableCompanion toCompanion(bool nullToAbsent) {
+    return AssetGroupTableCompanion(
       id: Value(id),
       name: Value(name),
     );
   }
 
-  factory Group.fromJson(Map<String, dynamic> json,
+  factory AssetGroup.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= moorRuntimeOptions.defaultSerializer;
-    return Group(
+    return AssetGroup(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
     );
@@ -274,13 +275,13 @@ class Group extends DataClass implements Insertable<Group> {
     };
   }
 
-  Group copyWith({int? id, String? name}) => Group(
+  AssetGroup copyWith({int? id, String? name}) => AssetGroup(
         id: id ?? this.id,
         name: name ?? this.name,
       );
   @override
   String toString() {
-    return (StringBuffer('Group(')
+    return (StringBuffer('AssetGroup(')
           ..write('id: $id, ')
           ..write('name: $name')
           ..write(')'))
@@ -292,21 +293,21 @@ class Group extends DataClass implements Insertable<Group> {
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
-      (other is Group && other.id == this.id && other.name == this.name);
+      (other is AssetGroup && other.id == this.id && other.name == this.name);
 }
 
-class AssetGroupCompanion extends UpdateCompanion<Group> {
+class AssetGroupTableCompanion extends UpdateCompanion<AssetGroup> {
   final Value<int> id;
   final Value<String> name;
-  const AssetGroupCompanion({
+  const AssetGroupTableCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
   });
-  AssetGroupCompanion.insert({
+  AssetGroupTableCompanion.insert({
     this.id = const Value.absent(),
     required String name,
   }) : name = Value(name);
-  static Insertable<Group> custom({
+  static Insertable<AssetGroup> custom({
     Expression<int>? id,
     Expression<String>? name,
   }) {
@@ -316,8 +317,8 @@ class AssetGroupCompanion extends UpdateCompanion<Group> {
     });
   }
 
-  AssetGroupCompanion copyWith({Value<int>? id, Value<String>? name}) {
-    return AssetGroupCompanion(
+  AssetGroupTableCompanion copyWith({Value<int>? id, Value<String>? name}) {
+    return AssetGroupTableCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
     );
@@ -337,7 +338,7 @@ class AssetGroupCompanion extends UpdateCompanion<Group> {
 
   @override
   String toString() {
-    return (StringBuffer('AssetGroupCompanion(')
+    return (StringBuffer('AssetGroupTableCompanion(')
           ..write('id: $id, ')
           ..write('name: $name')
           ..write(')'))
@@ -345,11 +346,11 @@ class AssetGroupCompanion extends UpdateCompanion<Group> {
   }
 }
 
-class $AssetGroupTable extends AssetGroup
-    with TableInfo<$AssetGroupTable, Group> {
+class $AssetGroupTableTable extends AssetGroupTable
+    with TableInfo<$AssetGroupTableTable, AssetGroup> {
   final GeneratedDatabase _db;
   final String? _alias;
-  $AssetGroupTable(this._db, [this._alias]);
+  $AssetGroupTableTable(this._db, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedIntColumn id = _constructId();
@@ -372,13 +373,13 @@ class $AssetGroupTable extends AssetGroup
   @override
   List<GeneratedColumn> get $columns => [id, name];
   @override
-  $AssetGroupTable get asDslTable => this;
+  $AssetGroupTableTable get asDslTable => this;
   @override
-  String get $tableName => _alias ?? 'asset_group';
+  String get $tableName => _alias ?? 'asset_group_table';
   @override
-  final String actualTableName = 'asset_group';
+  final String actualTableName = 'asset_group_table';
   @override
-  VerificationContext validateIntegrity(Insertable<Group> instance,
+  VerificationContext validateIntegrity(Insertable<AssetGroup> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -397,43 +398,43 @@ class $AssetGroupTable extends AssetGroup
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Group map(Map<String, dynamic> data, {String? tablePrefix}) {
+  AssetGroup map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
-    return Group.fromData(data, _db, prefix: effectivePrefix);
+    return AssetGroup.fromData(data, _db, prefix: effectivePrefix);
   }
 
   @override
-  $AssetGroupTable createAlias(String alias) {
-    return $AssetGroupTable(_db, alias);
+  $AssetGroupTableTable createAlias(String alias) {
+    return $AssetGroupTableTable(_db, alias);
   }
 }
 
-class Data extends DataClass implements Insertable<Data> {
+class AssetItem extends DataClass implements Insertable<AssetItem> {
   final int id;
-  final int typeId;
+  final int kindId;
   final int groupId;
   final String name;
   final double quantity;
   final double price;
   final double targetPercent;
-  Data(
+  AssetItem(
       {required this.id,
-      required this.typeId,
+      required this.kindId,
       required this.groupId,
       required this.name,
       required this.quantity,
       required this.price,
       required this.targetPercent});
-  factory Data.fromData(Map<String, dynamic> data, GeneratedDatabase db,
+  factory AssetItem.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String? prefix}) {
     final effectivePrefix = prefix ?? '';
     final intType = db.typeSystem.forDartType<int>();
     final stringType = db.typeSystem.forDartType<String>();
     final doubleType = db.typeSystem.forDartType<double>();
-    return Data(
+    return AssetItem(
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      typeId:
-          intType.mapFromDatabaseResponse(data['${effectivePrefix}type_id'])!,
+      kindId:
+          intType.mapFromDatabaseResponse(data['${effectivePrefix}kind_id'])!,
       groupId:
           intType.mapFromDatabaseResponse(data['${effectivePrefix}group_id'])!,
       name: stringType.mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
@@ -449,7 +450,7 @@ class Data extends DataClass implements Insertable<Data> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['type_id'] = Variable<int>(typeId);
+    map['kind_id'] = Variable<int>(kindId);
     map['group_id'] = Variable<int>(groupId);
     map['name'] = Variable<String>(name);
     map['quantity'] = Variable<double>(quantity);
@@ -458,10 +459,10 @@ class Data extends DataClass implements Insertable<Data> {
     return map;
   }
 
-  AssetDataCompanion toCompanion(bool nullToAbsent) {
-    return AssetDataCompanion(
+  AssetItemTableCompanion toCompanion(bool nullToAbsent) {
+    return AssetItemTableCompanion(
       id: Value(id),
-      typeId: Value(typeId),
+      kindId: Value(kindId),
       groupId: Value(groupId),
       name: Value(name),
       quantity: Value(quantity),
@@ -470,12 +471,12 @@ class Data extends DataClass implements Insertable<Data> {
     );
   }
 
-  factory Data.fromJson(Map<String, dynamic> json,
+  factory AssetItem.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= moorRuntimeOptions.defaultSerializer;
-    return Data(
+    return AssetItem(
       id: serializer.fromJson<int>(json['id']),
-      typeId: serializer.fromJson<int>(json['typeId']),
+      kindId: serializer.fromJson<int>(json['kindId']),
       groupId: serializer.fromJson<int>(json['groupId']),
       name: serializer.fromJson<String>(json['name']),
       quantity: serializer.fromJson<double>(json['quantity']),
@@ -488,7 +489,7 @@ class Data extends DataClass implements Insertable<Data> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'typeId': serializer.toJson<int>(typeId),
+      'kindId': serializer.toJson<int>(kindId),
       'groupId': serializer.toJson<int>(groupId),
       'name': serializer.toJson<String>(name),
       'quantity': serializer.toJson<double>(quantity),
@@ -497,17 +498,17 @@ class Data extends DataClass implements Insertable<Data> {
     };
   }
 
-  Data copyWith(
+  AssetItem copyWith(
           {int? id,
-          int? typeId,
+          int? kindId,
           int? groupId,
           String? name,
           double? quantity,
           double? price,
           double? targetPercent}) =>
-      Data(
+      AssetItem(
         id: id ?? this.id,
-        typeId: typeId ?? this.typeId,
+        kindId: kindId ?? this.kindId,
         groupId: groupId ?? this.groupId,
         name: name ?? this.name,
         quantity: quantity ?? this.quantity,
@@ -516,9 +517,9 @@ class Data extends DataClass implements Insertable<Data> {
       );
   @override
   String toString() {
-    return (StringBuffer('Data(')
+    return (StringBuffer('AssetItem(')
           ..write('id: $id, ')
-          ..write('typeId: $typeId, ')
+          ..write('kindId: $kindId, ')
           ..write('groupId: $groupId, ')
           ..write('name: $name, ')
           ..write('quantity: $quantity, ')
@@ -532,7 +533,7 @@ class Data extends DataClass implements Insertable<Data> {
   int get hashCode => $mrjf($mrjc(
       id.hashCode,
       $mrjc(
-          typeId.hashCode,
+          kindId.hashCode,
           $mrjc(
               groupId.hashCode,
               $mrjc(
@@ -542,9 +543,9 @@ class Data extends DataClass implements Insertable<Data> {
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
-      (other is Data &&
+      (other is AssetItem &&
           other.id == this.id &&
-          other.typeId == this.typeId &&
+          other.kindId == this.kindId &&
           other.groupId == this.groupId &&
           other.name == this.name &&
           other.quantity == this.quantity &&
@@ -552,40 +553,40 @@ class Data extends DataClass implements Insertable<Data> {
           other.targetPercent == this.targetPercent);
 }
 
-class AssetDataCompanion extends UpdateCompanion<Data> {
+class AssetItemTableCompanion extends UpdateCompanion<AssetItem> {
   final Value<int> id;
-  final Value<int> typeId;
+  final Value<int> kindId;
   final Value<int> groupId;
   final Value<String> name;
   final Value<double> quantity;
   final Value<double> price;
   final Value<double> targetPercent;
-  const AssetDataCompanion({
+  const AssetItemTableCompanion({
     this.id = const Value.absent(),
-    this.typeId = const Value.absent(),
+    this.kindId = const Value.absent(),
     this.groupId = const Value.absent(),
     this.name = const Value.absent(),
     this.quantity = const Value.absent(),
     this.price = const Value.absent(),
     this.targetPercent = const Value.absent(),
   });
-  AssetDataCompanion.insert({
+  AssetItemTableCompanion.insert({
     this.id = const Value.absent(),
-    required int typeId,
+    required int kindId,
     required int groupId,
     required String name,
     required double quantity,
     required double price,
     required double targetPercent,
-  })   : typeId = Value(typeId),
+  })   : kindId = Value(kindId),
         groupId = Value(groupId),
         name = Value(name),
         quantity = Value(quantity),
         price = Value(price),
         targetPercent = Value(targetPercent);
-  static Insertable<Data> custom({
+  static Insertable<AssetItem> custom({
     Expression<int>? id,
-    Expression<int>? typeId,
+    Expression<int>? kindId,
     Expression<int>? groupId,
     Expression<String>? name,
     Expression<double>? quantity,
@@ -594,7 +595,7 @@ class AssetDataCompanion extends UpdateCompanion<Data> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (typeId != null) 'type_id': typeId,
+      if (kindId != null) 'kind_id': kindId,
       if (groupId != null) 'group_id': groupId,
       if (name != null) 'name': name,
       if (quantity != null) 'quantity': quantity,
@@ -603,17 +604,17 @@ class AssetDataCompanion extends UpdateCompanion<Data> {
     });
   }
 
-  AssetDataCompanion copyWith(
+  AssetItemTableCompanion copyWith(
       {Value<int>? id,
-      Value<int>? typeId,
+      Value<int>? kindId,
       Value<int>? groupId,
       Value<String>? name,
       Value<double>? quantity,
       Value<double>? price,
       Value<double>? targetPercent}) {
-    return AssetDataCompanion(
+    return AssetItemTableCompanion(
       id: id ?? this.id,
-      typeId: typeId ?? this.typeId,
+      kindId: kindId ?? this.kindId,
       groupId: groupId ?? this.groupId,
       name: name ?? this.name,
       quantity: quantity ?? this.quantity,
@@ -628,8 +629,8 @@ class AssetDataCompanion extends UpdateCompanion<Data> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
-    if (typeId.present) {
-      map['type_id'] = Variable<int>(typeId.value);
+    if (kindId.present) {
+      map['kind_id'] = Variable<int>(kindId.value);
     }
     if (groupId.present) {
       map['group_id'] = Variable<int>(groupId.value);
@@ -651,9 +652,9 @@ class AssetDataCompanion extends UpdateCompanion<Data> {
 
   @override
   String toString() {
-    return (StringBuffer('AssetDataCompanion(')
+    return (StringBuffer('AssetItemTableCompanion(')
           ..write('id: $id, ')
-          ..write('typeId: $typeId, ')
+          ..write('kindId: $kindId, ')
           ..write('groupId: $groupId, ')
           ..write('name: $name, ')
           ..write('quantity: $quantity, ')
@@ -664,10 +665,11 @@ class AssetDataCompanion extends UpdateCompanion<Data> {
   }
 }
 
-class $AssetDataTable extends AssetData with TableInfo<$AssetDataTable, Data> {
+class $AssetItemTableTable extends AssetItemTable
+    with TableInfo<$AssetItemTableTable, AssetItem> {
   final GeneratedDatabase _db;
   final String? _alias;
-  $AssetDataTable(this._db, [this._alias]);
+  $AssetItemTableTable(this._db, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedIntColumn id = _constructId();
@@ -676,12 +678,12 @@ class $AssetDataTable extends AssetData with TableInfo<$AssetDataTable, Data> {
         hasAutoIncrement: true, declaredAsPrimaryKey: true);
   }
 
-  final VerificationMeta _typeIdMeta = const VerificationMeta('typeId');
+  final VerificationMeta _kindIdMeta = const VerificationMeta('kindId');
   @override
-  late final GeneratedIntColumn typeId = _constructTypeId();
-  GeneratedIntColumn _constructTypeId() {
+  late final GeneratedIntColumn kindId = _constructKindId();
+  GeneratedIntColumn _constructKindId() {
     return GeneratedIntColumn(
-      'type_id',
+      'kind_id',
       $tableName,
       false,
     );
@@ -745,26 +747,26 @@ class $AssetDataTable extends AssetData with TableInfo<$AssetDataTable, Data> {
 
   @override
   List<GeneratedColumn> get $columns =>
-      [id, typeId, groupId, name, quantity, price, targetPercent];
+      [id, kindId, groupId, name, quantity, price, targetPercent];
   @override
-  $AssetDataTable get asDslTable => this;
+  $AssetItemTableTable get asDslTable => this;
   @override
-  String get $tableName => _alias ?? 'asset_data';
+  String get $tableName => _alias ?? 'asset_item_table';
   @override
-  final String actualTableName = 'asset_data';
+  final String actualTableName = 'asset_item_table';
   @override
-  VerificationContext validateIntegrity(Insertable<Data> instance,
+  VerificationContext validateIntegrity(Insertable<AssetItem> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('type_id')) {
-      context.handle(_typeIdMeta,
-          typeId.isAcceptableOrUnknown(data['type_id']!, _typeIdMeta));
+    if (data.containsKey('kind_id')) {
+      context.handle(_kindIdMeta,
+          kindId.isAcceptableOrUnknown(data['kind_id']!, _kindIdMeta));
     } else if (isInserting) {
-      context.missing(_typeIdMeta);
+      context.missing(_kindIdMeta);
     }
     if (data.containsKey('group_id')) {
       context.handle(_groupIdMeta,
@@ -804,22 +806,23 @@ class $AssetDataTable extends AssetData with TableInfo<$AssetDataTable, Data> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Data map(Map<String, dynamic> data, {String? tablePrefix}) {
+  AssetItem map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
-    return Data.fromData(data, _db, prefix: effectivePrefix);
+    return AssetItem.fromData(data, _db, prefix: effectivePrefix);
   }
 
   @override
-  $AssetDataTable createAlias(String alias) {
-    return $AssetDataTable(_db, alias);
+  $AssetItemTableTable createAlias(String alias) {
+    return $AssetItemTableTable(_db, alias);
   }
 }
 
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
-  late final $AssetKindTable assetKind = $AssetKindTable(this);
-  late final $AssetGroupTable assetGroup = $AssetGroupTable(this);
-  late final $AssetDataTable assetData = $AssetDataTable(this);
+  late final $AssetKindTableTable assetKindTable = $AssetKindTableTable(this);
+  late final $AssetGroupTableTable assetGroupTable =
+      $AssetGroupTableTable(this);
+  late final $AssetItemTableTable assetItemTable = $AssetItemTableTable(this);
   Future<int> _resetCategory(String var1) {
     return customUpdate(
       'UPDATE todos SET category = NULL WHERE category = ?',
@@ -829,19 +832,21 @@ abstract class _$Database extends GeneratedDatabase {
     );
   }
 
-  Selectable<Group> getGroup() {
-    return customSelect('SELECT * FROM asset_group',
-        variables: [], readsFrom: {assetGroup}).map(assetGroup.mapFromRow);
+  Selectable<AssetGroup> getGroup() {
+    return customSelect('SELECT * FROM asset_group_table',
+        variables: [],
+        readsFrom: {assetGroupTable}).map(assetGroupTable.mapFromRow);
   }
 
-  Selectable<Data> getData() {
-    return customSelect('SELECT * FROM asset_data',
-        variables: [], readsFrom: {assetData}).map(assetData.mapFromRow);
+  Selectable<AssetItem> getData() {
+    return customSelect('SELECT * FROM asset_item_table',
+        variables: [],
+        readsFrom: {assetItemTable}).map(assetItemTable.mapFromRow);
   }
 
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [assetKind, assetGroup, assetData];
+      [assetKindTable, assetGroupTable, assetItemTable];
 }
