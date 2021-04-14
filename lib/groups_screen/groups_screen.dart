@@ -9,9 +9,68 @@ import '../l10n/l10n.dart';
 import '../util/retrieve_spaced_list.dart';
 import '../util/row_column_spacer.dart';
 import '../util/tailwind_colors.dart';
-import 'home_input_dialog.dart';
+import 'groups_input_dialog.dart';
 
-class HomeScreen extends StatelessWidget {
+class WhenEmptyCard extends StatelessWidget {
+  const WhenEmptyCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        padding: EdgeInsets.all(24),
+        margin: EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            width: 2,
+            color: Theme.of(context).colorScheme.secondary,
+          ),
+        ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 300),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                icon,
+                size: 32,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+              SizedBox(height: 8),
+              Text(
+                title,
+                style: GoogleFonts.rubik(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                subtitle,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyText1!
+                    .copyWith(fontSize: 14),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class GroupsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,58 +93,19 @@ class HomeScreen extends StatelessWidget {
         label: Text(AppLocalizations.of(context)!.mainFAB),
       ),
       backgroundColor: Theme.of(context).colorScheme.background,
-      body: StreamBuilder<Object>(
+      body: StreamBuilder<Map<AssetGroup, List<ItemKindData>>>(
           stream: BlocProvider.of<DataBloc>(context).db.watchGroups(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              final listData =
-                  snapshot.data as Map<AssetGroup, List<ItemKindData>>;
+              final listData = snapshot.data!;
 
               final listDataEntries = listData.entries.toList();
 
               if (listData.isEmpty) {
-                return Center(
-                  child: Container(
-                    padding: EdgeInsets.all(24),
-                    margin: EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        width: 2,
-                        color: Theme.of(context).colorScheme.secondary,
-                      ),
-                    ),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: 300),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.account_balance,
-                            size: 32,
-                            color: Theme.of(context).colorScheme.secondary,
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            AppLocalizations.of(context)!.mainEmptyTitle,
-                            style: GoogleFonts.rubik(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            AppLocalizations.of(context)!.mainEmptySubtitle,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText1!
-                                .copyWith(fontSize: 14),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                return WhenEmptyCard(
+                  title: AppLocalizations.of(context)!.mainEmptyTitle,
+                  subtitle: AppLocalizations.of(context)!.mainEmptySubtitle,
+                  icon: Icons.account_balance,
                 );
               }
 
@@ -99,9 +119,8 @@ class HomeScreen extends StatelessWidget {
                     return OpenContainer<bool>(
                       transitionType: ContainerTransitionType.fadeThrough,
                       openBuilder: (context, _) {
-                        return Text("EMPTY");
-
-                        // return DetailsPage(d.name, data[0].data);
+                        return Text("Expanded");
+                        // return DetailsPage(data.key.id);
                       },
                       onClosed: (_) {},
                       closedColor: Colors.transparent,

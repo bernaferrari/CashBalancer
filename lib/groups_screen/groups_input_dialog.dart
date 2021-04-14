@@ -81,7 +81,6 @@ class _HomeInputDialogState extends State<HomeInputDialog> {
                   style: GoogleFonts.rubik(),
                 ),
                 onPressed: () {
-                  widget.onSavePressed?.call(textEditingController.text);
                   Navigator.of(context).pop();
                 },
               ),

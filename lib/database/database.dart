@@ -179,32 +179,14 @@ class Database extends _$Database {
     });
   }
 
-  Stream<List<FullData>> watchItems() {
-    final query2 = select(assetItemTable).join([
+  Stream<List<FullData>> watchItems(int groupId) {
+    final queryFiltered = select(assetGroupTable)
+      ..where((group) => group.id.equals(groupId));
+
+    final query = queryFiltered.join([
       leftOuterJoin(
-        assetGroupTable,
-        assetGroupTable.id.equalsExp(assetItemTable.groupId),
-      ),
-      leftOuterJoin(
-        assetKindTable,
-        assetKindTable.id.equalsExp(assetItemTable.kindId),
-      ),
-    ]);
-
-    query2.get().then((value) {
-      print("query2: ${value}");
-    });
-
-    final query3 = select(assetGroupTable);
-
-    query3.get().then((value) {
-      print("query3: ${value}");
-    });
-
-    final query = select(assetItemTable).join([
-      leftOuterJoin(
-        assetGroupTable,
-        assetGroupTable.id.equalsExp(assetItemTable.groupId),
+        assetItemTable,
+        assetItemTable.groupId.equalsExp(assetGroupTable.id),
       ),
       leftOuterJoin(
         assetKindTable,
@@ -240,8 +222,8 @@ class Database extends _$Database {
   //   });
   // }
 
-  Stream<FullDataExtended> watchItemsGrouped() {
-    return watchItems().map((data) {
+  Stream<FullDataExtended> watchItemsGrouped(int groupId) {
+    return watchItems(groupId).map((data) {
       final List<FullData> sortedData = [...data]..sort((a, b) {
           return (b.item.price * b.item.quantity)
               .compareTo((a.item.price * a.item.quantity));

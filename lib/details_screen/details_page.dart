@@ -1,26 +1,46 @@
 import 'dart:ui';
 
+import 'package:cash_balancer/groups_screen/groups_screen.dart';
+import 'package:cash_balancer/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'blocs/data_bloc.dart';
-import 'database/database.dart';
-import 'util/retrieve_spaced_list.dart';
-import 'util/row_column_spacer.dart';
-import 'util/tailwind_colors.dart';
-import 'widgets/circle_percentage_painter.dart';
-import 'widgets/input_dialog_group.dart';
+import '../blocs/data_bloc.dart';
+import '../database/database.dart';
+import '../util/retrieve_spaced_list.dart';
+import '../util/row_column_spacer.dart';
+import '../util/tailwind_colors.dart';
+import '../widgets/circle_percentage_painter.dart';
+import '../widgets/input_dialog_group.dart';
 
 extension Percent on double {
   String toPercent() => (this * 100).toStringAsFixed(0);
 }
 
 class DetailsPage extends StatelessWidget {
-  final FullDataExtended data;
   final int id;
 
-  const DetailsPage(this.id, this.data);
+  const DetailsPage(this.id);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<FullDataExtended>(
+        stream: BlocProvider.of<DataBloc>(context).db.watchItemsGrouped(id),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return DetailsPage2(snapshot.data!);
+          } else {
+            return Text("loading(?)");
+          }
+        });
+  }
+}
+
+class DetailsPage2 extends StatelessWidget {
+  final FullDataExtended data;
+
+  const DetailsPage2(this.data);
 
   @override
   Widget build(BuildContext context) {
@@ -43,31 +63,37 @@ class DetailsPage extends StatelessWidget {
         },
         label: Text("Add Group"),
         // TODO add Savings icon when available.
-        icon: Icon(Icons.account_balance),
+        icon: Icon(Icons.add),
       ),
-      body: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: double.infinity,
-            margin: EdgeInsets.all(20),
-            width: 30,
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
+      body: data.fullData.isEmpty
+          ? WhenEmptyCard(
+              title: AppLocalizations.of(context)!.mainEmptyTitle,
+              subtitle: AppLocalizations.of(context)!.mainEmptySubtitle,
+              icon: Icons.account_balance,
+            )
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: double.infinity,
+                  margin: EdgeInsets.all(20),
+                  width: 30,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: VerticalProgressBar(
+                    data: data,
+                    isProportional: false,
+                  ),
+                ),
+                SingleChildScrollView(
+                  child: CardGroupDetails(data),
+                ),
+              ],
             ),
-            child: VerticalProgressBar(
-              data: data,
-              isProportional: false,
-            ),
-          ),
-          SingleChildScrollView(
-            child: CardGroupDetails(data),
-          ),
-        ],
-      ),
     );
   }
 }
