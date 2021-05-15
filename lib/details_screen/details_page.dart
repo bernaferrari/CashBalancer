@@ -1,18 +1,18 @@
 import 'dart:ui';
 
-import 'package:cash_balancer/groups_screen/groups_screen.dart';
-import 'package:cash_balancer/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/database.dart';
+import '../groups_screen/groups_screen.dart';
+import '../l10n/l10n.dart';
 import '../util/retrieve_spaced_list.dart';
 import '../util/row_column_spacer.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/circle_percentage_painter.dart';
-import '../widgets/input_dialog_group.dart';
+import 'details_data_dialog.dart';
 
 extension Percent on double {
   String toPercent() => (this * 100).toStringAsFixed(0);
@@ -44,8 +44,20 @@ class DetailsPage2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Future<dynamic>.delayed(Duration(milliseconds: 500)).then((void value) {
+    //   showDialog<dynamic>(
+    //     context: context,
+    //     builder: (_) => DetailsDataDialog(
+    //       onSavePressed: (text) {
+    //         // Preserve the Bloc's context.
+    //         BlocProvider.of<DataBloc>(context).db.createGroup(text);
+    //       },
+    //     ),
+    //   );
+    // });
+
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         title: Text('Name'),
       ),
@@ -53,7 +65,7 @@ class DetailsPage2 extends StatelessWidget {
         onPressed: () {
           showDialog<dynamic>(
             context: context,
-            builder: (_) => InputDialogGroup(
+            builder: (_) => DetailsDataDialog(
               onSavePressed: (text) {
                 // Preserve the Bloc's context.
                 BlocProvider.of<DataBloc>(context).db.createGroup(text);
