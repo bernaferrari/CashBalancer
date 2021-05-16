@@ -6,13 +6,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/database.dart';
-import '../groups_screen/groups_screen.dart';
 import '../l10n/l10n.dart';
+import '../users_screen/users_screen.dart';
 import '../util/retrieve_spaced_list.dart';
 import '../util/row_column_spacer.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/circle_percentage_painter.dart';
-import 'details_data_dialog.dart';
+import 'details_group_dialog.dart';
+import 'details_item_dialog.dart';
 
 extension Percent on double {
   String toPercent() => (this * 100).toStringAsFixed(0);
@@ -25,63 +26,66 @@ class DetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<FullDataExtended>(
-        stream: BlocProvider.of<DataBloc>(context).db.watchItemsGrouped(id),
+    return FutureBuilder<int>(
+        future: BlocProvider.of<DataBloc>(context).db.getDefaultUser(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return DetailsPage2(snapshot.data!);
+            return StreamBuilder<FullDataExtended2>(
+                stream: BlocProvider.of<DataBloc>(context)
+                    .db
+                    .watchGroups(snapshot.data!),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData || !snapshot.hasError) {
+                    return DetailsPage2(snapshot.data);
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text(snapshot.error.toString()));
+                  } else {
+                    return Center(child: Text("Loading..."));
+                  }
+                });
+          } else if (snapshot.hasError) {
+            return Center(child: Text(snapshot.error.toString()));
           } else {
-            return Text("loading(?)");
+            return SizedBox();
           }
         });
   }
 }
 
 class DetailsPage2 extends StatelessWidget {
-  final FullDataExtended data;
+  final FullDataExtended2? data;
 
   const DetailsPage2(this.data);
 
   @override
   Widget build(BuildContext context) {
-    // Future<dynamic>.delayed(Duration(milliseconds: 500)).then((void value) {
-    //   showDialog<dynamic>(
-    //     context: context,
-    //     builder: (_) => DetailsDataDialog(
-    //       onSavePressed: (text) {
-    //         // Preserve the Bloc's context.
-    //         BlocProvider.of<DataBloc>(context).db.createGroup(text);
-    //       },
-    //     ),
-    //   );
-    // });
-
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Color(0xff121212),
       appBar: AppBar(
         title: Text('Name'),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          showDialog<dynamic>(
+          showDialog<Object>(
             context: context,
-            builder: (_) => DetailsDataDialog(
-              onSavePressed: (text) {
+            builder: (_) => DetailsGroupDialog(
+              onSavePressed: (text, colorName) {
                 // Preserve the Bloc's context.
-                BlocProvider.of<DataBloc>(context).db.createGroup(text);
+                BlocProvider.of<DataBloc>(context)
+                    .db
+                    .createGroup(text, colorName);
               },
             ),
           );
         },
         label: Text("Add Group"),
-        // TODO add Savings icon when available.
         icon: Icon(Icons.add),
       ),
-      body: data.fullData.isEmpty
+      body: (data == null || data!.groupsMap.isEmpty == true)
           ? WhenEmptyCard(
               title: AppLocalizations.of(context)!.mainEmptyTitle,
               subtitle: AppLocalizations.of(context)!.mainEmptySubtitle,
-              icon: Icons.account_balance,
+              icon: Icons.account_balance_sharp,
             )
           : Row(
               mainAxisSize: MainAxisSize.min,
@@ -94,15 +98,18 @@ class DetailsPage2 extends StatelessWidget {
                   width: 30,
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.10)),
                   child: VerticalProgressBar(
-                    data: data,
+                    data: data!,
                     isProportional: false,
                   ),
                 ),
                 SingleChildScrollView(
-                  child: CardGroupDetails(data),
+                  child: CardGroupDetails(data!),
                 ),
               ],
             ),
@@ -111,7 +118,7 @@ class DetailsPage2 extends StatelessWidget {
 }
 
 class VerticalProgressBar extends StatelessWidget {
-  final FullDataExtended data;
+  final FullDataExtended2 data;
   final bool isProportional;
 
   const VerticalProgressBar({
@@ -124,20 +131,20 @@ class VerticalProgressBar extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final List<double> spacedList =
-            retrieveSpacedList(data.fullData, constraints.maxHeight);
+            retrieveSpacedList(data.itemsList, constraints.maxHeight);
 
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: spaceColumn(
             2,
             [
-              for (int i = 0; i < data.fullData.length; i++)
+              for (int i = 0; i < data.itemsList.length; i++)
                 Tooltip(
-                  message: "${data.fullData[i].item.name}",
+                  message: "${data.itemsList[i].name}",
                   child: Container(
                     width: double.infinity,
                     height: spacedList[i],
-                    color: data.colors[i],
+                    color: data.colorsMap[data.itemsList[i]],
                   ),
                 ),
             ],
@@ -149,14 +156,14 @@ class VerticalProgressBar extends StatelessWidget {
 }
 
 class CardGroupDetails extends StatelessWidget {
-  final FullDataExtended data;
+  final FullDataExtended2 data;
 
   const CardGroupDetails(this.data);
 
   @override
   Widget build(BuildContext context) {
-    final double totalValue = data.fullData
-        .map((d) => d.item.price * d.item.quantity)
+    final double totalValue = data.itemsList
+        .map((d) => d.price * d.quantity)
         .fold(0.0, (previous, current) => previous + current);
 
     return Padding(
@@ -167,17 +174,17 @@ class CardGroupDetails extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: spaceColumn(
             20,
-            data.groupedData.entries.map(
-              (e) => IndividualItem(
-                e.key,
-                e.value
-                  ..sort(
-                    (a, b) => (b.item.price * a.item.quantity)
-                        .compareTo(a.item.price * a.item.quantity),
+            data.groupsMap.entries.map(
+              (e) => GroupCard(
+                data.itemsMap[e.key]
+                  ?..sort(
+                    (a, b) =>
+                        (b.price * a.quantity).compareTo(a.price * a.quantity),
                   ),
+                data.colorsMap,
                 totalValue,
-                data.fullData[e.key].kind.color,
-                data.colors,
+                e.value.name,
+                e.value.color,
               ),
             ),
           ),
@@ -191,103 +198,127 @@ Map<int, Color> getColor(String colorType) {
   return tailwindColors[colorType]!;
 }
 
-class IndividualItem extends StatelessWidget {
-  final int kind;
-  final List<FullData> data;
+class GroupCard extends StatelessWidget {
+  final List<Item>? itemsList;
+  final Map<Item, Color> colors;
   final double totalValue;
-  final String colorType;
-  final Map<FullData, Color> colors;
+  final String colorName;
+  final String name;
 
-  const IndividualItem(
-    this.kind,
-    this.data,
-    this.totalValue,
-    this.colorType,
+  const GroupCard(
+    this.itemsList,
     this.colors,
+    this.totalValue,
+    this.name,
+    this.colorName,
   );
 
   @override
   Widget build(BuildContext context) {
-    final double totalLocalPrice = data
-        .map((e) => e.item.price * e.item.quantity)
-        .fold(0.0, (previous, current) => previous + current);
+    final localTailwindColor = getColor(colorName);
 
-    final double totalLocalPercent = 100.0 * totalLocalPrice / totalValue;
-
-    final localTailwindColor = getColor(colorType);
-
-    return Container(
-      padding: EdgeInsets.all(10.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        border: Border.all(
-          color: localTailwindColor[500]!.withOpacity(0.20),
+    if (itemsList == null) {
+      return Container(
+        padding: EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.0),
+          border: Border.all(
+            color: localTailwindColor[500]!.withOpacity(0.20),
+          ),
+          color: localTailwindColor[500]!.withOpacity(0.10),
         ),
-        color: localTailwindColor[500]!.withOpacity(0.10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: spaceColumn(
-          0.0,
-          [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('kind',
-                          style: Theme.of(context).textTheme.headline5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GroupCardTitleBar(
+              title: name,
+              subtitle: "Empty",
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                      primary: localTailwindColor[400]),
+                  label: Text("Add Asset"),
+                  icon: Icon(Icons.add_rounded),
+                  onPressed: () {
+                    showDialog<Object>(
+                      context: context,
+                      builder: (_) => DetailsItemDialog(
+                        colorName: colorName,
+                        onSavePressed: (text, colorName) {
+                          // Preserve the Bloc's context.
+                          BlocProvider.of<DataBloc>(context)
+                              .db
+                              .createGroup(text, colorName);
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      final double totalLocalPrice = itemsList!
+          .map((e) => e.price * e.quantity)
+          .fold(0.0, (previous, current) => previous + current);
+
+      final double totalLocalPercent = 100.0 * totalLocalPrice / totalValue;
+
+      return Container(
+        padding: EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.0),
+          border: Border.all(
+            color: localTailwindColor[500]!.withOpacity(0.20),
+          ),
+          color: localTailwindColor[500]!.withOpacity(0.10),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GroupCardTitleBar(
+              title: name,
+              subtitle: "Total: R\$$totalLocalPrice",
+              widget: CustomPaint(
+                isComplex: false,
+                painter: CirclePercentagePainter(
+                  percent: totalLocalPercent / 100,
+                  color: localTailwindColor[500]!,
+                  circleColor: Colors.transparent,
+                  backgroundColor:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.15),
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
                       Text(
-                        "Total: R\$$totalLocalPrice",
+                        "${totalLocalPercent.toStringAsFixed(0)}%",
                         style: Theme.of(context).textTheme.overline,
                       ),
                     ],
                   ),
-                  Container(
-                    width: true ? 40 : 80,
-                    height: true ? 40 : 80,
-                    margin: const EdgeInsets.symmetric(vertical: 16),
-                    child: CustomPaint(
-                      isComplex: false,
-                      painter: CirclePercentagePainter(
-                        percent: totalLocalPercent / 100,
-                        color: localTailwindColor[500]!,
-                        circleColor: Colors.transparent,
-                        backgroundColor: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacity(0.15),
-                      ),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              "${totalLocalPercent.toStringAsFixed(0)}%",
-                              style: Theme.of(context).textTheme.overline,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-            for (int i = 0; i < data.length; i++) ...[
+            for (int i = 0; i < itemsList!.length; i++) ...[
               SizedBox(
                 width: double.infinity,
                 child: CardButton(
-                  data[i],
-                  colors[data[i]]!,
+                  itemsList![i],
+                  colors[itemsList![i]]!,
                   totalValue,
                 ),
               ),
-              if (i < data.length - 1)
+              if (i < itemsList!.length - 1)
                 Container(
                   height: 1,
                   color: Colors.white.withOpacity(0.10),
@@ -295,17 +326,55 @@ class IndividualItem extends StatelessWidget {
             ],
           ],
         ),
+      );
+    }
+  }
+}
+
+class GroupCardTitleBar extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final Widget? widget;
+
+  const GroupCardTitleBar({
+    Key? key,
+    required this.title,
+    required this.subtitle,
+    this.widget,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: Theme.of(context).textTheme.headline5),
+              Text(subtitle, style: Theme.of(context).textTheme.overline),
+            ],
+          ),
+          Container(
+            width: true ? 40 : 80,
+            height: true ? 40 : 80,
+            margin: const EdgeInsets.symmetric(vertical: 16),
+            child: widget,
+          ),
+        ],
       ),
     );
   }
 }
 
 class CardButton extends StatelessWidget {
-  final FullData data;
+  final Item item;
   final Color color;
   final double totalValue;
 
-  const CardButton(this.data, this.color, this.totalValue);
+  const CardButton(this.item, this.color, this.totalValue);
 
   @override
   Widget build(BuildContext context) {
@@ -347,7 +416,7 @@ class CardButton extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  data.item.name,
+                  item.name,
                   style: GoogleFonts.firaSans(
                     color: Colors.white,
                     fontSize: 18,
@@ -360,7 +429,7 @@ class CardButton extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "R\$ ${data.item.price} (${(data.item.price / totalValue).toPercent()}%)",
+                      "R\$ ${item.price} (${(item.price / totalValue).toPercent()}%)",
                       style: GoogleFonts.firaSans(
                         color: Color(0xbfffffff),
                         fontSize: 12,
@@ -372,7 +441,7 @@ class CardButton extends StatelessWidget {
               ],
             ),
           ),
-          if (data.item.targetPercent > 0)
+          if (item.targetPercent > 0)
             Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -381,7 +450,7 @@ class CardButton extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      "${(data.item.price / totalValue).toPercent()}%",
+                      "${(item.price / totalValue).toPercent()}%",
                       style: GoogleFonts.firaSans(
                         color: Colors.white.withOpacity(0.50),
                         fontSize: 18,
@@ -400,7 +469,7 @@ class CardButton extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "${data.item.targetPercent.toPercent()}%",
+                      "${item.targetPercent.toPercent()}%",
                       style: GoogleFonts.firaSans(
                         color: Colors.white,
                         fontSize: 18,
@@ -413,12 +482,11 @@ class CardButton extends StatelessWidget {
                   ],
                 ),
                 Text(
-                  "${data.item.targetPercent > data.item.price / totalValue ? "↑" : "↓"} R\$ ${(totalValue * data.item.targetPercent - data.item.price).toStringAsFixed(0)} (${(data.item.targetPercent - data.item.price / totalValue).toPercent()}%)",
+                  "${item.targetPercent > item.price / totalValue ? "↑" : "↓"} R\$ ${(totalValue * item.targetPercent - item.price).toStringAsFixed(0)} (${(item.targetPercent - item.price / totalValue).toPercent()}%)",
                   style: GoogleFonts.firaSans(
-                    color:
-                        data.item.targetPercent > data.item.price / totalValue
-                            ? Color(0xff77d874)
-                            : Color(0xffff5a74),
+                    color: item.targetPercent > item.price / totalValue
+                        ? Color(0xff77d874)
+                        : Color(0xffff5a74),
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),

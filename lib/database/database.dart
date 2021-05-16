@@ -1,17 +1,17 @@
 // don't import moor_web.dart or moor_flutter/moor_flutter.dart in shared code
 import 'dart:ui';
 
-import 'package:cash_balancer/util/get_color_by_quantile.dart';
 import 'package:moor/moor.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 import 'package:rxdart/rxdart.dart';
+
+import '../util/get_color_by_quantile.dart';
 
 export 'database/shared.dart';
 
 part 'database.g.dart';
 
-@DataClassName('AssetKind')
-class AssetKindTable extends Table {
+class Groups extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   TextColumn get name => text()();
@@ -19,20 +19,18 @@ class AssetKindTable extends Table {
   TextColumn get color => text()();
 }
 
-@DataClassName('AssetGroup')
-class AssetGroupTable extends Table {
+class Users extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   TextColumn get name => text()();
 }
 
-@DataClassName('AssetItem')
-class AssetItemTable extends Table {
+class Items extends Table {
   IntColumn get id => integer().autoIncrement()();
 
-  IntColumn get kindId => integer()();
-
   IntColumn get groupId => integer()();
+
+  IntColumn get userId => integer()();
 
   TextColumn get name => text()();
 
@@ -45,13 +43,13 @@ class AssetItemTable extends Table {
 
 class FullData extends FullDataNullable {
   const FullData(
-    AssetGroup group,
+    User user,
     this.item,
-    this.kind,
-  ) : super(group);
+    this.group,
+  ) : super(user);
 
-  final AssetItem item;
-  final AssetKind kind;
+  final Item item;
+  final Group group;
 }
 
 class ItemKindData {
@@ -60,14 +58,14 @@ class ItemKindData {
     this.kind,
   );
 
-  final AssetItem item;
-  final AssetKind kind;
+  final Item item;
+  final Group kind;
 }
 
 class FullDataNullable {
-  const FullDataNullable(this.group);
+  const FullDataNullable(this.user);
 
-  final AssetGroup group;
+  final User user;
 }
 
 class FullDataExtended {
@@ -78,13 +76,28 @@ class FullDataExtended {
   final Map<FullData, Color> colors;
 }
 
+class FullDataExtended2 {
+  const FullDataExtended2(
+      this.itemsList, this.itemsMap, this.groupsMap, this.colorsMap);
+
+  // List of Items
+  final List<Item> itemsList;
+
+  // groupID -> Items
+  final Map<int, List<Item>> itemsMap;
+
+  // groupID -> Groups
+  final Map<int, Group> groupsMap;
+
+  // Items -> Colors
+  final Map<Item, Color> colorsMap;
+}
+
 @UseMoor(
-  tables: [AssetKindTable, AssetGroupTable, AssetItemTable],
+  tables: [Users, Groups, Items],
   queries: {
-    '_resetCategory': 'UPDATE todos SET category = NULL WHERE category = ?',
-    'getGroup': 'SELECT * FROM asset_group_table',
-    'getKind': 'SELECT * FROM asset_kind_table,',
-    'getData': 'SELECT * FROM asset_item_table',
+    // '_resetCategory': 'UPDATE todos SET category = NULL WHERE category = ?',
+    'userExists': """SELECT count(1) where exists (select * from users)"""
   },
 )
 class Database extends _$Database {
@@ -142,65 +155,55 @@ class Database extends _$Database {
 // /// Watches all entries in the given [category]. If the category is null, all
 // /// entries will be shown instead.
 
-  Stream<Map<AssetGroup, List<ItemKindData>>> watchGroups() {
-    final groupQuery = select(assetGroupTable);
+  // Users -> Groups : [Items]
+  Stream<FullDataExtended2> watchGroups(int userId) {
+    final groupsQuery = select(groups);
 
-    // These can be empty.
-    final itemsQuery = select(assetItemTable)
-        .join([
-          leftOuterJoin(
-            assetKindTable,
-            assetKindTable.id.equalsExp(assetItemTable.kindId),
-          ),
-        ])
-        .watch()
-        .map(
-          (rows) => rows
-              .map(
-                (row) => ItemKindData(
-                  row.readTable(assetItemTable),
-                  row.readTable(assetKindTable),
-                ),
-              )
-              .toList(),
-        );
+    final itemsQuery = select(items)
+      ..where((item) => item.userId.equals(userId));
 
-    return Rx.combineLatest2(groupQuery.watch(), itemsQuery,
-        // ignore: avoid_types_on_closure_parameters
-        (List<AssetGroup> a, List<ItemKindData> b) {
-      final map = <AssetGroup, List<ItemKindData>>{};
-
-      for (final group in a) {
-        map[group] =
-            b.where((element) => element.item.groupId == group.id).toList();
+    return Rx.combineLatest2<List<Group>, List<Item>, FullDataExtended2>(
+        groupsQuery.watch(), itemsQuery.watch(), (groupList, itemsList) {
+      final groupMap = <int, Group>{};
+      for (final group in groupList) {
+        groupMap[group.id] = group;
       }
 
-      return map;
+      final List<Item> sortedItems = [...itemsList]..sort((a, b) {
+          return (b.price * b.quantity).compareTo((a.price * a.quantity));
+        });
+
+      final Map<int, List<Item>> groupedItems = groupByKind(sortedItems);
+
+      final Map<Item, Color> colors =
+          getColorByQuantile(groupedItems, groupMap, sortedItems);
+
+      return FullDataExtended2(itemsList, groupedItems, groupMap, colors);
     });
   }
 
-  Stream<List<FullData>> watchItems(int groupId) {
-    final queryFiltered = select(assetGroupTable)
-      ..where((group) => group.id.equals(groupId));
+  Stream<List<FullData>> watchItems(int userId) {
+    final queryUser = select(users)..where((user) => user.id.equals(userId));
 
-    final query = queryFiltered.join([
+    final query = queryUser.join([
       leftOuterJoin(
-        assetItemTable,
-        assetItemTable.groupId.equalsExp(assetGroupTable.id),
+        items,
+        items.userId.equalsExp(users.id),
       ),
-      leftOuterJoin(
-        assetKindTable,
-        assetKindTable.id.equalsExp(assetItemTable.kindId),
-      ),
+      // leftOuterJoin(
+      //   groups,
+      //   groups.id.equalsExp(items.groupId),
+      // ),
     ]);
 
     return query.watch().map((rows) {
+      print("rows are $rows");
       // read both the entry and the associated category for each row
       return rows.map((row) {
         return FullData(
-          row.readTable(assetGroupTable),
-          row.readTable(assetItemTable),
-          row.readTable(assetKindTable),
+          row.readTable(users),
+          row.readTable(items),
+          row.readTable(groups),
         );
       }).toList();
     });
@@ -222,31 +225,36 @@ class Database extends _$Database {
   //   });
   // }
 
-  Stream<FullDataExtended> watchItemsGrouped(int groupId) {
-    return watchItems(groupId).map((data) {
-      final List<FullData> sortedData = [...data]..sort((a, b) {
-          return (b.item.price * b.item.quantity)
-              .compareTo((a.item.price * a.item.quantity));
-        });
+  // Stream<FullDataExtended> watchItemsGrouped(int userId) =>
+  //     watchItems(userId).map((data) {
+  //       print("watchItemsGrouped was updated, now $data");
+  //
+  //       final List<FullData> sortedData = [...data]..sort((a, b) {
+  //           return (b.item.price * b.item.quantity)
+  //               .compareTo((a.item.price * a.item.quantity));
+  //         });
+  //
+  //       final Map<int, List<FullData>> groupedData = groupByKind(sortedData);
+  //       print("sortedData: $sortedData groupedData $groupedData");
+  //
+  //       final Map<FullData, Color> colors =
+  //           getColorByQuantile(groupedData, sortedData);
+  //       print("colors: $colors");
+  //
+  //       return FullDataExtended(groupedData, colors, sortedData);
+  //     });
 
-      final Map<int, List<FullData>> groupedData = groupByKind(sortedData);
+  Map<int, List<Item>> groupByKind(List<Item> itemList) {
+    final groupedList = <int, List<Item>>{};
 
-      final Map<FullData, Color> colors =
-          getColorByQuantile(groupedData, sortedData);
+    for (int i = 0; i < itemList.length; i++) {
+      final groupId = itemList[i].groupId;
 
-      return FullDataExtended(groupedData, colors, sortedData);
-    });
-  }
-
-  Map<int, List<FullData>> groupByKind(List<FullData> data) {
-    final groupedList = <int, List<FullData>>{};
-
-    for (int i = 0; i < data.length; i++) {
-      final groupPosition = groupedList[data[i].item.kindId];
+      final groupPosition = groupedList[groupId];
       if (groupPosition != null) {
-        groupPosition.add(data[i]);
+        groupPosition.add(itemList[i]);
       } else {
-        groupedList[data[i].item.kindId] = [data[i]];
+        groupedList[groupId] = [itemList[i]];
       }
     }
 
@@ -254,14 +262,14 @@ class Database extends _$Database {
   }
 
   Stream<List<FullData>> watchMainGroups() {
-    final query = select(assetGroupTable).join([
+    final query = select(users).join([
       leftOuterJoin(
-        assetItemTable,
-        assetGroupTable.id.equalsExp(assetItemTable.groupId),
+        items,
+        users.id.equalsExp(items.userId),
       ),
       leftOuterJoin(
-        assetKindTable,
-        assetKindTable.id.equalsExp(assetItemTable.kindId),
+        groups,
+        groups.id.equalsExp(items.groupId),
       ),
     ]);
 
@@ -269,9 +277,9 @@ class Database extends _$Database {
       // read both the entry and the associated category for each row
       return rows.map((row) {
         return FullData(
-          row.readTable(assetGroupTable),
-          row.readTable(assetItemTable),
-          row.readTable(assetKindTable),
+          row.readTable(users),
+          row.readTable(items),
+          row.readTable(groups),
         );
       }).toList();
     });
@@ -296,16 +304,31 @@ class Database extends _$Database {
 //   return into(categories)
 //       .insert(CategoriesCompanion(description: Value(description)));
 // }
-  Future<int> createGroup(String description) {
-    return into(assetGroupTable)
-        .insert(AssetGroupTableCompanion.insert(name: description));
+  Future<int> createUser(String description) {
+    return into(users).insert(UsersCompanion.insert(name: description));
   }
 
-  Future<bool> editGroup(AssetGroup group) {
-    return update(assetGroupTable).replace(group);
+  Future<int> createGroup(String description, String colorName) {
+    return into(groups).insert(GroupsCompanion.insert(
+      name: description,
+      color: colorName,
+    ));
   }
 
-//
+  Future<bool> editUser(User user) {
+    return update(users).replace(user);
+  }
+
+  Future<int> getDefaultUser() async {
+    if (await userExists().getSingle() == 0) {
+      // Create a new default user if it doesn't exist.
+      final id = await into(users).insert(UsersCompanion.insert(name: '🚀'));
+      return id;
+    }
+
+    return (await select(users).get())[0].id;
+  }
+
 // Future deleteCategory(Category category) {
 //   return transaction<dynamic>(() async {
 //     await _resetCategory(category.id);

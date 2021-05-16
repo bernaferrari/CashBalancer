@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,10 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../blocs/data_bloc.dart';
 import '../database/database.dart';
 import '../l10n/l10n.dart';
-import '../util/retrieve_spaced_list.dart';
 import '../util/row_column_spacer.dart';
 import '../util/tailwind_colors.dart';
-import 'groups_input_dialog.dart';
+import 'users_input_dialog.dart';
 
 class WhenEmptyCard extends StatelessWidget {
   const WhenEmptyCard({
@@ -93,82 +91,81 @@ class GroupsScreen extends StatelessWidget {
         label: Text(AppLocalizations.of(context)!.mainFAB),
       ),
       backgroundColor: Theme.of(context).colorScheme.background,
-      body: StreamBuilder<Map<AssetGroup, List<ItemKindData>>>(
-          stream: BlocProvider.of<DataBloc>(context).db.watchGroups(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final listData = snapshot.data!;
-
-              final listDataEntries = listData.entries.toList();
-
-              if (listData.isEmpty) {
-                return WhenEmptyCard(
-                  title: AppLocalizations.of(context)!.mainEmptyTitle,
-                  subtitle: AppLocalizations.of(context)!.mainEmptySubtitle,
-                  icon: Icons.account_balance,
-                );
-              }
-
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView.builder(
-                  itemCount: listDataEntries.length,
-                  itemBuilder: (context, index) {
-                    final data = listDataEntries[index];
-
-                    return OpenContainer<bool>(
-                      transitionType: ContainerTransitionType.fadeThrough,
-                      openBuilder: (context, _) {
-                        return Text("Expanded");
-                        // return DetailsPage(data.key.id);
-                      },
-                      onClosed: (_) {},
-                      closedColor: Colors.transparent,
-                      openColor: Colors.transparent,
-                      closedBuilder: (context, action) {
-                        print("data is ${data}");
-
-                        // return Text(data.item?.name ?? "Empty");
-                        if (data.value.isEmpty) {
-                          return HomeScreenEmptyCard(data.key.name, action, () {
-                            showAddEditDialog(context, data.key);
-                          });
-                        } else {
-                          return Text("NOT NULL");
-                          // return HomeScreenCard(
-                          //   data.key.name,
-                          //   data.value,
-                          //   action,
-                          // );
-                        }
-                      },
-                    );
-                  },
-                ),
-              );
-            } else if (snapshot.hasError) {
-              return Text("Error is ${snapshot.error}");
-            } else {
-              return Center(child: CircularProgressIndicator());
-            }
-          }),
+      // TODO uncomment. This was changed because now we listen to groups from individual users.
+      // body: StreamBuilder<FullDataExtended2>(
+      //     stream: BlocProvider.of<DataBloc>(context).db.watchGroups(),
+      //     builder: (context, snapshot) {
+      //       if (snapshot.hasData) {
+      //         final listData = snapshot.data!.itemsList;
+      //
+      //         if (listData.isEmpty) {
+      //           return WhenEmptyCard(
+      //             title: AppLocalizations.of(context)!.mainEmptyTitle,
+      //             subtitle: AppLocalizations.of(context)!.mainEmptySubtitle,
+      //             icon: Icons.account_balance,
+      //           );
+      //         }
+      //
+      //         return Padding(
+      //           padding: const EdgeInsets.all(8.0),
+      //           child: ListView.builder(
+      //             itemCount: listData.length,
+      //             itemBuilder: (context, index) {
+      //               final data = listData[index];
+      //
+      //               return OpenContainer<bool>(
+      //                 transitionType: ContainerTransitionType.fadeThrough,
+      //                 openBuilder: (context, _) {
+      //                   return Text("Expanded");
+      //                   // return DetailsPage(data.key.id);
+      //                 },
+      //                 onClosed: (_) {},
+      //                 closedColor: Colors.transparent,
+      //                 openColor: Colors.transparent,
+      //                 closedBuilder: (context, action) {
+      //                   print("data is ${data}");
+      //
+      //                   // return Text(data.item?.name ?? "Empty");
+      //                   if (listData.isEmpty) {
+      //                     // return HomeScreenEmptyCard(data.key.name, action, () {
+      //                     //   showAddEditDialog(context, data.key);
+      //                     // });
+      //                   } else {
+      //                     return Text("NOT NULL");
+      //                     // return HomeScreenCard(
+      //                     //   data.key.name,
+      //                     //   data.value,
+      //                     //   action,
+      //                     // );
+      //                   }
+      //                 },
+      //               );
+      //             },
+      //           ),
+      //         );
+      //       } else if (snapshot.hasError) {
+      //         return Text("Error is ${snapshot.error}");
+      //       } else {
+      //         return Center(child: CircularProgressIndicator());
+      //       }
+      //     }),
     );
   }
 
-  void showAddEditDialog(BuildContext context, [AssetGroup? group]) {
+  void showAddEditDialog(BuildContext context, [User? user]) {
     showDialog<dynamic>(
       context: context,
       builder: (_) => HomeInputDialog(
-        initialValue: group?.name,
+        initialValue: user?.name,
         onSavePressed: (text) {
-          if (group != null) {
+          if (user != null) {
             // Update the existing Group with text.
             BlocProvider.of<DataBloc>(context)
                 .db
-                .editGroup(group.copyWith(name: text));
+                .editUser(user.copyWith(name: text));
           } else {
             // Create a new Group
-            BlocProvider.of<DataBloc>(context).db.createGroup(text);
+            BlocProvider.of<DataBloc>(context).db.createUser(text);
           }
         },
       ),
@@ -220,10 +217,10 @@ class HomeScreenCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: HorizontalProgressBar(
-                  data: data,
-                  isProportional: false,
-                ),
+                // child: HorizontalProgressBar(
+                //   data: data,
+                //   isProportional: false,
+                // ),
               ),
               SizedBox(height: 10),
               Container(
@@ -340,40 +337,41 @@ class HomeScreenEmptyCard extends StatelessWidget {
   }
 }
 
-class HorizontalProgressBar extends StatelessWidget {
-  final FullDataExtended data;
-
-  final bool isProportional;
-
-  const HorizontalProgressBar({
-    required this.data,
-    required this.isProportional,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final List<double> spacedList =
-            retrieveSpacedList(data.fullData, constraints.maxWidth);
-
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: spaceRow(2, [
-            for (int i = 0; i < data.colors.length; i++)
-              Container(
-                width: spacedList[i],
-                height: double.infinity,
-                color: data.colors[i],
-              ),
-          ]),
-        );
-      },
-    );
-  }
-}
+// TODO uncomment this.
+// class HorizontalProgressBar extends StatelessWidget {
+//   final FullDataExtended data;
+//
+//   final bool isProportional;
+//
+//   const HorizontalProgressBar({
+//     required this.data,
+//     required this.isProportional,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return LayoutBuilder(
+//       builder: (context, constraints) {
+//         final List<double> spacedList =
+//             retrieveSpacedList(data.fullData, constraints.maxWidth);
+//
+//         return Row(
+//           mainAxisSize: MainAxisSize.min,
+//           mainAxisAlignment: MainAxisAlignment.start,
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: spaceRow(2, [
+//             for (int i = 0; i < data.colors.length; i++)
+//               Container(
+//                 width: spacedList[i],
+//                 height: double.infinity,
+//                 color: data.colors[i],
+//               ),
+//           ]),
+//         );
+//       },
+//     );
+//   }
+// }
 
 class MiniName extends StatelessWidget {
   final String title;

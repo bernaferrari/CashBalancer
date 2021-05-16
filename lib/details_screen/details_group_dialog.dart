@@ -8,17 +8,17 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../l10n/l10n.dart';
 
-class DetailsDataDialog extends StatefulWidget {
-  final ValueChanged<String>? onSavePressed;
+class DetailsGroupDialog extends StatefulWidget {
+  final Function(String, String)? onSavePressed;
   final String? initialValue;
 
-  const DetailsDataDialog({this.onSavePressed, this.initialValue});
+  const DetailsGroupDialog({this.onSavePressed, this.initialValue});
 
   @override
-  _DetailsDataDialogState createState() => _DetailsDataDialogState();
+  _DetailsGroupDialogState createState() => _DetailsGroupDialogState();
 }
 
-class _DetailsDataDialogState extends State<DetailsDataDialog> {
+class _DetailsGroupDialogState extends State<DetailsGroupDialog> {
   late final TextEditingController textEditingController;
   final _formKey = GlobalKey<FormState>();
   late String colorName;
@@ -135,7 +135,7 @@ class _DetailsDataDialogState extends State<DetailsDataDialog> {
 
   void onSubmit([String? value]) {
     if (_formKey.currentState!.validate()) {
-      widget.onSavePressed?.call(textEditingController.text);
+      widget.onSavePressed?.call(textEditingController.text, colorName);
       Navigator.of(context).pop();
     }
   }
