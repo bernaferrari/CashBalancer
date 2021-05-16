@@ -163,6 +163,8 @@ class VerticalProgressBar extends StatelessWidget {
                       showDialog<Object>(
                         context: context,
                         builder: (_) => ItemDialog(
+                          totalValue: data.itemsList
+                              .fold(0, (a, b) => a + b.price * b.quantity),
                           colorName:
                               data.groupsMap[data.itemsList[i].groupId]!.color,
                           previousItem: data.itemsList[i],
@@ -270,11 +272,11 @@ class GroupCard extends StatelessWidget {
               EditGroup(color: color, group: group),
               SizedBox(width: 8),
               AddItem(
-                color: color,
-                userId: userId,
-                groupId: group.id,
-                colorName: group.color,
-              ),
+                  color: color,
+                  userId: userId,
+                  groupId: group.id,
+                  colorName: group.color,
+                  totalValue: totalValue),
             ],
           ),
         ),
@@ -337,6 +339,7 @@ class GroupCard extends StatelessWidget {
                     userId: userId,
                     groupId: group.id,
                     colorName: group.color,
+                    totalValue: totalValue,
                   ),
                 ],
               ),
@@ -353,6 +356,7 @@ class AddItem extends StatelessWidget {
   final String colorName;
   final int userId;
   final int groupId;
+  final double totalValue;
 
   const AddItem({
     Key? key,
@@ -360,6 +364,7 @@ class AddItem extends StatelessWidget {
     required this.colorName,
     required this.userId,
     required this.groupId,
+    required this.totalValue,
   }) : super(key: key);
 
   @override
@@ -372,6 +377,7 @@ class AddItem extends StatelessWidget {
           context: context,
           builder: (_) => ItemDialog(
             colorName: colorName,
+            totalValue: totalValue,
             onSavePressed: (name, value, target) {
               // Preserve the Bloc's context.
               context.read<DataBloc>().db.createItem(
@@ -539,6 +545,7 @@ class ItemCard extends StatelessWidget {
         showDialog<Object>(
           context: context,
           builder: (_) => ItemDialog(
+            totalValue: totalValue,
             colorName: nameColor,
             previousItem: item,
             onSavePressed: (name, value, target) {

@@ -12,10 +12,12 @@ class ItemDialog extends StatefulWidget {
   final VoidCallback? onDeletePressed;
   final Item? previousItem;
   final String colorName;
+  final double totalValue;
 
   const ItemDialog({
     required this.colorName,
     required this.onSavePressed,
+    required this.totalValue,
     this.onDeletePressed,
     this.previousItem,
   });
@@ -29,6 +31,7 @@ class _DetailsGroupDialogState extends State<ItemDialog> {
   late final TextEditingController moneyEditingController;
   late final TextEditingController targetEditingController;
   final _formKey = GlobalKey<FormState>();
+  late String relativePercentage;
 
   @override
   void initState() {
@@ -38,6 +41,7 @@ class _DetailsGroupDialogState extends State<ItemDialog> {
         TextEditingController(text: widget.previousItem?.price.toString());
     targetEditingController = TextEditingController(
         text: widget.previousItem?.targetPercent.toString());
+    onChanged();
     super.initState();
   }
 
@@ -117,6 +121,7 @@ class _DetailsGroupDialogState extends State<ItemDialog> {
                     child: TextFormField(
                       controller: moneyEditingController,
                       onFieldSubmitted: onSubmit,
+                      onChanged: onChanged,
                       autofocus: widget.previousItem != null,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -205,6 +210,11 @@ class _DetailsGroupDialogState extends State<ItemDialog> {
                 ],
               ),
               SizedBox(height: 16),
+              Text(
+                relativePercentage,
+                style: Theme.of(context).textTheme.bodyText2,
+              ),
+              SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -285,6 +295,27 @@ class _DetailsGroupDialogState extends State<ItemDialog> {
           moneyEditingController.text, targetEditingController.text);
       Navigator.of(context).pop();
     }
+  }
+
+  void onChanged([String? value]) {
+    final moneyValue = double.tryParse(moneyEditingController.text) ?? 0;
+
+    late final String finalPercent;
+    if (widget.previousItem == null) {
+      finalPercent = (moneyValue / (widget.totalValue + moneyValue) * 100)
+          .toStringAsFixed(2);
+    } else {
+      // Remove the previous price before adding the updated one.
+      finalPercent = (moneyValue /
+              (widget.totalValue + moneyValue - widget.previousItem!.price) *
+              100)
+          .toStringAsFixed(2);
+    }
+
+    setState(() {
+      relativePercentage =
+          '\$${moneyEditingController.text} is going to be $finalPercent%';
+    });
   }
 
   void onSaveAddMore([String? value]) {
