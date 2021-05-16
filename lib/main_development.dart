@@ -14,7 +14,7 @@ void main() {
   };
 
   runZonedGuarded(
-    () => runApp(const App()),
+    () => runApp(App()),
     (error, stackTrace) => log(error.toString(), stackTrace: stackTrace),
   );
 }

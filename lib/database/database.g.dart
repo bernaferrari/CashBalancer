@@ -14,11 +14,11 @@ class User extends DataClass implements Insertable<User> {
   factory User.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String? prefix}) {
     final effectivePrefix = prefix ?? '';
-    final intType = db.typeSystem.forDartType<int>();
-    final stringType = db.typeSystem.forDartType<String>();
     return User(
-      id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      name: stringType.mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
+      id: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
+      name: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
     );
   }
   @override
@@ -69,7 +69,7 @@ class User extends DataClass implements Insertable<User> {
   @override
   int get hashCode => $mrjf($mrjc(id.hashCode, name.hashCode));
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
       identical(this, other) ||
       (other is User && other.id == this.id && other.name == this.name);
 }
@@ -194,13 +194,13 @@ class Group extends DataClass implements Insertable<Group> {
   factory Group.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String? prefix}) {
     final effectivePrefix = prefix ?? '';
-    final intType = db.typeSystem.forDartType<int>();
-    final stringType = db.typeSystem.forDartType<String>();
     return Group(
-      id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      name: stringType.mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
-      color:
-          stringType.mapFromDatabaseResponse(data['${effectivePrefix}color'])!,
+      id: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
+      name: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
+      color: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}color'])!,
     );
   }
   @override
@@ -258,7 +258,7 @@ class Group extends DataClass implements Insertable<Group> {
   int get hashCode =>
       $mrjf($mrjc(id.hashCode, $mrjc(name.hashCode, color.hashCode)));
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Group &&
           other.id == this.id &&
@@ -279,7 +279,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     this.id = const Value.absent(),
     required String name,
     required String color,
-  })   : name = Value(name),
+  })  : name = Value(name),
         color = Value(color);
   static Insertable<Group> custom({
     Expression<int>? id,
@@ -426,21 +426,20 @@ class Item extends DataClass implements Insertable<Item> {
   factory Item.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String? prefix}) {
     final effectivePrefix = prefix ?? '';
-    final intType = db.typeSystem.forDartType<int>();
-    final stringType = db.typeSystem.forDartType<String>();
-    final doubleType = db.typeSystem.forDartType<double>();
     return Item(
-      id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      groupId:
-          intType.mapFromDatabaseResponse(data['${effectivePrefix}group_id'])!,
-      userId:
-          intType.mapFromDatabaseResponse(data['${effectivePrefix}user_id'])!,
-      name: stringType.mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
-      quantity: doubleType
+      id: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
+      groupId: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}group_id'])!,
+      userId: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}user_id'])!,
+      name: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
+      quantity: const RealType()
           .mapFromDatabaseResponse(data['${effectivePrefix}quantity'])!,
-      price:
-          doubleType.mapFromDatabaseResponse(data['${effectivePrefix}price'])!,
-      targetPercent: doubleType
+      price: const RealType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}price'])!,
+      targetPercent: const RealType()
           .mapFromDatabaseResponse(data['${effectivePrefix}target_percent'])!,
     );
   }
@@ -539,7 +538,7 @@ class Item extends DataClass implements Insertable<Item> {
                   $mrjc(quantity.hashCode,
                       $mrjc(price.hashCode, targetPercent.hashCode)))))));
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Item &&
           other.id == this.id &&
@@ -576,7 +575,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     required double quantity,
     required double price,
     required double targetPercent,
-  })   : groupId = Value(groupId),
+  })  : groupId = Value(groupId),
         userId = Value(userId),
         name = Value(name),
         quantity = Value(quantity),

@@ -7,7 +7,7 @@ import 'tailwind_colors.dart';
 Map<Item, Color> getColorByQuantile(
   Map<int, List<Item>> itemsMap,
   Map<int, Group> groupMap,
-  List<Item> data,
+  List<Item> itemsList,
 ) {
   final colors = <Item, Color>{};
 
@@ -19,16 +19,16 @@ Map<Item, Color> getColorByQuantile(
     final quartile50 = q50(arr);
     final quartile75 = q75(arr);
 
-    for (final currentData in data) {
-      final colorType = groupMap[currentData.groupId]!.color;
-      if (currentData.price <= quartile25) {
-        colors[currentData] = _getColor(colorType)[200]!;
-      } else if (currentData.price <= quartile50) {
-        colors[currentData] = _getColor(colorType)[300]!;
-      } else if (currentData.price <= quartile75) {
-        colors[currentData] = _getColor(colorType)[400]!;
+    for (final item in itemsList) {
+      final colorName = groupMap[item.groupId]!.color;
+      if (item.price <= quartile25) {
+        colors[item] = _getColor(colorName)[200]!;
+      } else if (item.price <= quartile50) {
+        colors[item] = _getColor(colorName)[300]!;
+      } else if (item.price <= quartile75) {
+        colors[item] = _getColor(colorName)[400]!;
       } else {
-        colors[currentData] = _getColor(colorType)[500]!;
+        colors[item] = _getColor(colorName)[500]!;
       }
     }
   }

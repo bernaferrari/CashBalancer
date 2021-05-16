@@ -33,7 +33,11 @@ class _HomeInputDialogState extends State<HomeInputDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.mainDialogTitle),
+      title: Text(
+        widget.initialValue == null
+            ? AppLocalizations.of(context)!.addGroup
+            : AppLocalizations.of(context)!.editGroup,
+      ),
       content: Form(
         key: _formKey,
         child: Column(
@@ -64,7 +68,7 @@ class _HomeInputDialogState extends State<HomeInputDialog> {
               width: double.infinity,
               child: ElevatedButton(
                 child: Text(
-                  AppLocalizations.of(context)!.mainDialogSave,
+                  AppLocalizations.of(context)!.dialogSave,
                   style: GoogleFonts.rubik(
                     fontWeight: FontWeight.w800,
                   ),
@@ -77,7 +81,7 @@ class _HomeInputDialogState extends State<HomeInputDialog> {
               width: double.infinity,
               child: TextButton(
                 child: Text(
-                  AppLocalizations.of(context)!.mainDialogCancel,
+                  AppLocalizations.of(context)!.dialogCancel,
                   style: GoogleFonts.rubik(),
                 ),
                 onPressed: () {

@@ -27,7 +27,7 @@ double quantile(List<double> arr, double q) {
   final double pos = (sorted.length - 1) * q;
   final base = pos.floor();
   final rest = pos - base;
-  if (sorted[base + 1] != null) {
+  if (sorted.length > base + 1) {
     return sorted[base] + rest * (sorted[base + 1] - sorted[base]);
   } else {
     return sorted[base];

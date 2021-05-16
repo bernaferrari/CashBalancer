@@ -20,8 +20,7 @@ void main() {
     // Test listening to user
     // (await db.watchItems(id)).map((event) => print("event is $event"));
 
-    final queryUser = db.select(db.users)
-      ..where((user) => user.id.equals(id));
+    final queryUser = db.select(db.users)..where((user) => user.id.equals(id));
 
     final query = queryUser.join([
       // leftOuterJoin(

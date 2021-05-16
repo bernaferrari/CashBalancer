@@ -173,84 +173,84 @@ class GroupsScreen extends StatelessWidget {
   }
 }
 
-class HomeScreenCard extends StatelessWidget {
-  final FullDataExtended data;
-  final VoidCallback onClicked;
-
-  const HomeScreenCard(this.data, this.onClicked);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        onTap: onClicked,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [Color(0x14c6ffdd), Color(0x14fbd786), Color(0x14f7797d)],
-            ),
-          ),
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'title',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                height: 25,
-                clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                // child: HorizontalProgressBar(
-                //   data: data,
-                //   isProportional: false,
-                // ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                child: ClipRect(
-                  clipBehavior: Clip.antiAlias,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: spaceRow(
-                      20,
-                      [
-                        for (int i = 0; i < data.fullData.length; i++)
-                          MiniName(
-                            data.fullData[i].item.name,
-                            data.colors[i] ?? Colors.red,
-                          )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+// class HomeScreenCard extends StatelessWidget {
+//   final FullDataExtended data;
+//   final VoidCallback onClicked;
+//
+//   const HomeScreenCard(this.data, this.onClicked);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.all(8.0),
+//       child: InkWell(
+//         borderRadius: BorderRadius.circular(10),
+//         onTap: onClicked,
+//         child: Container(
+//           decoration: BoxDecoration(
+//             borderRadius: BorderRadius.circular(10),
+//             gradient: LinearGradient(
+//               begin: Alignment.centerLeft,
+//               end: Alignment.centerRight,
+//               colors: [Color(0x14c6ffdd), Color(0x14fbd786), Color(0x14f7797d)],
+//             ),
+//           ),
+//           padding: const EdgeInsets.all(20),
+//           child: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             mainAxisAlignment: MainAxisAlignment.start,
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               Text(
+//                 'title',
+//                 style: TextStyle(
+//                   color: Colors.white,
+//                   fontSize: 18,
+//                   fontWeight: FontWeight.w600,
+//                 ),
+//               ),
+//               SizedBox(height: 10),
+//               Container(
+//                 width: double.infinity,
+//                 height: 25,
+//                 clipBehavior: Clip.antiAlias,
+//                 decoration: BoxDecoration(
+//                   borderRadius: BorderRadius.circular(10),
+//                 ),
+//                 // child: HorizontalProgressBar(
+//                 //   data: data,
+//                 //   isProportional: false,
+//                 // ),
+//               ),
+//               SizedBox(height: 10),
+//               Container(
+//                 width: double.infinity,
+//                 child: ClipRect(
+//                   clipBehavior: Clip.antiAlias,
+//                   child: Row(
+//                     mainAxisSize: MainAxisSize.min,
+//                     mainAxisAlignment: MainAxisAlignment.start,
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: spaceRow(
+//                       20,
+//                       [
+//                         for (int i = 0; i < data.fullData.length; i++)
+//                           MiniName(
+//                             data.fullData[i].item.name,
+//                             data.colors[i] ?? Colors.red,
+//                           )
+//                       ],
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class HomeScreenEmptyCard extends StatelessWidget {
   final String title;

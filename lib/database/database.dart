@@ -41,43 +41,43 @@ class Items extends Table {
   RealColumn get targetPercent => real()();
 }
 
-class FullData extends FullDataNullable {
-  const FullData(
-    User user,
-    this.item,
-    this.group,
-  ) : super(user);
+// class FullData extends FullDataNullable {
+//   const FullData(
+//     User user,
+//     this.item,
+//     this.group,
+//   ) : super(user);
+//
+//   final Item item;
+//   final Group group;
+// }
 
-  final Item item;
-  final Group group;
-}
+// class ItemKindData {
+//   const ItemKindData(
+//     this.item,
+//     this.kind,
+//   );
+//
+//   final Item item;
+//   final Group kind;
+// }
 
-class ItemKindData {
-  const ItemKindData(
-    this.item,
-    this.kind,
-  );
+// class FullDataNullable {
+//   const FullDataNullable(this.user);
+//
+//   final User user;
+// }
 
-  final Item item;
-  final Group kind;
-}
+// class FullDataExtended {
+//   const FullDataExtended(this.groupedData, this.colors, this.fullData);
+//
+//   final Map<int, List<FullData>> groupedData;
+//   final List<FullData> fullData;
+//   final Map<FullData, Color> colors;
+// }
 
-class FullDataNullable {
-  const FullDataNullable(this.user);
-
-  final User user;
-}
-
-class FullDataExtended {
-  const FullDataExtended(this.groupedData, this.colors, this.fullData);
-
-  final Map<int, List<FullData>> groupedData;
-  final List<FullData> fullData;
-  final Map<FullData, Color> colors;
-}
-
-class FullDataExtended2 {
-  const FullDataExtended2(
+class DataExtended {
+  const DataExtended(
       this.itemsList, this.itemsMap, this.groupsMap, this.colorsMap);
 
   // List of Items
@@ -155,14 +155,14 @@ class Database extends _$Database {
 // /// Watches all entries in the given [category]. If the category is null, all
 // /// entries will be shown instead.
 
-  // Users -> Groups : [Items]
-  Stream<FullDataExtended2> watchGroups(int userId) {
+  // Users, Groups : [Items]
+  Stream<DataExtended> watchGroups(int userId) {
     final groupsQuery = select(groups);
 
     final itemsQuery = select(items)
       ..where((item) => item.userId.equals(userId));
 
-    return Rx.combineLatest2<List<Group>, List<Item>, FullDataExtended2>(
+    return Rx.combineLatest2<List<Group>, List<Item>, DataExtended>(
         groupsQuery.watch(), itemsQuery.watch(), (groupList, itemsList) {
       final groupMap = <int, Group>{};
       for (final group in groupList) {
@@ -178,36 +178,36 @@ class Database extends _$Database {
       final Map<Item, Color> colors =
           getColorByQuantile(groupedItems, groupMap, sortedItems);
 
-      return FullDataExtended2(itemsList, groupedItems, groupMap, colors);
+      return DataExtended(sortedItems, groupedItems, groupMap, colors);
     });
   }
 
-  Stream<List<FullData>> watchItems(int userId) {
-    final queryUser = select(users)..where((user) => user.id.equals(userId));
-
-    final query = queryUser.join([
-      leftOuterJoin(
-        items,
-        items.userId.equalsExp(users.id),
-      ),
-      // leftOuterJoin(
-      //   groups,
-      //   groups.id.equalsExp(items.groupId),
-      // ),
-    ]);
-
-    return query.watch().map((rows) {
-      print("rows are $rows");
-      // read both the entry and the associated category for each row
-      return rows.map((row) {
-        return FullData(
-          row.readTable(users),
-          row.readTable(items),
-          row.readTable(groups),
-        );
-      }).toList();
-    });
-  }
+  // Stream<List<FullData>> watchItems(int userId) {
+  //   final queryUser = select(users)..where((user) => user.id.equals(userId));
+  //
+  //   final query = queryUser.join([
+  //     leftOuterJoin(
+  //       items,
+  //       items.userId.equalsExp(users.id),
+  //     ),
+  //     // leftOuterJoin(
+  //     //   groups,
+  //     //   groups.id.equalsExp(items.groupId),
+  //     // ),
+  //   ]);
+  //
+  //   return query.watch().map((rows) {
+  //     print("rows are $rows");
+  //     // read both the entry and the associated category for each row
+  //     return rows.map((row) {
+  //       return FullData(
+  //         row.readTable(users),
+  //         row.readTable(items),
+  //         row.readTable(groups),
+  //       );
+  //     }).toList();
+  //   });
+  // }
 
   // Stream<FullDataExtended> watchItemsGroupedHome() {
   //   return watchGroups().map((data) {
@@ -261,29 +261,29 @@ class Database extends _$Database {
     return groupedList;
   }
 
-  Stream<List<FullData>> watchMainGroups() {
-    final query = select(users).join([
-      leftOuterJoin(
-        items,
-        users.id.equalsExp(items.userId),
-      ),
-      leftOuterJoin(
-        groups,
-        groups.id.equalsExp(items.groupId),
-      ),
-    ]);
-
-    return query.watch().map((rows) {
-      // read both the entry and the associated category for each row
-      return rows.map((row) {
-        return FullData(
-          row.readTable(users),
-          row.readTable(items),
-          row.readTable(groups),
-        );
-      }).toList();
-    });
-  }
+  // Stream<List<FullData>> watchMainGroups() {
+  //   final query = select(users).join([
+  //     leftOuterJoin(
+  //       items,
+  //       users.id.equalsExp(items.userId),
+  //     ),
+  //     leftOuterJoin(
+  //       groups,
+  //       groups.id.equalsExp(items.groupId),
+  //     ),
+  //   ]);
+  //
+  //   return query.watch().map((rows) {
+  //     // read both the entry and the associated category for each row
+  //     return rows.map((row) {
+  //       return FullData(
+  //         row.readTable(users),
+  //         row.readTable(items),
+  //         row.readTable(groups),
+  //       );
+  //     }).toList();
+  //   });
+  // }
 
 //
 // Future createEntry(TodosCompanion entry) {
@@ -308,6 +308,10 @@ class Database extends _$Database {
     return into(users).insert(UsersCompanion.insert(name: description));
   }
 
+  Future<bool> editUser(User user) {
+    return update(users).replace(user);
+  }
+
   Future<int> createGroup(String description, String colorName) {
     return into(groups).insert(GroupsCompanion.insert(
       name: description,
@@ -315,8 +319,41 @@ class Database extends _$Database {
     ));
   }
 
-  Future<bool> editUser(User user) {
-    return update(users).replace(user);
+  Future<bool> editGroup(Group group) {
+    return update(groups).replace(group);
+  }
+
+  Future<int> createItem({
+    required int groupId,
+    required int userId,
+    required String name,
+    required String value,
+    required String target,
+  }) {
+    return into(items).insert(ItemsCompanion.insert(
+      groupId: groupId,
+      userId: userId,
+      name: name,
+      quantity: 1,
+      price: double.parse(value),
+      targetPercent: double.tryParse(target) ?? 0,
+    ));
+  }
+
+  // Future<bool> updateItem(Item item) {
+  //   return update(items).replace(item);
+  // }
+
+  Future<bool> updateItem(Item item, String name, String price, String target) {
+    return update(items).replace(item.copyWith(
+      name: name,
+      price: double.parse(price),
+      targetPercent: double.tryParse(target) ?? 0,
+    ));
+  }
+
+  Future<int> deleteItem(Item item) {
+    return (delete(items)..where((t) => t.id.equals(item.id))).go();
   }
 
   Future<int> getDefaultUser() async {

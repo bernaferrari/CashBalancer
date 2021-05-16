@@ -8,27 +8,32 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../l10n/l10n.dart';
 
-class DetailsGroupDialog extends StatefulWidget {
+class GroupDialog extends StatefulWidget {
   final Function(String, String)? onSavePressed;
-  final String? initialValue;
+  final String? initialTitle;
+  final String? initialColorName;
 
-  const DetailsGroupDialog({this.onSavePressed, this.initialValue});
+  const GroupDialog({
+    this.onSavePressed,
+    this.initialTitle,
+    this.initialColorName,
+  });
 
   @override
-  _DetailsGroupDialogState createState() => _DetailsGroupDialogState();
+  _GroupDialogState createState() => _GroupDialogState();
 }
 
-class _DetailsGroupDialogState extends State<DetailsGroupDialog> {
+class _GroupDialogState extends State<GroupDialog> {
   late final TextEditingController textEditingController;
   final _formKey = GlobalKey<FormState>();
   late String colorName;
 
   @override
   void initState() {
-    colorName =
+    colorName = widget.initialColorName ??
         tailwindColorsNames[Random().nextInt(tailwindColorsNames.length)];
 
-    textEditingController = TextEditingController(text: widget.initialValue);
+    textEditingController = TextEditingController(text: widget.initialTitle);
     super.initState();
   }
 
@@ -45,7 +50,11 @@ class _DetailsGroupDialogState extends State<DetailsGroupDialog> {
         : tailwindColors[colorName]![800]!;
 
     return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.mainDialogTitle),
+      title: Text(
+        widget.initialTitle == null
+            ? AppLocalizations.of(context)!.addGroup
+            : AppLocalizations.of(context)!.editGroup,
+      ),
       backgroundColor: Theme.of(context).brightness == Brightness.dark
           ? Color.alphaBlend(
               Colors.black.withOpacity(0.60),
@@ -60,6 +69,7 @@ class _DetailsGroupDialogState extends State<DetailsGroupDialog> {
             TextFormField(
               controller: textEditingController,
               onFieldSubmitted: onSubmit,
+              autofocus: true,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return AppLocalizations.of(context)!.mainDialogValidator;
@@ -104,7 +114,7 @@ class _DetailsGroupDialogState extends State<DetailsGroupDialog> {
                   primary: primaryColor,
                 ),
                 child: Text(
-                  AppLocalizations.of(context)!.mainDialogSave,
+                  AppLocalizations.of(context)!.dialogSave,
                   style: GoogleFonts.rubik(
                     fontWeight: FontWeight.w800,
                   ),
@@ -117,7 +127,7 @@ class _DetailsGroupDialogState extends State<DetailsGroupDialog> {
               width: double.infinity,
               child: TextButton(
                 child: Text(
-                  AppLocalizations.of(context)!.mainDialogCancel,
+                  AppLocalizations.of(context)!.dialogCancel,
                   style: GoogleFonts.rubik(
                     color: primaryColor,
                   ),
