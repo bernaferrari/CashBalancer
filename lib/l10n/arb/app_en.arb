@@ -1,7 +1,8 @@
 {
+  "appTitle": "Cash Balancer",
   "mainFAB": "Add Wallet",
   "mainEmptyTitle": "Add your first wallet.",
-  "mainEmptySubtitle": "Tap the + to add an account, where you'll be able to add your cash.",
+  "mainEmptySubtitle": "Tap the + to add a group, where you'll be able to add your cash.",
   "mainDialogValidator": "Please enter some text",
   "addGroup": "Add a Group",
   "editGroup": "Edit a Group",

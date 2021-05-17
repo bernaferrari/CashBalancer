@@ -63,7 +63,7 @@ class DetailsPageImpl extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         title: Text(
-          'Cash Balancer',
+          AppLocalizations.of(context)!.appTitle,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         backgroundColor: Colors.transparent,
@@ -98,48 +98,94 @@ class DetailsPageImpl extends StatelessWidget {
               subtitle: AppLocalizations.of(context)!.mainEmptySubtitle,
               icon: Icons.account_balance_sharp,
             )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: double.infinity,
-                  margin: EdgeInsets.all(20),
-                  width: 20,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.10),
+          : MainList(data: data!, userId: userId),
+    );
+  }
+}
+
+class MainList extends StatelessWidget {
+  final DataExtended data;
+  final int userId;
+
+  const MainList({
+    Key? key,
+    required this.data,
+    required this.userId,
+  }) : super(key: key);
+
+  static const double margin = 20.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final double totalValue =
+        data.itemsList.fold(0, (a, b) => a + b.price * b.quantity);
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 500),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: double.infinity,
+              margin: EdgeInsets.all(margin),
+              width: 20,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.10),
+              ),
+              child: VerticalProgressBar(
+                data: data,
+                totalValue: totalValue,
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    right: margin,
+                    top: margin,
+                    bottom: margin,
                   ),
-                  child: VerticalProgressBar(
-                    data: data!,
-                    isProportional: false,
-                  ),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 20.0),
-                      child: CardGroupDetails(data!, userId),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: spaceColumn(
+                      20,
+                      data.groupsMap.entries.map(
+                        (e) => GroupCard(
+                          itemsList: data.itemsMap[e.key]
+                            ?..sort(
+                              (a, b) => (b.price * a.quantity)
+                                  .compareTo(a.price * a.quantity),
+                            ),
+                          colorsMap: data.colorsMap,
+                          totalValue: totalValue,
+                          group: e.value,
+                          userId: userId,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
+          ],
+        ),
+      ),
     );
   }
 }
 
 class VerticalProgressBar extends StatelessWidget {
   final DataExtended data;
-  final bool isProportional;
+  final double totalValue;
 
   const VerticalProgressBar({
     required this.data,
-    required this.isProportional,
+    required this.totalValue,
   });
 
   @override
@@ -169,8 +215,7 @@ class VerticalProgressBar extends StatelessWidget {
                       showDialog<Object>(
                         context: context,
                         builder: (_) => ItemDialog(
-                          totalValue: data.itemsList
-                              .fold(0, (a, b) => a + b.price * b.quantity),
+                          totalValue: totalValue,
                           colorName:
                               data.groupsMap[data.itemsList[i].groupId]!.color,
                           previousItem: data.itemsList[i],
@@ -197,46 +242,6 @@ class VerticalProgressBar extends StatelessWidget {
   }
 }
 
-class CardGroupDetails extends StatelessWidget {
-  final DataExtended data;
-  final int userId;
-
-  const CardGroupDetails(this.data, this.userId);
-
-  @override
-  Widget build(BuildContext context) {
-    final double totalValue = data.itemsList
-        .map((d) => d.price * d.quantity)
-        .fold(0.0, (previous, current) => previous + current);
-
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 20),
-      child: SizedBox(
-        width: 300,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: spaceColumn(
-            20,
-            data.groupsMap.entries.map(
-              (e) => GroupCard(
-                itemsList: data.itemsMap[e.key]
-                  ?..sort(
-                    (a, b) =>
-                        (b.price * a.quantity).compareTo(a.price * a.quantity),
-                  ),
-                colorsMap: data.colorsMap,
-                totalValue: totalValue,
-                group: e.value,
-                userId: userId,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 Map<int, Color> getColor(String colorType) {
   return tailwindColors[colorType]!;
 }
@@ -257,19 +262,29 @@ class GroupCard extends StatelessWidget {
     required this.userId,
   }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    final Map<int, Color> localTailwindColor = getColor(group.color);
-    final color = localTailwindColor[500]!;
-
-    if (itemsList == null) {
-      return Container(
+  // Make it reusable.
+  Widget customContainer({
+    required Widget child,
+    required Color color,
+  }) =>
+      Container(
         padding: EdgeInsets.all(10.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.0),
           border: Border.all(color: color.withOpacity(0.20)),
           color: color.withOpacity(0.10),
         ),
+        child: child,
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final Map<int, Color> localTailwindColor = getColor(group.color);
+    final color = localTailwindColor[500]!;
+
+    if (itemsList == null) {
+      return customContainer(
+        color: color,
         child: GroupCardTitleBar(
           title: group.name,
           subtitle: "Press + to add.",
@@ -295,13 +310,8 @@ class GroupCard extends StatelessWidget {
 
       final double totalLocalPercent = 100.0 * totalLocalPrice / totalValue;
 
-      return Container(
-        padding: EdgeInsets.all(10.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.0),
-          border: Border.all(color: color.withOpacity(0.20)),
-          color: color.withOpacity(0.10),
-        ),
+      return customContainer(
+        color: color,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -379,7 +389,9 @@ class AddItem extends StatelessWidget {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         primary: color,
-        minimumSize: Size(36, 36),
+        padding: EdgeInsets.zero,
+        minimumSize: Size.zero,
+        fixedSize: Size(64, 40),
       ),
       child: Icon(Icons.add_rounded),
       onPressed: () {
@@ -428,7 +440,7 @@ class EditGroup extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        fixedSize: Size(36, 36),
+        fixedSize: Size(40, 40),
       ),
       child: Icon(Icons.edit_rounded),
       onPressed: () {
