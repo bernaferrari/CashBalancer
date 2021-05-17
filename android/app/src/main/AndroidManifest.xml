@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.cash_balancer">
+    package="com.bernaferrari.cash_balancer">
    <application
-        android:label="cash_balancer"
+        android:label="Cash Balancer"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

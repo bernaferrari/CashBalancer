@@ -99,14 +99,13 @@ class DetailsPageImpl extends StatelessWidget {
               icon: Icons.account_balance_sharp,
             )
           : Row(
-              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   height: double.infinity,
                   margin: EdgeInsets.all(20),
-                  width: 30,
+                  width: 20,
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -120,7 +119,14 @@ class DetailsPageImpl extends StatelessWidget {
                     isProportional: false,
                   ),
                 ),
-                SingleChildScrollView(child: CardGroupDetails(data!, userId)),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 20.0),
+                      child: CardGroupDetails(data!, userId),
+                    ),
+                  ),
+                ),
               ],
             ),
     );
@@ -272,11 +278,12 @@ class GroupCard extends StatelessWidget {
               EditGroup(color: color, group: group),
               SizedBox(width: 8),
               AddItem(
-                  color: color,
-                  userId: userId,
-                  groupId: group.id,
-                  colorName: group.color,
-                  totalValue: totalValue),
+                color: color,
+                userId: userId,
+                groupId: group.id,
+                colorName: group.color,
+                totalValue: totalValue,
+              ),
             ],
           ),
         ),
@@ -370,7 +377,10 @@ class AddItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      style: ElevatedButton.styleFrom(primary: color),
+      style: ElevatedButton.styleFrom(
+        primary: color,
+        minimumSize: Size(36, 36),
+      ),
       child: Icon(Icons.add_rounded),
       onPressed: () {
         showDialog<Object>(
@@ -378,6 +388,9 @@ class AddItem extends StatelessWidget {
           builder: (_) => ItemDialog(
             colorName: colorName,
             totalValue: totalValue,
+            bloc: context.read<DataBloc>(),
+            groupId: groupId,
+            userId: userId,
             onSavePressed: (name, value, target) {
               // Preserve the Bloc's context.
               context.read<DataBloc>().db.createItem(

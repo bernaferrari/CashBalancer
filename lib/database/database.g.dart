@@ -279,7 +279,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     this.id = const Value.absent(),
     required String name,
     required String color,
-  })  : name = Value(name),
+  })   : name = Value(name),
         color = Value(color);
   static Insertable<Group> custom({
     Expression<int>? id,
@@ -575,7 +575,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     required double quantity,
     required double price,
     required double targetPercent,
-  })  : groupId = Value(groupId),
+  })   : groupId = Value(groupId),
         userId = Value(userId),
         name = Value(name),
         quantity = Value(quantity),

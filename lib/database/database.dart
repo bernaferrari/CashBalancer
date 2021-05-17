@@ -118,6 +118,10 @@ class Database extends _$Database {
         // }
       },
       beforeOpen: (details) async {
+        if (details.wasCreated) {
+          await into(users).insert(UsersCompanion.insert(name: 'Wallet #1'));
+        }
+
         // if (details.wasCreated) {
         //   // create default categories and entries
         //   final workId = await into(categories)
@@ -357,11 +361,12 @@ class Database extends _$Database {
   }
 
   Future<int> getDefaultUser() async {
-    if (await userExists().getSingle() == 0) {
-      // Create a new default user if it doesn't exist.
-      final id = await into(users).insert(UsersCompanion.insert(name: '🚀'));
-      return id;
-    }
+    // This was moved to [wasCreated]
+    // if (await userExists().getSingle() == 0) {
+    //   // Create a new default user if it doesn't exist.
+    //   final id = await into(users).insert(UsersCompanion.insert(name: '🚀'));
+    //   return id;
+    // }
 
     return (await select(users).get())[0].id;
   }

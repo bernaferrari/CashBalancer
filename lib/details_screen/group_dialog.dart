@@ -70,6 +70,7 @@ class _GroupDialogState extends State<GroupDialog> {
               controller: textEditingController,
               onFieldSubmitted: onSubmit,
               autofocus: true,
+              textCapitalization: TextCapitalization.sentences,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return AppLocalizations.of(context)!.mainDialogValidator;

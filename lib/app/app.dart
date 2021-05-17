@@ -30,6 +30,7 @@ class App extends StatelessWidget {
 
     final textButtonTheme = TextButtonThemeData(
       style: TextButton.styleFrom(
+        minimumSize: Size(48, 48),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -38,6 +39,7 @@ class App extends StatelessWidget {
 
     final elevatedButtonTheme = ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
+        minimumSize: Size(48, 48),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -46,6 +48,7 @@ class App extends StatelessWidget {
 
     final outlinedButtonTheme = OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
+        minimumSize: Size(48, 48),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -70,7 +73,6 @@ class App extends StatelessWidget {
           ),
           accentColor: const Color(0xff5ae492),
           appBarTheme: const AppBarTheme(color: Color(0xFF13B9FF)),
-          visualDensity: VisualDensity.standard,
           typography: Typography.material2018(),
           applyElevationOverlayColor: true,
           elevatedButtonTheme: elevatedButtonTheme,
@@ -92,7 +94,6 @@ class App extends StatelessWidget {
           ),
           accentColor: const Color(0xff5ae492),
           appBarTheme: const AppBarTheme(color: Color(0xFF13B9FF)),
-          visualDensity: VisualDensity.standard,
           typography: Typography.material2018(),
           applyElevationOverlayColor: true,
           elevatedButtonTheme: elevatedButtonTheme,

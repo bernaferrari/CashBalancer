@@ -27,8 +27,8 @@ class _AnimatedColorPickerState extends State<AnimatedColorPicker> {
       height: 56,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
+        physics: BouncingScrollPhysics(),
         child: Row(
-          // scrollDirection: Axis.horizontal,
           children: [
             for (String colorName in tailwindColorsNames)
               AnimatedColorItem(
@@ -59,7 +59,7 @@ class AnimatedColorItem extends StatelessWidget {
     this.onSelected,
   });
 
-  final maxSize = 40.0;
+  final maxSize = 36.0;
 
   @override
   Widget build(BuildContext context) {
@@ -69,8 +69,8 @@ class AnimatedColorItem extends StatelessWidget {
       customBorder: CircleBorder(),
       onTap: onSelected,
       child: SizedBox(
-        width: 56,
-        height: 56,
+        width: 48,
+        height: 48,
         child: Stack(
           children: [
             Center(

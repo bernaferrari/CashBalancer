@@ -1,4 +1,4 @@
-package com.example.cash_balancer
+package com.bernaferrari.cash_balancer
 
 import io.flutter.embedding.android.FlutterActivity
 
