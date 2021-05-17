@@ -266,13 +266,16 @@ class GroupCard extends StatelessWidget {
   Widget customContainer({
     required Widget child,
     required Color color,
+    required BuildContext context,
   }) =>
       Container(
         padding: EdgeInsets.all(10.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.0),
           border: Border.all(color: color.withOpacity(0.20)),
-          color: color.withOpacity(0.10),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? color.withOpacity(0.10)
+              : color.withOpacity(0.05),
         ),
         child: child,
       );
@@ -284,6 +287,7 @@ class GroupCard extends StatelessWidget {
 
     if (itemsList == null) {
       return customContainer(
+        context: context,
         color: color,
         child: GroupCardTitleBar(
           title: group.name,
@@ -311,6 +315,7 @@ class GroupCard extends StatelessWidget {
       final double totalLocalPercent = 100.0 * totalLocalPrice / totalValue;
 
       return customContainer(
+        context: context,
         color: color,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -564,7 +569,7 @@ class ItemCard extends StatelessWidget {
         padding: EdgeInsets.all(10.0),
         backgroundColor: Theme.of(context).brightness == Brightness.dark
             ? color.withOpacity(0.05)
-            : color.withOpacity(0.15),
+            : color.withOpacity(0.25),
       ),
       onPressed: () {
         showDialog<Object>(
@@ -701,117 +706,3 @@ class ItemCard extends StatelessWidget {
     );
   }
 }
-
-// class CardButton2 extends StatelessWidget {
-//   final AssetData data;
-//   final Color color;
-//   final double totalValue;
-//
-//   const CardButton2(this.data, this.color, this.totalValue);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return TextButton(
-//       style: TextButton.styleFrom(
-//         padding: EdgeInsets.all(10.0),
-//       ),
-//       onPressed: () {},
-//       child: Row(
-//         children: [
-//           Container(
-//             width: 15,
-//             height: 15,
-//             decoration: BoxDecoration(
-//               borderRadius: BorderRadius.circular(5),
-//               color: color,
-//             ),
-//           ),
-//           SizedBox(width: 10),
-//           Center(
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   data.name,
-//                   overflow: TextOverflow.ellipsis,
-//                   style: Theme.of(context).textTheme.subtitle2,
-//                 ),
-//                 Text(
-//                   "R\$ ${data.price * data.quantity}",
-//                   style: Theme.of(context).textTheme.bodyText2,
-//                 ),
-//               ],
-//             ),
-//           ),
-//           Spacer(),
-//           Text(
-//             "${(100 * data.price * data.quantity / totalValue).toStringAsFixed(2)} %",
-//             style: Theme.of(context).textTheme.bodyText2,
-//           ),
-//         ],
-//       ),
-// Row(
-//   mainAxisSize: MainAxisSize.min,
-//   children: [
-//     // Text(
-//     //   "R\$ ${data.price * data.quantity}",
-//     //   style: Theme.of(context).textTheme.bodyText2,
-//     // ),
-//     SizedBox(width: 8),
-//     if (false)
-//       Stack(
-//         children: [
-//           Text(
-//             "// ${(data.price * data.quantity / totalValue * 100).toStringAsFixed(2)}%",
-//             style: Theme.of(context)
-//                 .textTheme
-//                 .bodyText2
-//                 ?.copyWith(color: Colors.white.withOpacity(0.6)),
-//           ),
-//           Opacity(
-//             opacity: 0,
-//             child: Text(
-//               "// 99.99%",
-//               style: Theme.of(context)
-//                   .textTheme
-//                   .bodyText2
-//                   ?.copyWith(color: Colors.white.withOpacity(0.6)),
-//             ),
-//           ),
-//         ],
-//       ),
-//   ],
-// ),
-//     );
-//   }
-// }
-
-// class MiniNameDetails extends StatelessWidget {
-//   final String title;
-//   final Color color;
-//
-//   const MiniNameDetails(this.title, this.color);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Row(
-//       mainAxisSize: MainAxisSize.min,
-//       children: [
-//         Container(
-//           width: 15,
-//           height: 15,
-//           decoration: BoxDecoration(
-//             borderRadius: BorderRadius.circular(5),
-//             color: color,
-//           ),
-//         ),
-//         SizedBox(width: 10),
-//         Text(
-//           title,
-//           overflow: TextOverflow.ellipsis,
-//           style: Theme.of(context).textTheme.bodyText2,
-//         ),
-//       ],
-//     );
-//   }
-// }
