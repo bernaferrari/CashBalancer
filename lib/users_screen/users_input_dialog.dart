@@ -14,15 +14,9 @@ class HomeInputDialog extends StatefulWidget {
 }
 
 class _HomeInputDialogState extends State<HomeInputDialog> {
-  late final TextEditingController textEditingController;
+  late final TextEditingController textEditingController =
+      TextEditingController(text: widget.initialValue);
   final _formKey = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    textEditingController = TextEditingController(text: widget.initialValue);
-
-    super.initState();
-  }
 
   @override
   void dispose() {

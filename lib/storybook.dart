@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:storybook_flutter/storybook_flutter.dart';
 
-import 'details_screen/pickers.dart';
+import 'details_screen/color_picker.dart';
 
 void main() => runApp(const StorybookApp());
 
@@ -13,7 +13,7 @@ class StorybookApp extends StatelessWidget {
         children: [
           Story(
             name: 'Animated Color Item',
-            builder: (_, k) => AnimatedColorPicker('red', (changed) {}),
+            builder: (_, k) => ColorPicker('red', (changed) {}),
           ),
         ],
       );

@@ -1,13 +1,11 @@
 import 'dart:math';
 
-import 'package:cash_balancer/database/database.dart';
-import 'package:cash_balancer/details_screen/pickers.dart';
-
-import '../util/tailwind_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
+import '../database/database.dart';
 import '../l10n/l10n.dart';
+import '../util/tailwind_colors.dart';
+import 'color_picker.dart';
 
 class GroupDialog extends StatefulWidget {
   final Function(String text, String color) onSavePressed;
@@ -25,19 +23,11 @@ class GroupDialog extends StatefulWidget {
 }
 
 class _GroupDialogState extends State<GroupDialog> {
-  late final TextEditingController textEditingController;
   final _formKey = GlobalKey<FormState>();
-  late String colorName;
-
-  @override
-  void initState() {
-    colorName = widget.previousGroup?.color ??
-        tailwindColorsNames[Random().nextInt(tailwindColorsNames.length)];
-
-    textEditingController =
-        TextEditingController(text: widget.previousGroup?.name);
-    super.initState();
-  }
+  late final TextEditingController textEditingController =
+      TextEditingController(text: widget.previousGroup?.name);
+  late String colorName = widget.previousGroup?.color ??
+      tailwindColorsNames[Random().nextInt(tailwindColorsNames.length)];
 
   @override
   void dispose() {
@@ -104,7 +94,7 @@ class _GroupDialogState extends State<GroupDialog> {
             SizedBox(height: 16),
             ConstrainedBox(
               constraints: BoxConstraints(maxWidth: 400),
-              child: AnimatedColorPicker(colorName, (changed) {
+              child: ColorPicker(colorName, (changed) {
                 setState(() {
                   colorName = changed;
                 });

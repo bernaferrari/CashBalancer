@@ -2,24 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../util/tailwind_colors.dart';
 
-class AnimatedColorPicker extends StatefulWidget {
+class ColorPicker extends StatefulWidget {
   final String initialSelection;
   final ValueChanged<String> onChanged;
 
-  const AnimatedColorPicker(this.initialSelection, this.onChanged);
+  const ColorPicker(this.initialSelection, this.onChanged);
 
   @override
-  _AnimatedColorPickerState createState() => _AnimatedColorPickerState();
+  _ColorPickerState createState() => _ColorPickerState();
 }
 
-class _AnimatedColorPickerState extends State<AnimatedColorPicker> {
-  late String selected;
-
-  @override
-  void initState() {
-    selected = widget.initialSelection;
-    super.initState();
-  }
+class _ColorPickerState extends State<ColorPicker> {
+  late String selected = widget.initialSelection;
 
   @override
   Widget build(BuildContext context) {

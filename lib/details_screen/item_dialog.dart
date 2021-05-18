@@ -1,12 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/database.dart';
 import '../l10n/l10n.dart';
 import '../util/tailwind_colors.dart';
+
+class ItemPage extends StatelessWidget {
+  final int itemId;
+
+  const ItemPage({Key? key, required this.itemId}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: context.read<DataBloc>().db.getItemFromId(itemId),
+        builder: (ctx, snapshot) {
+          if (snapshot.hasData) {
+            return Text("HAS DATA ${snapshot.data}");
+          } else {
+            return Text("Loading");
+          }
+        });
+  }
+}
 
 class ItemDialog extends StatefulWidget {
   final Function(String, String, String) onSavePressed;
@@ -36,18 +55,17 @@ class ItemDialog extends StatefulWidget {
 }
 
 class _DetailsGroupDialogState extends State<ItemDialog> {
-  late final TextEditingController nameEditingController;
-  late final TextEditingController moneyEditingController;
+  late final TextEditingController nameEditingController =
+      TextEditingController(text: widget.previousItem?.name);
+  late final TextEditingController moneyEditingController =
+      TextEditingController(text: widget.previousItem?.price.toString());
+
   late final TextEditingController targetEditingController;
   final _formKey = GlobalKey<FormState>();
   late String relativePercentage;
 
   @override
   void initState() {
-    nameEditingController =
-        TextEditingController(text: widget.previousItem?.name);
-    moneyEditingController =
-        TextEditingController(text: widget.previousItem?.price.toString());
     if (widget.previousItem?.targetPercent == 0) {
       targetEditingController = TextEditingController();
     } else if (widget.previousItem?.targetPercent != null) {
@@ -272,6 +290,13 @@ class _DetailsGroupDialogState extends State<ItemDialog> {
 
   void onSubmit([String? value]) {
     if (_formKey.currentState!.validate()) {
+      widget.bloc!.db.createItem(
+        groupId: widget.groupId!,
+        userId: widget.userId!,
+        name: nameEditingController.text,
+        value: moneyEditingController.text,
+        target: targetEditingController.text,
+      );
       widget.onSavePressed(nameEditingController.text,
           moneyEditingController.text, targetEditingController.text);
       Navigator.of(context).pop();

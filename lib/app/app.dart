@@ -1,4 +1,5 @@
 import 'package:beamer/beamer.dart';
+import 'package:cash_balancer/details_screen/item_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -12,10 +13,23 @@ import '../settings/settings_page.dart';
 class App extends StatelessWidget {
   App({Key? key}) : super(key: key);
 
-  final _routerDelegate = BeamerRouterDelegate(
+  final _routerDelegate = BeamerDelegate(
     locationBuilder: SimpleLocationBuilder(routes: {
       '/': (context) => DetailsPage(),
       '/settings': (context) => SettingsPage(),
+      '/editItem/:itemId': (context) {
+        final beamState = context.currentBeamLocation.state;
+        final itemId = int.tryParse(beamState.pathParameters['itemId']!) ?? 0;
+
+        // Widgets and BeamPages can be mixed!
+        return BeamPage(
+          key: ValueKey('item-$itemId'),
+          title: 'Item #$itemId',
+          popToNamed: '/',
+          type: BeamPageType.scaleTransition,
+          child: ItemPage(itemId: itemId),
+        );
+      }
     }),
   );
 
@@ -108,7 +122,7 @@ class App extends StatelessWidget {
         supportedLocales: AppLocalizations.supportedLocales,
         title: 'Cash Balancer',
         routerDelegate: _routerDelegate,
-        routeInformationParser: BeamerRouteInformationParser(),
+        routeInformationParser: BeamerParser(),
         backButtonDispatcher:
             BeamerBackButtonDispatcher(delegate: _routerDelegate),
       ),

@@ -376,6 +376,10 @@ class Database extends _$Database {
     return (await select(users).get())[0].id;
   }
 
+  Future<Item?> getItemFromId(int id) async {
+    return (select(items)..where((t) => t.id.equals(id))).getSingleOrNull();
+  }
+
 // Future deleteCategory(Category category) {
 //   return transaction<dynamic>(() async {
 //     await _resetCategory(category.id);
