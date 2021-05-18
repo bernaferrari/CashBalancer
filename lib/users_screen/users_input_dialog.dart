@@ -35,7 +35,7 @@ class _HomeInputDialogState extends State<HomeInputDialog> {
     return AlertDialog(
       title: Text(
         widget.initialValue == null
-            ? AppLocalizations.of(context)!.addGroup
+            ? AppLocalizations.of(context)!.addAGroup
             : AppLocalizations.of(context)!.editGroup,
       ),
       content: Form(

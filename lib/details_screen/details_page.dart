@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -68,6 +69,17 @@ class DetailsPageImpl extends StatelessWidget {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () => Beamer.of(context).beamToNamed('/about'),
+            icon: Icon(Icons.info_outline_rounded),
+          ),
+          IconButton(
+            onPressed: () => Beamer.of(context).beamToNamed('/settings'),
+            icon: Icon(Icons.settings_outlined),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -84,7 +96,7 @@ class DetailsPageImpl extends StatelessWidget {
           );
         },
         label: Text(
-          "Add Group",
+          AppLocalizations.of(context)!.addGroup,
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
         ),
         icon: Icon(
@@ -452,8 +464,9 @@ class EditGroup extends StatelessWidget {
         showDialog<Object>(
           context: context,
           builder: (_) => GroupDialog(
-            initialColorName: group.color,
-            initialTitle: group.name,
+            previousGroup: group,
+            onDeletePressed: () async =>
+                await context.read<DataBloc>().db.deleteGroup(group.id),
             onSavePressed: (name, colorName) {
               // Preserve the Bloc's context.
               context.read<DataBloc>().db.editGroup(

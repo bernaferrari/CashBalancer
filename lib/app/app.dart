@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../blocs/data_bloc.dart';
 import '../details_screen/details_page.dart';
 import '../l10n/l10n.dart';
+import '../settings/settings_page.dart';
 
 class App extends StatelessWidget {
   App({Key? key}) : super(key: key);
@@ -14,7 +15,7 @@ class App extends StatelessWidget {
   final _routerDelegate = BeamerRouterDelegate(
     locationBuilder: SimpleLocationBuilder(routes: {
       '/': (context) => DetailsPage(),
-      '/settings': (context) => DetailsPage(),
+      '/settings': (context) => SettingsPage(),
     }),
   );
 
@@ -31,27 +32,23 @@ class App extends StatelessWidget {
     final textButtonTheme = TextButtonThemeData(
       style: TextButton.styleFrom(
         minimumSize: Size(48, 48),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
 
     final elevatedButtonTheme = ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         minimumSize: Size(48, 48),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        textStyle: GoogleFonts.rubik(fontWeight: FontWeight.w700),
       ),
     );
 
     final outlinedButtonTheme = OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         minimumSize: Size(48, 48),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        textStyle: GoogleFonts.rubik(fontWeight: FontWeight.w700),
       ),
     );
 
@@ -77,6 +74,7 @@ class App extends StatelessWidget {
           visualDensity: VisualDensity.standard,
           applyElevationOverlayColor: true,
           elevatedButtonTheme: elevatedButtonTheme,
+          outlinedButtonTheme: outlinedButtonTheme,
           textButtonTheme: textButtonTheme,
           textTheme: textTheme,
         ),

@@ -48,8 +48,14 @@ class _DetailsGroupDialogState extends State<ItemDialog> {
         TextEditingController(text: widget.previousItem?.name);
     moneyEditingController =
         TextEditingController(text: widget.previousItem?.price.toString());
-    targetEditingController = TextEditingController(
-        text: widget.previousItem?.targetPercent.toString());
+    if (widget.previousItem?.targetPercent == 0) {
+      targetEditingController = TextEditingController();
+    } else if (widget.previousItem?.targetPercent != null) {
+      targetEditingController = TextEditingController(
+          text: widget.previousItem?.targetPercent.toString());
+    } else {
+      targetEditingController = TextEditingController();
+    }
     onChanged();
     super.initState();
   }
@@ -84,220 +90,180 @@ class _DetailsGroupDialogState extends State<ItemDialog> {
               tailwindColors[widget.colorName]![900]!,
             )
           : tailwindColors[widget.colorName]![100],
-      content: SingleChildScrollView(
-        child: SizedBox(
-          width: 400,
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextFormField(
-                  controller: nameEditingController,
-                  onFieldSubmitted: onSubmit,
-                  autofocus: widget.previousItem == null ? true : false,
-                  keyboardType: TextInputType.text,
-                  textCapitalization: TextCapitalization.sentences,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return AppLocalizations.of(context)!.mainDialogValidator;
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    filled: true,
-                    labelText: AppLocalizations.of(context)!.mainDialogLabel,
-                    labelStyle: TextStyle(color: primaryColor),
-                    // border is used when there is an error
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: primaryColor),
-                    ),
-                    // focusedBorder is used when focused
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: primaryColor),
-                    ),
-                    // enabledBorder is the default, first shown, border.
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: primaryColor),
-                    ),
+      content: SizedBox(
+        width: 400,
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              TextFormField(
+                controller: nameEditingController,
+                onFieldSubmitted: onSubmit,
+                autofocus: widget.previousItem == null ? true : false,
+                keyboardType: TextInputType.text,
+                textCapitalization: TextCapitalization.sentences,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return AppLocalizations.of(context)!.mainDialogValidator;
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                  filled: true,
+                  labelText: AppLocalizations.of(context)!.mainDialogLabel,
+                  labelStyle: TextStyle(color: primaryColor),
+                  // border is used when there is an error
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: primaryColor),
+                  ),
+                  // focusedBorder is used when focused
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: primaryColor),
+                  ),
+                  // enabledBorder is the default, first shown, border.
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: primaryColor),
                   ),
                 ),
-                SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: moneyEditingController,
-                        onFieldSubmitted: onSubmit,
-                        onChanged: onChanged,
-                        autofocus: widget.previousItem != null,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return AppLocalizations.of(context)!
-                                .mainDialogValidator;
-                          }
-                          return null;
-                        },
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        textAlign: TextAlign.right,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          filled: true,
-                          labelText: "Value (\$)",
-                          // prefixIcon: Icon(
-                          //   Icons.money_rounded,
-                          //   color: primaryColor,
-                          // ),
-                          prefixText: "\$",
-                          suffixText: ".00",
-                          labelStyle: TextStyle(color: primaryColor),
-                          // border is used when there is an error
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: primaryColor),
-                          ),
-                          // focusedBorder is used when focused
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: primaryColor),
-                          ),
-                          // enabledBorder is the default, first shown, border.
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: primaryColor),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: TextFormField(
-                        controller: targetEditingController,
-                        onFieldSubmitted: onSubmit,
-                        validator: (value) {
-                          // No validator for target.
-                          //
-                          // if (value == null || value.isEmpty) {
-                          //   return AppLocalizations.of(context)!
-                          //       .mainDialogValidator;
-                          // }
-                          return null;
-                        },
-                        textAlign: TextAlign.right,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        decoration: InputDecoration(
-                          labelText: "Target (%)",
-                          suffixText: ".00 %",
-                          // prefixIcon: Icon(
-                          //   Icons.price_change_rounded,
-                          //   color: primaryColorWeaker,
-                          // ),
-                          labelStyle: TextStyle(color: primaryColorWeaker),
-                          // border is used when there is an error
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: primaryColorWeaker),
-                          ),
-                          // focusedBorder is used when focused
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: primaryColorWeaker),
-                          ),
-                          // enabledBorder is the default, first shown, border.
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: primaryColorWeaker),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16),
-                Text(
-                  relativePercentage,
-                  style: Theme.of(context).textTheme.bodyText2,
-                ),
-                SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      primary: primaryColor,
-                    ),
-                    icon: Icon(Icons.check_rounded),
-                    label: Text(
-                      AppLocalizations.of(context)!.dialogSave,
-                      style: GoogleFonts.rubik(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    onPressed: onSubmit,
-                  ),
-                ),
-                SizedBox(height: 8),
-                if (widget.previousItem == null)
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        primary: primaryColor,
-                        shape: RoundedRectangleBorder(
+              ),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: moneyEditingController,
+                      onFieldSubmitted: onSubmit,
+                      onChanged: onChanged,
+                      autofocus: widget.previousItem != null,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return AppLocalizations.of(context)!
+                              .mainDialogValidator;
+                        }
+                        return null;
+                      },
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
+                      textAlign: TextAlign.right,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        filled: true,
+                        labelText: "Value (\$)",
+                        // prefixIcon: Icon(
+                        //   Icons.money_rounded,
+                        //   color: primaryColor,
+                        // ),
+                        prefixText: "\$",
+                        suffixText: ".00",
+                        labelStyle: TextStyle(color: primaryColor),
+                        // border is used when there is an error
+                        border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: primaryColor),
                         ),
-                      ),
-                      icon: Icon(Icons.checklist_outlined),
-                      label: Text(
-                        AppLocalizations.of(context)!.dialogSaveAddMore,
-                        style: GoogleFonts.rubik(fontWeight: FontWeight.w800),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      onPressed: onSaveAddMore,
-                    ),
-                  )
-                else
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        primary: primaryColor,
-                        shape: RoundedRectangleBorder(
+                        // focusedBorder is used when focused
+                        focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: primaryColor),
+                        ),
+                        // enabledBorder is the default, first shown, border.
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: primaryColor),
                         ),
                       ),
-                      icon: Icon(Icons.delete_outline_outlined),
-                      label: Text(
-                        AppLocalizations.of(context)!.dialogDelete,
-                        style: GoogleFonts.rubik(fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: TextFormField(
+                      controller: targetEditingController,
+                      onFieldSubmitted: onSubmit,
+                      validator: (value) {
+                        // No validator for target.
+                        //
+                        // if (value == null || value.isEmpty) {
+                        //   return AppLocalizations.of(context)!
+                        //       .mainDialogValidator;
+                        // }
+                        return null;
+                      },
+                      textAlign: TextAlign.right,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
+                      decoration: InputDecoration(
+                        labelText: "Target (%)",
+                        suffixText: ".00 %",
+                        // prefixIcon: Icon(
+                        //   Icons.price_change_rounded,
+                        //   color: primaryColorWeaker,
+                        // ),
+                        labelStyle: TextStyle(color: primaryColorWeaker),
+                        // border is used when there is an error
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: primaryColorWeaker),
+                        ),
+                        // focusedBorder is used when focused
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: primaryColorWeaker),
+                        ),
+                        // enabledBorder is the default, first shown, border.
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: primaryColorWeaker),
+                        ),
                       ),
-                      onPressed: onDelete,
                     ),
                   ),
-                SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton.icon(
-                    icon: Icon(Icons.close_rounded, color: primaryColorWeaker),
-                    label: Text(
-                      AppLocalizations.of(context)!.dialogCancel,
-                      style: GoogleFonts.rubik(color: primaryColorWeaker),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+              Text(
+                relativePercentage,
+                style: Theme.of(context).textTheme.bodyText2,
+              ),
+              SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(primary: primaryColor),
+                  icon: Icon(Icons.check_rounded),
+                  label: Text(AppLocalizations.of(context)!.dialogSave),
+                  onPressed: onSubmit,
                 ),
-              ],
-            ),
+              ),
+              SizedBox(height: 8),
+              if (widget.previousItem == null)
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(primary: primaryColor),
+                  icon: Icon(Icons.checklist_outlined),
+                  label: Text(AppLocalizations.of(context)!.dialogSaveAddMore),
+                  onPressed: onSaveAddMore,
+                )
+              else
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(primary: primaryColor),
+                  icon: Icon(Icons.delete_outline_outlined),
+                  label: Text(AppLocalizations.of(context)!.dialogDelete),
+                  onPressed: onDelete,
+                ),
+              SizedBox(height: 8),
+              TextButton.icon(
+                style: TextButton.styleFrom(primary: primaryColorWeaker),
+                icon: Icon(Icons.close_rounded),
+                label: Text(AppLocalizations.of(context)!.dialogCancel),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
           ),
         ),
       ),

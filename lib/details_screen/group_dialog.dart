@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cash_balancer/database/database.dart';
 import 'package:cash_balancer/details_screen/pickers.dart';
 
 import '../util/tailwind_colors.dart';
@@ -9,14 +10,14 @@ import 'package:google_fonts/google_fonts.dart';
 import '../l10n/l10n.dart';
 
 class GroupDialog extends StatefulWidget {
-  final Function(String, String)? onSavePressed;
-  final String? initialTitle;
-  final String? initialColorName;
+  final Function(String text, String color) onSavePressed;
+  final VoidCallback? onDeletePressed;
+  final Group? previousGroup;
 
   const GroupDialog({
-    this.onSavePressed,
-    this.initialTitle,
-    this.initialColorName,
+    required this.onSavePressed,
+    this.previousGroup,
+    this.onDeletePressed,
   });
 
   @override
@@ -30,10 +31,11 @@ class _GroupDialogState extends State<GroupDialog> {
 
   @override
   void initState() {
-    colorName = widget.initialColorName ??
+    colorName = widget.previousGroup?.color ??
         tailwindColorsNames[Random().nextInt(tailwindColorsNames.length)];
 
-    textEditingController = TextEditingController(text: widget.initialTitle);
+    textEditingController =
+        TextEditingController(text: widget.previousGroup?.name);
     super.initState();
   }
 
@@ -51,8 +53,8 @@ class _GroupDialogState extends State<GroupDialog> {
 
     return AlertDialog(
       title: Text(
-        widget.initialTitle == null
-            ? AppLocalizations.of(context)!.addGroup
+        widget.previousGroup == null
+            ? AppLocalizations.of(context)!.addAGroup
             : AppLocalizations.of(context)!.editGroup,
       ),
       backgroundColor: Theme.of(context).brightness == Brightness.dark
@@ -65,6 +67,7 @@ class _GroupDialogState extends State<GroupDialog> {
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextFormField(
               controller: textEditingController,
@@ -108,35 +111,27 @@ class _GroupDialogState extends State<GroupDialog> {
               }),
             ),
             SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: primaryColor,
-                ),
-                child: Text(
-                  AppLocalizations.of(context)!.dialogSave,
-                  style: GoogleFonts.rubik(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                onPressed: onSubmit,
-              ),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(primary: primaryColor),
+              label: Text(AppLocalizations.of(context)!.dialogSave),
+              icon: Icon(Icons.check_rounded),
+              onPressed: onSubmit,
             ),
-            SizedBox(height: 8),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                child: Text(
-                  AppLocalizations.of(context)!.dialogCancel,
-                  style: GoogleFonts.rubik(
-                    color: primaryColor,
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+            if (widget.previousGroup != null) ...[
+              SizedBox(height: 8),
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(primary: primaryColor),
+                label: Text(AppLocalizations.of(context)!.dialogDelete),
+                icon: Icon(Icons.delete_outline_outlined),
+                onPressed: onDelete,
               ),
+            ],
+            SizedBox(height: 8),
+            TextButton.icon(
+              style: TextButton.styleFrom(primary: primaryColor),
+              label: Text(AppLocalizations.of(context)!.dialogCancel),
+              icon: Icon(Icons.close_rounded),
+              onPressed: () => Navigator.of(context).pop(),
             ),
           ],
         ),
@@ -146,8 +141,13 @@ class _GroupDialogState extends State<GroupDialog> {
 
   void onSubmit([String? value]) {
     if (_formKey.currentState!.validate()) {
-      widget.onSavePressed?.call(textEditingController.text, colorName);
+      widget.onSavePressed(textEditingController.text, colorName);
       Navigator.of(context).pop();
     }
+  }
+
+  void onDelete() {
+    widget.onDeletePressed!();
+    Navigator.of(context).pop();
   }
 }

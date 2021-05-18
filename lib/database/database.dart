@@ -360,6 +360,11 @@ class Database extends _$Database {
     return (delete(items)..where((t) => t.id.equals(item.id))).go();
   }
 
+  Future<void> deleteGroup(int groupId) async {
+    await (delete(items)..where((t) => t.groupId.equals(groupId))).go();
+    await (delete(groups)..where((t) => t.id.equals(groupId))).go();
+  }
+
   Future<int> getDefaultUser() async {
     // This was moved to [wasCreated]
     // if (await userExists().getSingle() == 0) {
