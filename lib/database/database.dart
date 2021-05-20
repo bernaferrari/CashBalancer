@@ -41,44 +41,11 @@ class Items extends Table {
   RealColumn get targetPercent => real()();
 }
 
-// class FullData extends FullDataNullable {
-//   const FullData(
-//     User user,
-//     this.item,
-//     this.group,
-//   ) : super(user);
-//
-//   final Item item;
-//   final Group group;
-// }
-
-// class ItemKindData {
-//   const ItemKindData(
-//     this.item,
-//     this.kind,
-//   );
-//
-//   final Item item;
-//   final Group kind;
-// }
-
-// class FullDataNullable {
-//   const FullDataNullable(this.user);
-//
-//   final User user;
-// }
-
-// class FullDataExtended {
-//   const FullDataExtended(this.groupedData, this.colors, this.fullData);
-//
-//   final Map<int, List<FullData>> groupedData;
-//   final List<FullData> fullData;
-//   final Map<FullData, Color> colors;
-// }
-
 class DataExtended {
-  const DataExtended(
-      this.itemsList, this.itemsMap, this.groupsMap, this.colorsMap);
+  const DataExtended(this.userId, this.itemsList, this.itemsMap, this.groupsMap,
+      this.colorsMap);
+
+  final int userId;
 
   // List of Items
   final List<Item> itemsList;
@@ -121,43 +88,9 @@ class Database extends _$Database {
         if (details.wasCreated) {
           await into(users).insert(UsersCompanion.insert(name: 'Wallet #1'));
         }
-
-        // if (details.wasCreated) {
-        //   // create default categories and entries
-        //   final workId = await into(categories)
-        //       .insert(const CategoriesCompanion(description: Value('Work')));
-        //
-        //   await into(todos).insert(TodosCompanion(
-        //     content: const Value('A first todo entry'),
-        //     targetDate: Value(DateTime.now()),
-        //   ));
-        //
-        //   await into(todos).insert(
-        //     TodosCompanion(
-        //       content: const Value('Rework persistence code'),
-        //       category: Value(workId),
-        //       targetDate: Value(
-        //         DateTime.now().add(const Duration(days: 4)),
-        //       ),
-        //     ),
-        //   );
-        // }
       },
     );
   }
-
-// Stream<List<CategoryWithCount>> categoriesWithCount() {
-//   // the _categoriesWithCount method has been generated automatically based
-//   // on the query declared in the @UseMoor annotation
-//   return _categoriesWithCount().map((row) {
-//     final category = Category(id: row.id, description: row.desc);
-//
-//     return CategoryWithCount(category, row.amount);
-//   }).watch();
-// }
-//
-// /// Watches all entries in the given [category]. If the category is null, all
-// /// entries will be shown instead.
 
   // Users, Groups : [Items]
   Stream<DataExtended> watchGroups(int userId) {
@@ -182,7 +115,7 @@ class Database extends _$Database {
       final Map<Item, Color> colors =
           getColorByQuantile(groupedItems, groupMap, sortedItems);
 
-      return DataExtended(sortedItems, groupedItems, groupMap, colors);
+      return DataExtended(userId, sortedItems, groupedItems, groupMap, colors);
     });
   }
 
@@ -289,25 +222,6 @@ class Database extends _$Database {
   //   });
   // }
 
-//
-// Future createEntry(TodosCompanion entry) {
-//   return into(todos).insert(entry);
-// }
-//
-// /// Updates the row in the database represents this entry by writing the
-// /// updated data.
-// Future updateEntry(TodoEntry entry) {
-//   return update(todos).replace(entry);
-// }
-//
-// Future deleteEntry(TodoEntry entry) {
-//   return delete(todos).delete(entry);
-// }
-//
-// Future<int> createCategory(String description) {
-//   return into(categories)
-//       .insert(CategoriesCompanion(description: Value(description)));
-// }
   Future<int> createUser(String description) {
     return into(users).insert(UsersCompanion.insert(name: description));
   }
@@ -344,11 +258,12 @@ class Database extends _$Database {
     ));
   }
 
-  // Future<bool> updateItem(Item item) {
-  //   return update(items).replace(item);
-  // }
-
-  Future<bool> updateItem(Item item, String name, String price, String target) {
+  Future<bool> updateItem({
+    required Item item,
+    required String name,
+    required String price,
+    required String target,
+  }) {
     return update(items).replace(item.copyWith(
       name: name,
       price: double.parse(price),
@@ -365,25 +280,9 @@ class Database extends _$Database {
     await (delete(groups)..where((t) => t.id.equals(groupId))).go();
   }
 
-  Future<int> getDefaultUser() async {
-    // This was moved to [wasCreated]
-    // if (await userExists().getSingle() == 0) {
-    //   // Create a new default user if it doesn't exist.
-    //   final id = await into(users).insert(UsersCompanion.insert(name: '🚀'));
-    //   return id;
-    // }
-
-    return (await select(users).get())[0].id;
-  }
+  Future<int> getDefaultUser() async => (await select(users).get())[0].id;
 
   Future<Item?> getItemFromId(int id) async {
     return (select(items)..where((t) => t.id.equals(id))).getSingleOrNull();
   }
-
-// Future deleteCategory(Category category) {
-//   return transaction<dynamic>(() async {
-//     await _resetCategory(category.id);
-//     await delete(categories).delete(category);
-//   });
-// }
 }

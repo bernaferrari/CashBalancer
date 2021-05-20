@@ -160,12 +160,12 @@ class GroupsScreen extends StatelessWidget {
         onSavePressed: (text) {
           if (user != null) {
             // Update the existing Group with text.
-            BlocProvider.of<DataBloc>(context)
+            BlocProvider.of<DataCubit>(context)
                 .db
                 .editUser(user.copyWith(name: text));
           } else {
             // Create a new Group
-            BlocProvider.of<DataBloc>(context).db.createUser(text);
+            BlocProvider.of<DataCubit>(context).db.createUser(text);
           }
         },
       ),

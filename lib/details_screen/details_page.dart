@@ -25,38 +25,16 @@ class DetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<int>(
-        future: BlocProvider.of<DataBloc>(context).db.getDefaultUser(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final int userId = snapshot.data!;
-
-            return StreamBuilder<DataExtended>(
-                stream:
-                    BlocProvider.of<DataBloc>(context).db.watchGroups(userId),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData || !snapshot.hasError) {
-                    return DetailsPageImpl(snapshot.data, userId);
-                  } else if (snapshot.hasError) {
-                    throw Exception(snapshot.error);
-                  } else {
-                    return Center(child: Text("Loading..."));
-                  }
-                });
-          } else if (snapshot.hasError) {
-            throw Exception(snapshot.error);
-          } else {
-            return SizedBox();
-          }
-        });
+    return BlocBuilder<DataCubit, DataExtended?>(builder: (context, state) {
+      return DetailsPageImpl(state);
+    });
   }
 }
 
 class DetailsPageImpl extends StatelessWidget {
   final DataExtended? data;
-  final int userId;
 
-  const DetailsPageImpl(this.data, this.userId);
+  const DetailsPageImpl(this.data);
 
   @override
   Widget build(BuildContext context) {
@@ -71,10 +49,10 @@ class DetailsPageImpl extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         actions: [
-          IconButton(
-            onPressed: () => Beamer.of(context).beamToNamed('/about'),
-            icon: Icon(Icons.info_outline_rounded),
-          ),
+          // IconButton(
+          //   onPressed: () => Beamer.of(context).beamToNamed('/about'),
+          //   icon: Icon(Icons.info_outline_rounded),
+          // ),
           IconButton(
             onPressed: () => Beamer.of(context).beamToNamed('/settings'),
             icon: Icon(Icons.settings_outlined),
@@ -88,7 +66,7 @@ class DetailsPageImpl extends StatelessWidget {
             builder: (_) => GroupDialog(
               onSavePressed: (text, colorName) {
                 // Preserve the Bloc's context.
-                BlocProvider.of<DataBloc>(context)
+                BlocProvider.of<DataCubit>(context)
                     .db
                     .createGroup(text, colorName);
               },
@@ -104,25 +82,23 @@ class DetailsPageImpl extends StatelessWidget {
           color: Theme.of(context).colorScheme.onPrimary,
         ),
       ),
-      body: (data == null || data!.groupsMap.isEmpty == true)
+      body: (data == null || data?.groupsMap.isEmpty == true)
           ? WhenEmptyCard(
               title: AppLocalizations.of(context)!.mainEmptyTitle,
               subtitle: AppLocalizations.of(context)!.mainEmptySubtitle,
               icon: Icons.account_balance_sharp,
             )
-          : MainList(data: data!, userId: userId),
+          : MainList(data: data!),
     );
   }
 }
 
 class MainList extends StatelessWidget {
   final DataExtended data;
-  final int userId;
 
   const MainList({
     Key? key,
     required this.data,
-    required this.userId,
   }) : super(key: key);
 
   static const double margin = 20.0;
@@ -176,7 +152,7 @@ class MainList extends StatelessWidget {
                           colorsMap: data.colorsMap,
                           totalValue: totalValue,
                           group: e.value,
-                          userId: userId,
+                          userId: data.userId,
                         ),
                       ),
                     ),
@@ -228,18 +204,12 @@ class VerticalProgressBar extends StatelessWidget {
                         context: context,
                         builder: (_) => ItemDialog(
                           totalValue: totalValue,
+                          bloc: context.read<DataCubit>(),
                           colorName:
                               data.groupsMap[data.itemsList[i].groupId]!.color,
                           previousItem: data.itemsList[i],
-                          onSavePressed: (name, value, target) {
-                            // Preserve the Bloc's context.
-                            context.read<DataBloc>().db.updateItem(
-                                data.itemsList[i], name, value, target);
-                          },
-                          onDeletePressed: () => context
-                              .read<DataBloc>()
-                              .db
-                              .deleteItem(data.itemsList[i]),
+                          userId: data.itemsList[i].id,
+                          groupId: data.itemsList[i].groupId,
                         ),
                       );
                     },
@@ -417,19 +387,9 @@ class AddItem extends StatelessWidget {
           builder: (_) => ItemDialog(
             colorName: colorName,
             totalValue: totalValue,
-            bloc: context.read<DataBloc>(),
+            bloc: context.read<DataCubit>(),
             groupId: groupId,
             userId: userId,
-            onSavePressed: (name, value, target) {
-              // Preserve the Bloc's context.
-              context.read<DataBloc>().db.createItem(
-                    groupId: groupId,
-                    userId: userId,
-                    name: name,
-                    value: value,
-                    target: target,
-                  );
-            },
           ),
         );
       },
@@ -466,10 +426,10 @@ class EditGroup extends StatelessWidget {
           builder: (_) => GroupDialog(
             previousGroup: group,
             onDeletePressed: () async =>
-                await context.read<DataBloc>().db.deleteGroup(group.id),
+                await context.read<DataCubit>().db.deleteGroup(group.id),
             onSavePressed: (name, colorName) {
               // Preserve the Bloc's context.
-              context.read<DataBloc>().db.editGroup(
+              context.read<DataCubit>().db.editGroup(
                     group.copyWith(
                       name: name,
                       color: colorName,
@@ -585,19 +545,19 @@ class ItemCard extends StatelessWidget {
             : color.withOpacity(0.25),
       ),
       onPressed: () {
-        showDialog<Object>(
-          context: context,
-          builder: (_) => ItemDialog(
-            totalValue: totalValue,
-            colorName: nameColor,
-            previousItem: item,
-            onSavePressed: (name, value, target) {
-              // Preserve the Bloc's context.
-              context.read<DataBloc>().db.updateItem(item, name, value, target);
-            },
-            onDeletePressed: () => context.read<DataBloc>().db.deleteItem(item),
-          ),
-        );
+        Beamer.of(context).beamToNamed('/editItem/${item.id}');
+
+        // showDialog<Object>(
+        //   context: context,
+        //   builder: (_) => ItemDialog(
+        //     bloc: context.read<DataCubit>(),
+        //     totalValue: totalValue,
+        //     colorName: nameColor,
+        //     previousItem: item,
+        //     userId: item.id,
+        //     groupId: item.groupId,
+        //   ),
+        // );
       },
       child: Row(
         mainAxisSize: MainAxisSize.min,

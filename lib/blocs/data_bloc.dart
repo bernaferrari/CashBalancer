@@ -1,25 +1,23 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 
 import '../database/database.dart';
 
-part 'data_event.dart';
-
-part 'data_state.dart';
-
-class DataBloc extends Bloc<DataEvent, DataState> {
+class DataCubit extends Cubit<DataExtended?> {
   final Database db;
 
-  DataBloc()
-      : db = constructDb(),
-        super(DataInitial());
+  late final StreamSubscription<DataExtended> _currentEntries;
+
+  DataCubit(this.db) : super(null) {
+    db.getDefaultUser().then((userId) {
+      _currentEntries = db.watchGroups(userId).listen(emit);
+    });
+  }
 
   @override
-  Stream<DataState> mapEventToState(
-    DataEvent event,
-  ) async* {
-    // TODO: implement mapEventToState
+  Future<void> close() {
+    _currentEntries.cancel();
+    return super.close();
   }
 }

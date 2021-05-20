@@ -1,12 +1,13 @@
 import 'package:beamer/beamer.dart';
-import 'package:cash_balancer/details_screen/item_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../blocs/data_bloc.dart';
+import '../database/database.dart';
 import '../details_screen/details_page.dart';
+import '../details_screen/item_dialog.dart';
 import '../l10n/l10n.dart';
 import '../settings/settings_page.dart';
 
@@ -26,7 +27,7 @@ class App extends StatelessWidget {
           key: ValueKey('item-$itemId'),
           title: 'Item #$itemId',
           popToNamed: '/',
-          type: BeamPageType.scaleTransition,
+          type: BeamPageType.slideTransition,
           child: ItemPage(itemId: itemId),
         );
       }
@@ -66,65 +67,71 @@ class App extends StatelessWidget {
       ),
     );
 
-    return BlocProvider<DataBloc>(
-      create: (context) => DataBloc(),
-      child: MaterialApp.router(
-        theme: ThemeData(
-          colorScheme: ColorScheme.light(
-            primary: Color(0xff162783),
-            secondary: Color(0xff168342),
-            // background: Color(0xff18170f),
-            // surface: Color(0xff201f15),
-          ),
-          dialogTheme: DialogTheme(
-            backgroundColor: Color(0xff18170f),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
+    return RepositoryProvider(
+      create: (context) => constructDb(),
+      child: BlocProvider<DataCubit>(
+        create: (context) {
+          final db = RepositoryProvider.of<Database>(context);
+          return DataCubit(db);
+        },
+        child: MaterialApp.router(
+          theme: ThemeData(
+            colorScheme: ColorScheme.light(
+              primary: Color(0xff162783),
+              secondary: Color(0xff168342),
+              // background: Color(0xff18170f),
+              // surface: Color(0xff201f15),
             ),
-          ),
-          accentColor: const Color(0xff5ae492),
-          appBarTheme: const AppBarTheme(color: Color(0xFF13B9FF)),
-          typography: Typography.material2018(),
-          visualDensity: VisualDensity.standard,
-          applyElevationOverlayColor: true,
-          elevatedButtonTheme: elevatedButtonTheme,
-          outlinedButtonTheme: outlinedButtonTheme,
-          textButtonTheme: textButtonTheme,
-          textTheme: textTheme,
-        ),
-        darkTheme: ThemeData(
-          brightness: Brightness.dark,
-          colorScheme: ColorScheme.dark(
-            primary: Color(0xffe4d75a),
-            secondary: Color(0xff5ae492),
-            background: Color(0xff121212),
-            surface: Color(0xff201f15),
-          ),
-          dialogTheme: DialogTheme(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
+            dialogTheme: DialogTheme(
+              backgroundColor: Color(0xff18170f),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
             ),
+            accentColor: const Color(0xff5ae492),
+            appBarTheme: const AppBarTheme(color: Color(0xFF13B9FF)),
+            typography: Typography.material2018(),
+            visualDensity: VisualDensity.standard,
+            applyElevationOverlayColor: true,
+            elevatedButtonTheme: elevatedButtonTheme,
+            outlinedButtonTheme: outlinedButtonTheme,
+            textButtonTheme: textButtonTheme,
+            textTheme: textTheme,
           ),
-          accentColor: const Color(0xff5ae492),
-          appBarTheme: const AppBarTheme(color: Color(0xFF13B9FF)),
-          typography: Typography.material2018(),
-          visualDensity: VisualDensity.standard,
-          applyElevationOverlayColor: true,
-          elevatedButtonTheme: elevatedButtonTheme,
-          outlinedButtonTheme: outlinedButtonTheme,
-          textButtonTheme: textButtonTheme,
-          textTheme: textTheme,
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            colorScheme: ColorScheme.dark(
+              primary: Color(0xffe4d75a),
+              secondary: Color(0xff5ae492),
+              background: Color(0xff121212),
+              surface: Color(0xff201f15),
+            ),
+            dialogTheme: DialogTheme(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+            ),
+            accentColor: const Color(0xff5ae492),
+            appBarTheme: const AppBarTheme(color: Color(0xFF13B9FF)),
+            typography: Typography.material2018(),
+            visualDensity: VisualDensity.standard,
+            applyElevationOverlayColor: true,
+            elevatedButtonTheme: elevatedButtonTheme,
+            outlinedButtonTheme: outlinedButtonTheme,
+            textButtonTheme: textButtonTheme,
+            textTheme: textTheme,
+          ),
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          title: 'Cash Balancer',
+          routerDelegate: _routerDelegate,
+          routeInformationParser: BeamerParser(),
+          backButtonDispatcher:
+              BeamerBackButtonDispatcher(delegate: _routerDelegate),
         ),
-        localizationsDelegates: [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-        ],
-        supportedLocales: AppLocalizations.supportedLocales,
-        title: 'Cash Balancer',
-        routerDelegate: _routerDelegate,
-        routeInformationParser: BeamerParser(),
-        backButtonDispatcher:
-            BeamerBackButtonDispatcher(delegate: _routerDelegate),
       ),
     );
   }
