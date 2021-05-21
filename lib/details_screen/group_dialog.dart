@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../database/database.dart';
+import '../database/data.dart';
 import '../l10n/l10n.dart';
 import '../util/tailwind_colors.dart';
 import 'color_picker.dart';
@@ -10,7 +10,7 @@ import 'color_picker.dart';
 class GroupDialog extends StatefulWidget {
   final Function(String text, String color) onSavePressed;
   final VoidCallback? onDeletePressed;
-  final Group? previousGroup;
+  final GroupData? previousGroup;
 
   const GroupDialog({
     required this.onSavePressed,
@@ -26,7 +26,7 @@ class _GroupDialogState extends State<GroupDialog> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController textEditingController =
       TextEditingController(text: widget.previousGroup?.name);
-  late String colorName = widget.previousGroup?.color ??
+  late String colorName = widget.previousGroup?.colorName ??
       tailwindColorsNames[Random().nextInt(tailwindColorsNames.length)];
 
   @override

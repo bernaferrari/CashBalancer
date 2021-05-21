@@ -189,8 +189,10 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
 class Group extends DataClass implements Insertable<Group> {
   final int id;
   final String name;
-  final String color;
-  Group({required this.id, required this.name, required this.color});
+  final String colorName;
+
+  Group({required this.id, required this.name, required this.colorName});
+
   factory Group.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String? prefix}) {
     final effectivePrefix = prefix ?? '';
@@ -199,8 +201,8 @@ class Group extends DataClass implements Insertable<Group> {
           .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
       name: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
-      color: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}color'])!,
+      colorName: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}color_name'])!,
     );
   }
   @override
@@ -208,7 +210,7 @@ class Group extends DataClass implements Insertable<Group> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
-    map['color'] = Variable<String>(color);
+    map['color_name'] = Variable<String>(colorName);
     return map;
   }
 
@@ -216,7 +218,7 @@ class Group extends DataClass implements Insertable<Group> {
     return GroupsCompanion(
       id: Value(id),
       name: Value(name),
-      color: Value(color),
+      colorName: Value(colorName),
     );
   }
 
@@ -226,7 +228,7 @@ class Group extends DataClass implements Insertable<Group> {
     return Group(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
-      color: serializer.fromJson<String>(json['color']),
+      colorName: serializer.fromJson<String>(json['colorName']),
     );
   }
   @override
@@ -235,70 +237,73 @@ class Group extends DataClass implements Insertable<Group> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
-      'color': serializer.toJson<String>(color),
+      'colorName': serializer.toJson<String>(colorName),
     };
   }
 
-  Group copyWith({int? id, String? name, String? color}) => Group(
+  Group copyWith({int? id, String? name, String? colorName}) => Group(
         id: id ?? this.id,
         name: name ?? this.name,
-        color: color ?? this.color,
+        colorName: colorName ?? this.colorName,
       );
+
   @override
   String toString() {
     return (StringBuffer('Group(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('color: $color')
+          ..write('colorName: $colorName')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      $mrjf($mrjc(id.hashCode, $mrjc(name.hashCode, color.hashCode)));
+      $mrjf($mrjc(id.hashCode, $mrjc(name.hashCode, colorName.hashCode)));
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Group &&
           other.id == this.id &&
           other.name == this.name &&
-          other.color == this.color);
+          other.colorName == this.colorName);
 }
 
 class GroupsCompanion extends UpdateCompanion<Group> {
   final Value<int> id;
   final Value<String> name;
-  final Value<String> color;
+  final Value<String> colorName;
+
   const GroupsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
-    this.color = const Value.absent(),
+    this.colorName = const Value.absent(),
   });
+
   GroupsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
-    required String color,
+    required String colorName,
   })  : name = Value(name),
-        color = Value(color);
+        colorName = Value(colorName);
   static Insertable<Group> custom({
     Expression<int>? id,
     Expression<String>? name,
-    Expression<String>? color,
+    Expression<String>? colorName,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
-      if (color != null) 'color': color,
+      if (colorName != null) 'color_name': colorName,
     });
   }
 
   GroupsCompanion copyWith(
-      {Value<int>? id, Value<String>? name, Value<String>? color}) {
+      {Value<int>? id, Value<String>? name, Value<String>? colorName}) {
     return GroupsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
-      color: color ?? this.color,
+      colorName: colorName ?? this.colorName,
     );
   }
 
@@ -311,8 +316,8 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
-    if (color.present) {
-      map['color'] = Variable<String>(color.value);
+    if (colorName.present) {
+      map['color_name'] = Variable<String>(colorName.value);
     }
     return map;
   }
@@ -322,7 +327,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     return (StringBuffer('GroupsCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('color: $color')
+          ..write('colorName: $colorName')
           ..write(')'))
         .toString();
   }
@@ -343,6 +348,7 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   final VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedTextColumn name = _constructName();
+
   GeneratedTextColumn _constructName() {
     return GeneratedTextColumn(
       'name',
@@ -351,19 +357,21 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
     );
   }
 
-  final VerificationMeta _colorMeta = const VerificationMeta('color');
+  final VerificationMeta _colorNameMeta = const VerificationMeta('colorName');
   @override
-  late final GeneratedTextColumn color = _constructColor();
-  GeneratedTextColumn _constructColor() {
+  late final GeneratedTextColumn colorName = _constructColorName();
+
+  GeneratedTextColumn _constructColorName() {
     return GeneratedTextColumn(
-      'color',
+      'color_name',
       $tableName,
       false,
     );
   }
 
   @override
-  List<GeneratedColumn> get $columns => [id, name, color];
+  List<GeneratedColumn> get $columns => [id, name, colorName];
+
   @override
   $GroupsTable get asDslTable => this;
   @override
@@ -384,11 +392,11 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
-    if (data.containsKey('color')) {
-      context.handle(
-          _colorMeta, color.isAcceptableOrUnknown(data['color']!, _colorMeta));
+    if (data.containsKey('color_name')) {
+      context.handle(_colorNameMeta,
+          colorName.isAcceptableOrUnknown(data['color_name']!, _colorNameMeta));
     } else if (isInserting) {
-      context.missing(_colorMeta);
+      context.missing(_colorNameMeta);
     }
     return context;
   }

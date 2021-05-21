@@ -6,6 +6,7 @@ import 'package:moor_flutter/moor_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../util/get_color_by_quantile.dart';
+import 'data.dart';
 
 export 'database/shared.dart';
 
@@ -16,7 +17,7 @@ class Groups extends Table {
 
   TextColumn get name => text()();
 
-  TextColumn get color => text()();
+  TextColumn get colorName => text()();
 }
 
 class Users extends Table {
@@ -39,25 +40,6 @@ class Items extends Table {
   RealColumn get price => real()();
 
   RealColumn get targetPercent => real()();
-}
-
-class DataExtended {
-  const DataExtended(this.userId, this.itemsList, this.itemsMap, this.groupsMap,
-      this.colorsMap);
-
-  final int userId;
-
-  // List of Items
-  final List<Item> itemsList;
-
-  // groupID -> Items
-  final Map<int, List<Item>> itemsMap;
-
-  // groupID -> Groups
-  final Map<int, Group> groupsMap;
-
-  // Items -> Colors
-  final Map<Item, Color> colorsMap;
 }
 
 @UseMoor(
@@ -93,95 +75,122 @@ class Database extends _$Database {
   }
 
   // Users, Groups : [Items]
-  Stream<DataExtended> watchGroups(int userId) {
+  Stream<FullData> watchGroups(int userId) {
     final groupsQuery = select(groups);
 
     final itemsQuery = select(items)
       ..where((item) => item.userId.equals(userId));
 
-    return Rx.combineLatest2<List<Group>, List<Item>, DataExtended>(
+    return Rx.combineLatest2<List<Group>, List<Item>, FullData>(
         groupsQuery.watch(), itemsQuery.watch(), (groupList, itemsList) {
-      final groupMap = <int, Group>{};
-      for (final group in groupList) {
-        groupMap[group.id] = group;
-      }
-
       final List<Item> sortedItems = [...itemsList]..sort((a, b) {
           return (b.price * b.quantity).compareTo((a.price * a.quantity));
         });
+      final Map<int, List<Item>> groupedItems = groupItemByGroupID(sortedItems);
 
-      final Map<int, List<Item>> groupedItems = groupByKind(sortedItems);
+      final groupsMap = <int, GroupData>{};
+      double totalValue = 0;
+      for (final group in groupList) {
+        final double groupValue;
+        if (groupedItems[group.id] != null) {
+          groupValue = groupedItems[group.id]!
+              .fold(0, (a, b) => a + (b.price * b.quantity));
+        } else {
+          groupValue = 0;
+        }
 
-      final Map<Item, Color> colors =
-          getColorByQuantile(groupedItems, groupMap, sortedItems);
+        totalValue += groupValue;
 
-      return DataExtended(userId, sortedItems, groupedItems, groupMap, colors);
+        groupsMap[group.id] = GroupData(group, groupValue);
+      }
+
+      final Map<int, Color> colors =
+          getColorByQuantile(groupedItems, groupsMap, sortedItems);
+
+      final allItemData = sortedItems
+          .map((d) => ItemData(
+                item: d,
+                colorName: groupsMap[d.groupId]!.colorName,
+                color: colors[d.id]!,
+              ))
+          .toList();
+
+      final Map<int, List<ItemData>> groupedItemData =
+          groupItemDataByGroupID(allItemData);
+
+      return FullData(
+        userId: userId,
+        totalValue: totalValue,
+        allItems: allItemData,
+        groupedItems: groupedItemData,
+        groupsMap: groupsMap,
+      );
     });
   }
 
-  // Stream<List<FullData>> watchItems(int userId) {
-  //   final queryUser = select(users)..where((user) => user.id.equals(userId));
-  //
-  //   final query = queryUser.join([
-  //     leftOuterJoin(
-  //       items,
-  //       items.userId.equalsExp(users.id),
-  //     ),
-  //     // leftOuterJoin(
-  //     //   groups,
-  //     //   groups.id.equalsExp(items.groupId),
-  //     // ),
-  //   ]);
-  //
-  //   return query.watch().map((rows) {
-  //     print("rows are $rows");
-  //     // read both the entry and the associated category for each row
-  //     return rows.map((row) {
-  //       return FullData(
-  //         row.readTable(users),
-  //         row.readTable(items),
-  //         row.readTable(groups),
-  //       );
-  //     }).toList();
-  //   });
-  // }
+// Stream<List<FullData>> watchItems(int userId) {
+//   final queryUser = select(users)..where((user) => user.id.equals(userId));
+//
+//   final query = queryUser.join([
+//     leftOuterJoin(
+//       items,
+//       items.userId.equalsExp(users.id),
+//     ),
+//     // leftOuterJoin(
+//     //   groups,
+//     //   groups.id.equalsExp(items.groupId),
+//     // ),
+//   ]);
+//
+//   return query.watch().map((rows) {
+//     print("rows are $rows");
+//     // read both the entry and the associated category for each row
+//     return rows.map((row) {
+//       return FullData(
+//         row.readTable(users),
+//         row.readTable(items),
+//         row.readTable(groups),
+//       );
+//     }).toList();
+//   });
+// }
 
-  // Stream<FullDataExtended> watchItemsGroupedHome() {
-  //   return watchGroups().map((data) {
-  //     final List<FullDataNullable> sortedData = [...data]..sort((a, b) {
-  //         return (b.item.price * b.item.quantity)
-  //             .compareTo((a.item.price * a.item.quantity));
-  //       });
-  //
-  //     final Map<int, List<FullData>> groupedData = groupByKind(sortedData);
-  //
-  //     final Map<FullData, Color> colors =
-  //         getColorByQuantile(groupedData, sortedData);
-  //
-  //     return FullDataExtended(groupedData, colors, sortedData);
-  //   });
-  // }
+// Stream<FullDataExtended> watchItemsGroupedHome() {
+//   return watchGroups().map((data) {
+//     final List<FullDataNullable> sortedData = [...data]..sort((a, b) {
+//         return (b.item.price * b.item.quantity)
+//             .compareTo((a.item.price * a.item.quantity));
+//       });
+//
+//     final Map<int, List<FullData>> groupedData = groupByKind(sortedData);
+//
+//     final Map<FullData, Color> colors =
+//         getColorByQuantile(groupedData, sortedData);
+//
+//     return FullDataExtended(groupedData, colors, sortedData);
+//   });
+// }
 
-  // Stream<FullDataExtended> watchItemsGrouped(int userId) =>
-  //     watchItems(userId).map((data) {
-  //       print("watchItemsGrouped was updated, now $data");
-  //
-  //       final List<FullData> sortedData = [...data]..sort((a, b) {
-  //           return (b.item.price * b.item.quantity)
-  //               .compareTo((a.item.price * a.item.quantity));
-  //         });
-  //
-  //       final Map<int, List<FullData>> groupedData = groupByKind(sortedData);
-  //       print("sortedData: $sortedData groupedData $groupedData");
-  //
-  //       final Map<FullData, Color> colors =
-  //           getColorByQuantile(groupedData, sortedData);
-  //       print("colors: $colors");
-  //
-  //       return FullDataExtended(groupedData, colors, sortedData);
-  //     });
+// Stream<FullDataExtended> watchItemsGrouped(int userId) =>
+//     watchItems(userId).map((data) {
+//       print("watchItemsGrouped was updated, now $data");
+//
+//       final List<FullData> sortedData = [...data]..sort((a, b) {
+//           return (b.item.price * b.item.quantity)
+//               .compareTo((a.item.price * a.item.quantity));
+//         });
+//
+//       final Map<int, List<FullData>> groupedData = groupByKind(sortedData);
+//       print("sortedData: $sortedData groupedData $groupedData");
+//
+//       final Map<FullData, Color> colors =
+//           getColorByQuantile(groupedData, sortedData);
+//       print("colors: $colors");
+//
+//       return FullDataExtended(groupedData, colors, sortedData);
+//     });
 
-  Map<int, List<Item>> groupByKind(List<Item> itemList) {
+  Map<int, List<Item>> groupItemByGroupID(List<Item> itemList) {
     final groupedList = <int, List<Item>>{};
 
     for (int i = 0; i < itemList.length; i++) {
@@ -198,29 +207,46 @@ class Database extends _$Database {
     return groupedList;
   }
 
-  // Stream<List<FullData>> watchMainGroups() {
-  //   final query = select(users).join([
-  //     leftOuterJoin(
-  //       items,
-  //       users.id.equalsExp(items.userId),
-  //     ),
-  //     leftOuterJoin(
-  //       groups,
-  //       groups.id.equalsExp(items.groupId),
-  //     ),
-  //   ]);
-  //
-  //   return query.watch().map((rows) {
-  //     // read both the entry and the associated category for each row
-  //     return rows.map((row) {
-  //       return FullData(
-  //         row.readTable(users),
-  //         row.readTable(items),
-  //         row.readTable(groups),
-  //       );
-  //     }).toList();
-  //   });
-  // }
+  Map<int, List<ItemData>> groupItemDataByGroupID(List<ItemData> itemList) {
+    final groupedList = <int, List<ItemData>>{};
+
+    for (int i = 0; i < itemList.length; i++) {
+      final groupId = itemList[i].groupId;
+
+      final groupPosition = groupedList[groupId];
+      if (groupPosition != null) {
+        groupPosition.add(itemList[i]);
+      } else {
+        groupedList[groupId] = [itemList[i]];
+      }
+    }
+
+    return groupedList;
+  }
+
+// Stream<List<FullData>> watchMainGroups() {
+//   final query = select(users).join([
+//     leftOuterJoin(
+//       items,
+//       users.id.equalsExp(items.userId),
+//     ),
+//     leftOuterJoin(
+//       groups,
+//       groups.id.equalsExp(items.groupId),
+//     ),
+//   ]);
+//
+//   return query.watch().map((rows) {
+//     // read both the entry and the associated category for each row
+//     return rows.map((row) {
+//       return FullData(
+//         row.readTable(users),
+//         row.readTable(items),
+//         row.readTable(groups),
+//       );
+//     }).toList();
+//   });
+// }
 
   Future<int> createUser(String description) {
     return into(users).insert(UsersCompanion.insert(name: description));
@@ -233,7 +259,7 @@ class Database extends _$Database {
   Future<int> createGroup(String description, String colorName) {
     return into(groups).insert(GroupsCompanion.insert(
       name: description,
-      color: colorName,
+      colorName: colorName,
     ));
   }
 

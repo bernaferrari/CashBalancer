@@ -2,12 +2,13 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 
+import '../database/data.dart';
 import '../database/database.dart';
 
-class DataCubit extends Cubit<DataExtended?> {
+class DataCubit extends Cubit<FullData?> {
   final Database db;
 
-  late final StreamSubscription<DataExtended> _currentEntries;
+  late final StreamSubscription<FullData> _currentEntries;
 
   DataCubit(this.db) : super(null) {
     db.getDefaultUser().then((userId) {

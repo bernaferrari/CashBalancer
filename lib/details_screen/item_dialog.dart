@@ -15,38 +15,24 @@ class ItemPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DataCubit, DataExtended?>(builder: (context, state) {
-      if (state == null) {
-        return Text("loading");
-      } else {
-        final previousItem =
-            state.itemsList.firstWhere((element) => element.id == itemId);
+    final state = context.read<DataCubit>().state;
 
-        final colorName = state.groupsMap[previousItem.groupId]!.color;
+    if (state == null) {
+      return Text("loading");
+    } else {
+      final previousItem =
+          state.allItems.firstWhere((element) => element.id == itemId);
 
-        return ItemDialog(
-          userId: state.userId,
-          previousItem: previousItem,
-          colorName: colorName,
-          bloc: context.read<DataCubit>(),
-          groupId: previousItem.groupId,
-          totalValue: 0,
-          isDialog: false,
-        );
-      }
-    });
-
-    // return FutureBuilder(
-    //     future: context.read<DataBloc>().db.getItemFromId(itemId),
-    //     builder: (ctx, snapshot) {
-    //       if (snapshot.hasData) {
-    //
-    //         return ItemDialog();
-    //         return Text("HAS DATA ${snapshot.data}");
-    //       } else {
-    //         return Text("Loading");
-    //       }
-    //     });
+      return ItemDialog(
+        userId: state.userId,
+        previousItem: previousItem,
+        colorName: previousItem.colorName,
+        groupId: previousItem.groupId,
+        bloc: context.read<DataCubit>(),
+        totalValue: 0,
+        isDialog: false,
+      );
+    }
   }
 }
 

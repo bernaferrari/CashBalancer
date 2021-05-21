@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../blocs/data_bloc.dart';
-import '../database/database.dart';
+import '../database/data.dart';
 import '../l10n/l10n.dart';
 import '../users_screen/users_screen.dart';
 import '../util/retrieve_spaced_list.dart';
@@ -25,19 +25,21 @@ class DetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DataCubit, DataExtended?>(builder: (context, state) {
+    return BlocBuilder<DataCubit, FullData?>(builder: (context, state) {
       return DetailsPageImpl(state);
     });
   }
 }
 
 class DetailsPageImpl extends StatelessWidget {
-  final DataExtended? data;
+  final FullData? data;
 
   const DetailsPageImpl(this.data);
 
   @override
   Widget build(BuildContext context) {
+    print("data is $data");
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
@@ -84,17 +86,17 @@ class DetailsPageImpl extends StatelessWidget {
       ),
       body: (data == null || data?.groupsMap.isEmpty == true)
           ? WhenEmptyCard(
-              title: AppLocalizations.of(context)!.mainEmptyTitle,
-              subtitle: AppLocalizations.of(context)!.mainEmptySubtitle,
-              icon: Icons.account_balance_sharp,
-            )
+        title: AppLocalizations.of(context)!.mainEmptyTitle,
+        subtitle: AppLocalizations.of(context)!.mainEmptySubtitle,
+        icon: Icons.account_balance_sharp,
+      )
           : MainList(data: data!),
     );
   }
 }
 
 class MainList extends StatelessWidget {
-  final DataExtended data;
+  final FullData data;
 
   const MainList({
     Key? key,
@@ -106,7 +108,7 @@ class MainList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double totalValue =
-        data.itemsList.fold(0, (a, b) => a + b.price * b.quantity);
+        data.allItems.fold(0, (a, b) => a + b.price * b.quantity);
 
     return Center(
       child: ConstrainedBox(
@@ -144,13 +146,11 @@ class MainList extends StatelessWidget {
                       20,
                       data.groupsMap.entries.map(
                         (e) => GroupCard(
-                          itemsList: data.itemsMap[e.key]
+                          itemsList: data.groupedItems[e.key]
                             ?..sort(
                               (a, b) => (b.price * a.quantity)
                                   .compareTo(a.price * a.quantity),
                             ),
-                          colorsMap: data.colorsMap,
-                          totalValue: totalValue,
                           group: e.value,
                           userId: data.userId,
                         ),
@@ -168,7 +168,7 @@ class MainList extends StatelessWidget {
 }
 
 class VerticalProgressBar extends StatelessWidget {
-  final DataExtended data;
+  final FullData data;
   final double totalValue;
 
   const VerticalProgressBar({
@@ -181,19 +181,19 @@ class VerticalProgressBar extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final List<double> spacedList =
-            retrieveSpacedList(data.itemsList, constraints.maxHeight);
+            retrieveSpacedList(data.allItems, constraints.maxHeight);
 
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: spaceColumn(
             2,
             [
-              for (int i = 0; i < data.itemsList.length; i++)
+              for (int i = 0; i < data.allItems.length; i++)
                 Tooltip(
-                  message: "${data.itemsList[i].name}",
+                  message: "${data.allItems[i].name}",
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: data.colorsMap[data.itemsList[i]],
+                      primary: data.allItems[i].color,
                       padding: EdgeInsets.zero,
                       minimumSize: Size.zero,
                       fixedSize: Size(100, spacedList[i]),
@@ -205,11 +205,11 @@ class VerticalProgressBar extends StatelessWidget {
                         builder: (_) => ItemDialog(
                           totalValue: totalValue,
                           bloc: context.read<DataCubit>(),
-                          colorName:
-                              data.groupsMap[data.itemsList[i].groupId]!.color,
-                          previousItem: data.itemsList[i],
-                          userId: data.itemsList[i].id,
-                          groupId: data.itemsList[i].groupId,
+                          colorName: data
+                              .groupsMap[data.allItems[i].groupId]!.colorName,
+                          previousItem: data.allItems[i],
+                          userId: data.allItems[i].id,
+                          groupId: data.allItems[i].groupId,
                         ),
                       );
                     },
@@ -229,17 +229,13 @@ Map<int, Color> getColor(String colorType) {
 }
 
 class GroupCard extends StatelessWidget {
-  final List<Item>? itemsList;
-  final Map<Item, Color> colorsMap;
-  final double totalValue;
-  final Group group;
+  final List<ItemData>? itemsList;
+  final GroupData group;
   final int userId;
 
   const GroupCard({
     Key? key,
     required this.itemsList,
-    required this.colorsMap,
-    required this.totalValue,
     required this.group,
     required this.userId,
   }) : super(key: key);
@@ -264,7 +260,7 @@ class GroupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Map<int, Color> localTailwindColor = getColor(group.color);
+    final Map<int, Color> localTailwindColor = getColor(group.colorName);
     final color = localTailwindColor[500]!;
 
     if (itemsList == null) {
@@ -282,8 +278,8 @@ class GroupCard extends StatelessWidget {
                 color: color,
                 userId: userId,
                 groupId: group.id,
-                colorName: group.color,
-                totalValue: totalValue,
+                colorName: group.colorName,
+                totalValue: group.totalValue,
               ),
             ],
           ),
@@ -294,7 +290,8 @@ class GroupCard extends StatelessWidget {
           .map((e) => e.price * e.quantity)
           .fold(0.0, (previous, current) => previous + current);
 
-      final double totalLocalPercent = 100.0 * totalLocalPrice / totalValue;
+      final double totalLocalPercent =
+          100.0 * totalLocalPrice / group.totalValue;
 
       return customContainer(
         context: context,
@@ -317,9 +314,8 @@ class GroupCard extends StatelessWidget {
                 width: double.infinity,
                 child: ItemCard(
                   itemsList![i],
-                  colorsMap[itemsList![i]]!,
-                  totalValue,
-                  group.color,
+                  group.totalValue,
+                  group.colorName,
                 ),
               ),
               if (i < itemsList!.length - 1)
@@ -342,8 +338,8 @@ class GroupCard extends StatelessWidget {
                     color: color,
                     userId: userId,
                     groupId: group.id,
-                    colorName: group.color,
-                    totalValue: totalValue,
+                    colorName: group.colorName,
+                    totalValue: group.totalValue,
                   ),
                 ],
               ),
@@ -399,7 +395,7 @@ class AddItem extends StatelessWidget {
 
 class EditGroup extends StatelessWidget {
   final Color color;
-  final Group group;
+  final GroupData group;
 
   const EditGroup({
     Key? key,
@@ -432,7 +428,7 @@ class EditGroup extends StatelessWidget {
               context.read<DataCubit>().db.editGroup(
                     group.copyWith(
                       name: name,
-                      color: colorName,
+                      colorName: colorName,
                     ),
                   );
             },
@@ -520,12 +516,11 @@ class GroupCardTitleBar extends StatelessWidget {
 }
 
 class ItemCard extends StatelessWidget {
-  final Item item;
-  final Color color;
+  final ItemData item;
   final double totalValue;
   final String nameColor;
 
-  const ItemCard(this.item, this.color, this.totalValue, this.nameColor);
+  const ItemCard(this.item, this.totalValue, this.nameColor);
 
   @override
   Widget build(BuildContext context) {
@@ -541,8 +536,8 @@ class ItemCard extends StatelessWidget {
       style: TextButton.styleFrom(
         padding: EdgeInsets.all(10.0),
         backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? color.withOpacity(0.05)
-            : color.withOpacity(0.25),
+            ? item.color.withOpacity(0.05)
+            : item.color.withOpacity(0.25),
       ),
       onPressed: () {
         Beamer.of(context).beamToNamed('/editItem/${item.id}');
@@ -578,7 +573,7 @@ class ItemCard extends StatelessWidget {
                   height: 38,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(4),
-                    color: color,
+                    color: item.color,
                   ),
                 ),
               ],

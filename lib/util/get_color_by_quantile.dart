@@ -1,15 +1,16 @@
 import 'dart:ui';
 
+import '../database/data.dart';
 import '../database/database.dart';
 import 'quartile.dart';
 import 'tailwind_colors.dart';
 
-Map<Item, Color> getColorByQuantile(
+Map<int, Color> getColorByQuantile(
   Map<int, List<Item>> itemsMap,
-  Map<int, Group> groupMap,
+  Map<int, GroupData> groupMap,
   List<Item> itemsList,
 ) {
-  final colors = <Item, Color>{};
+  final colors = <int, Color>{};
 
   for (final element in itemsMap.entries) {
     final List<double> arr =
@@ -20,15 +21,15 @@ Map<Item, Color> getColorByQuantile(
     final quartile75 = q75(arr);
 
     for (final item in itemsList) {
-      final colorName = groupMap[item.groupId]!.color;
-      if (item.price <= quartile25) {
-        colors[item] = _getColor(colorName)[200]!;
-      } else if (item.price <= quartile50) {
-        colors[item] = _getColor(colorName)[300]!;
-      } else if (item.price <= quartile75) {
-        colors[item] = _getColor(colorName)[400]!;
+      final colorName = groupMap[item.groupId]!.colorName;
+      if (item.price >= quartile75) {
+        colors[item.id] = _getColor(colorName)[500]!;
+      } else if (item.price >= quartile50) {
+        colors[item.id] = _getColor(colorName)[400]!;
+      } else if (item.price >= quartile25) {
+        colors[item.id] = _getColor(colorName)[300]!;
       } else {
-        colors[item] = _getColor(colorName)[500]!;
+        colors[item.id] = _getColor(colorName)[200]!;
       }
     }
   }
