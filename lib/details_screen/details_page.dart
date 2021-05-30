@@ -86,10 +86,10 @@ class DetailsPageImpl extends StatelessWidget {
       ),
       body: (data == null || data?.groupsMap.isEmpty == true)
           ? WhenEmptyCard(
-        title: AppLocalizations.of(context)!.mainEmptyTitle,
-        subtitle: AppLocalizations.of(context)!.mainEmptySubtitle,
-        icon: Icons.account_balance_sharp,
-      )
+              title: AppLocalizations.of(context)!.mainEmptyTitle,
+              subtitle: AppLocalizations.of(context)!.mainEmptySubtitle,
+              icon: Icons.account_balance_sharp,
+            )
           : MainList(data: data!),
     );
   }
@@ -202,7 +202,7 @@ class VerticalProgressBar extends StatelessWidget {
                     onPressed: () {
                       showDialog<Object>(
                         context: context,
-                        builder: (_) => ItemDialog(
+                        builder: (_) => ItemDialogImpl(
                           totalValue: totalValue,
                           bloc: context.read<DataCubit>(),
                           colorName: data
@@ -378,16 +378,17 @@ class AddItem extends StatelessWidget {
       ),
       child: Icon(Icons.add_rounded),
       onPressed: () {
-        showDialog<Object>(
-          context: context,
-          builder: (_) => ItemDialog(
-            colorName: colorName,
-            totalValue: totalValue,
-            bloc: context.read<DataCubit>(),
-            groupId: groupId,
-            userId: userId,
-          ),
-        );
+        Beamer.of(context).beamToNamed('/addItem/$groupId/$userId');
+        // showDialog<Object>(
+        //   context: context,
+        //   builder: (_) => ItemDialogImpl(
+        //     colorName: colorName,
+        //     totalValue: totalValue,
+        //     bloc: context.read<DataCubit>(),
+        //     groupId: groupId,
+        //     userId: userId,
+        //   ),
+        // );
       },
     );
   }

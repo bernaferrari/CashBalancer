@@ -48,7 +48,7 @@ class _HomeInputDialogState extends State<HomeInputDialog> {
               },
               decoration: InputDecoration(
                 filled: true,
-                labelText: AppLocalizations.of(context)!.mainDialogLabel,
+                labelText: AppLocalizations.of(context)!.dialogAssetName,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(

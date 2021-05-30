@@ -18,17 +18,31 @@ class App extends StatelessWidget {
     locationBuilder: SimpleLocationBuilder(routes: {
       '/': (context) => DetailsPage(),
       '/settings': (context) => SettingsPage(),
+      '/addItem/:groupId/:userId': (context) {
+        final beamState = context.currentBeamLocation.state;
+        final groupId = int.tryParse(beamState.pathParameters['groupId']!)!;
+        final userId = int.tryParse(beamState.pathParameters['userId']!)!;
+
+        // Widgets and BeamPages can be mixed!
+        return BeamPage(
+          key: ValueKey('addItem-$groupId$userId'),
+          title: 'Add Item',
+          popToNamed: '/',
+          type: BeamPageType.cupertino,
+          child: AddItemPage(groupId: groupId, userId: userId),
+        );
+      },
       '/editItem/:itemId': (context) {
         final beamState = context.currentBeamLocation.state;
-        final itemId = int.tryParse(beamState.pathParameters['itemId']!) ?? 0;
+        final itemId = int.tryParse(beamState.pathParameters['itemId']!)!;
 
         // Widgets and BeamPages can be mixed!
         return BeamPage(
           key: ValueKey('item-$itemId'),
           title: 'Item #$itemId',
           popToNamed: '/',
-          type: BeamPageType.slideTransition,
-          child: ItemPage(itemId: itemId),
+          type: BeamPageType.cupertino,
+          child: EditItemPage(itemId: itemId),
         );
       }
     }),

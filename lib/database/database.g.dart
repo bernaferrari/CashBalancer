@@ -190,9 +190,7 @@ class Group extends DataClass implements Insertable<Group> {
   final int id;
   final String name;
   final String colorName;
-
   Group({required this.id, required this.name, required this.colorName});
-
   factory Group.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String? prefix}) {
     final effectivePrefix = prefix ?? '';
@@ -246,7 +244,6 @@ class Group extends DataClass implements Insertable<Group> {
         name: name ?? this.name,
         colorName: colorName ?? this.colorName,
       );
-
   @override
   String toString() {
     return (StringBuffer('Group(')
@@ -273,13 +270,11 @@ class GroupsCompanion extends UpdateCompanion<Group> {
   final Value<int> id;
   final Value<String> name;
   final Value<String> colorName;
-
   const GroupsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.colorName = const Value.absent(),
   });
-
   GroupsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
@@ -348,7 +343,6 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   final VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedTextColumn name = _constructName();
-
   GeneratedTextColumn _constructName() {
     return GeneratedTextColumn(
       'name',
@@ -360,7 +354,6 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   final VerificationMeta _colorNameMeta = const VerificationMeta('colorName');
   @override
   late final GeneratedTextColumn colorName = _constructColorName();
-
   GeneratedTextColumn _constructColorName() {
     return GeneratedTextColumn(
       'color_name',
@@ -371,7 +364,6 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
 
   @override
   List<GeneratedColumn> get $columns => [id, name, colorName];
-
   @override
   $GroupsTable get asDslTable => this;
   @override

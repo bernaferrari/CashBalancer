@@ -72,7 +72,7 @@ class _GroupDialogState extends State<GroupDialog> {
               },
               decoration: InputDecoration(
                 filled: true,
-                labelText: AppLocalizations.of(context)!.mainDialogLabel,
+                labelText: AppLocalizations.of(context)!.dialogAssetName,
                 labelStyle: TextStyle(color: primaryColor),
                 // border is used when there is an error
                 border: OutlineInputBorder(
