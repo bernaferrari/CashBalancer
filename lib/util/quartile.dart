@@ -36,7 +36,11 @@ double quantile(List<double> arr, double q) {
 
 double q25(List<double> arr) => quantile(arr, .25);
 
+double q33(List<double> arr) => quantile(arr, .33);
+
 double q50(List<double> arr) => quantile(arr, .50);
+
+double q66(List<double> arr) => quantile(arr, .66);
 
 double q75(List<double> arr) => quantile(arr, .75);
 

@@ -53,8 +53,8 @@ class AddItemPage extends StatelessWidget {
       final colorName = state.groupsMap[groupId]!.colorName;
 
       return ItemDialogImpl(
-        userId: groupId,
-        groupId: userId,
+        userId: userId,
+        groupId: groupId,
         previousItem: null,
         colorName: colorName,
         bloc: context.read<DataCubit>(),
@@ -544,7 +544,7 @@ class _DetailsGroupDialogState extends State<ItemDialogImpl> {
     });
   }
 
-  void onSaveAddMore([String? value]) {
+  Future<void> onSaveAddMore([String? value]) async {
     if (_formKey.currentState!.validate()) {
       widget.bloc.db.createItem(
         groupId: widget.groupId,

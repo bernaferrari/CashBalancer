@@ -196,9 +196,8 @@ class Database extends _$Database {
     for (int i = 0; i < itemList.length; i++) {
       final groupId = itemList[i].groupId;
 
-      final groupPosition = groupedList[groupId];
-      if (groupPosition != null) {
-        groupPosition.add(itemList[i]);
+      if (groupedList[groupId] != null) {
+        groupedList[groupId]!.add(itemList[i]);
       } else {
         groupedList[groupId] = [itemList[i]];
       }

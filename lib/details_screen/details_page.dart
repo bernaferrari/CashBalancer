@@ -110,6 +110,8 @@ class MainList extends StatelessWidget {
     final double totalValue =
         data.allItems.fold(0, (a, b) => a + b.price * b.quantity);
 
+    final bool longWidth = MediaQuery.of(context).size.width > 400;
+
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: 500),
@@ -120,7 +122,7 @@ class MainList extends StatelessWidget {
             Container(
               height: double.infinity,
               margin: EdgeInsets.all(margin),
-              width: 20,
+              width: longWidth ? 30 : 20,
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
@@ -198,6 +200,7 @@ class VerticalProgressBar extends StatelessWidget {
                       minimumSize: Size.zero,
                       fixedSize: Size(100, spacedList[i]),
                       shape: RoundedRectangleBorder(),
+                      elevation: 0,
                     ),
                     onPressed: () {
                       showDialog<Object>(
@@ -472,9 +475,8 @@ class CircularProgress extends StatelessWidget {
             children: <Widget>[
               Text(
                 "${totalLocalPercent.toStringAsFixed(0)}%",
-                style: Theme.of(context).textTheme.overline!.copyWith(
-                      fontSize: 8,
-                    ),
+                style:
+                    Theme.of(context).textTheme.overline!.copyWith(fontSize: 8),
               ),
             ],
           ),
@@ -505,8 +507,16 @@ class GroupCardTitleBar extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: Theme.of(context).textTheme.headline5),
-              Text(subtitle, style: Theme.of(context).textTheme.overline),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.headline5,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                subtitle,
+                style: Theme.of(context).textTheme.overline,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           ),
         ),
@@ -539,45 +549,23 @@ class ItemCard extends StatelessWidget {
         backgroundColor: Theme.of(context).brightness == Brightness.dark
             ? item.color.withOpacity(0.05)
             : item.color.withOpacity(0.25),
+        elevation: 0,
       ),
       onPressed: () {
         Beamer.of(context).beamToNamed('/editItem/${item.id}');
-
-        // showDialog<Object>(
-        //   context: context,
-        //   builder: (_) => ItemDialog(
-        //     bloc: context.read<DataCubit>(),
-        //     totalValue: totalValue,
-        //     colorName: nameColor,
-        //     previousItem: item,
-        //     userId: item.id,
-        //     groupId: item.groupId,
-        //   ),
-        // );
       },
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(
-              right: 8,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 4,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    color: item.color,
-                  ),
-                ),
-              ],
+          Container(
+            width: 4,
+            height: 38,
+            margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+              color: item.color,
             ),
           ),
           Expanded(
@@ -593,24 +581,19 @@ class ItemCard extends StatelessWidget {
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "R\$ ${item.price} (${(item.price / totalValue).toPercent()}%)",
-                      style: GoogleFonts.firaSans(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacity(0.75),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                Text(
+                  "R\$ ${item.price} (${(item.price / totalValue).toPercent()}%)",
+                  style: GoogleFonts.firaSans(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.75),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
