@@ -17,17 +17,17 @@ Color getScaffoldDialogBackgroundColor(BuildContext context, String colorName) {
 
 class DialogScreenBase extends StatelessWidget {
   final String colorName;
-  final Color backgroundDialogColor;
   final List<Widget> children;
   final String appBarTitle;
   final List<Widget>? appBarActions;
+  final Color? backgroundDialogColor;
 
   const DialogScreenBase({
     Key? key,
     required this.children,
     required this.colorName,
-    required this.backgroundDialogColor,
     required this.appBarTitle,
+    this.backgroundDialogColor,
     this.appBarActions,
   }) : super(key: key);
 
@@ -52,7 +52,13 @@ class DialogScreenBase extends StatelessWidget {
                 clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
-                  color: backgroundDialogColor,
+                  color: backgroundDialogColor ??
+                      (Theme.of(context).brightness == Brightness.dark
+                          ? Color.alphaBlend(
+                              Colors.black.withOpacity(0.60),
+                              tailwindColors[colorName]![900]!,
+                            )
+                          : tailwindColors[colorName]![100]!),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

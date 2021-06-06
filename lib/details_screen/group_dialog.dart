@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../database/data.dart';
 import '../l10n/l10n.dart';
 import '../util/tailwind_colors.dart';
-import 'color_picker.dart';
+import '../widgets/color_picker.dart';
 
 class GroupDialog extends StatefulWidget {
   final Function(String text, String color) onSavePressed;

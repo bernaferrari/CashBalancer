@@ -7,7 +7,7 @@ import '../blocs/data_bloc.dart';
 import '../database/data.dart';
 import '../l10n/l10n.dart';
 import '../util/tailwind_colors.dart';
-import 'dialog_screen_base.dart';
+import '../widgets/dialog_screen_base.dart';
 
 class MoveItemPage extends StatefulWidget {
   final ItemData item;

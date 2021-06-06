@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../database/database.dart';
 import '../l10n/l10n.dart';
 import '../util/tailwind_colors.dart';
-import 'dialog_screen_base.dart';
+import '../widgets/dialog_screen_base.dart';
 
 class ItemDialogPage extends StatefulWidget {
   final Item? previousItem;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:storybook_flutter/storybook_flutter.dart';
 
-import 'details_screen/color_picker.dart';
+import 'widgets/color_picker.dart';
 
 void main() => runApp(const StorybookApp());
 

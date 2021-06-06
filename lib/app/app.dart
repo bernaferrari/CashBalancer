@@ -8,11 +8,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../blocs/data_bloc.dart';
 import '../database/database.dart';
 import '../details_screen/details_page.dart';
-import '../details_screen/dialog_screen_base.dart';
 import '../details_screen/item_page.dart';
 import '../details_screen/move_item_page.dart';
 import '../l10n/l10n.dart';
 import '../settings/settings_page.dart';
+import '../widgets/dialog_screen_base.dart';
 
 class App extends StatelessWidget {
   App({Key? key}) : super(key: key);
@@ -20,15 +20,18 @@ class App extends StatelessWidget {
   final _routerDelegate = BeamerDelegate(
     locationBuilder: SimpleLocationBuilder(routes: {
       '/': (context) => DetailsPage(),
-      '/settings': (context) => SettingsPage(),
+      '/settings': (context) => BeamerMaterialTransitionPage(
+            key: ValueKey('settings'),
+            title: 'Settings',
+            child: SettingsPage(),
+            fillColor: getScaffoldDialogBackgroundColor(context, 'warmGray'),
+          ),
       '/addItem/:groupId/:userId': (context) {
         final beamState = context.currentBeamLocation.state;
         final groupId = int.tryParse(beamState.pathParameters['groupId']!)!;
         final userId = int.tryParse(beamState.pathParameters['userId']!)!;
 
-        final state = context
-            .read<DataCubit>()
-            .state;
+        final state = context.read<DataCubit>().state;
         if (state != null) {
           final String colorName = state.groupsMap[groupId]!.colorName;
 
