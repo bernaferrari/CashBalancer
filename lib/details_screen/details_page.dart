@@ -561,86 +561,91 @@ class ItemCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item.name,
-                  style: GoogleFonts.firaSans(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.name,
+                        style: GoogleFonts.firaSans(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (item.targetPercent > 0) ...[
+                      Text(
+                        "${(item.price / totalValue).toPercent()}%",
+                        style: GoogleFonts.firaSans(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.50),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        child: Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 16,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.50),
+                        ),
+                      ),
+                      Text(
+                        "${item.targetPercent.toStringAsFixed(0)}%",
+                        style: GoogleFonts.firaSans(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          fontFeatures: [
+                            FontFeature.enable('calc'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 SizedBox(height: 4),
-                Text(
-                  "R\$ ${item.price.toStringAsFixed(2)} (${(item.price / totalValue).toPercent()}%)",
-                  style: GoogleFonts.firaSans(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.75),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "R\$ ${item.price.toStringAsFixed(2)} (${(item.price / totalValue).toPercent()}%)",
+                        style: GoogleFonts.firaSans(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.75),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (item.targetPercent > 0)
+                      Text(
+                        "${item.targetPercent / 100 > item.price / totalValue ? "↑" : "↓"} R\$ ${(totalValue * item.targetPercent / 100 - item.price).toStringAsFixed(0)} (${(item.targetPercent / 100 - item.price / totalValue).toPercent()}%)",
+                        style: GoogleFonts.firaSans(
+                          color:
+                              item.targetPercent / 100 > item.price / totalValue
+                                  ? greenColor
+                                  : redColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),
           ),
-          if (item.targetPercent > 0)
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      "${(item.price / totalValue).toPercent()}%",
-                      style: GoogleFonts.firaSans(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacity(0.50),
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                      child: Icon(
-                        Icons.arrow_forward_rounded,
-                        size: 16,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacity(0.50),
-                      ),
-                    ),
-                    Text(
-                      "${item.targetPercent}%",
-                      style: GoogleFonts.firaSans(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        fontFeatures: [
-                          FontFeature.enable('calc'),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  "${item.targetPercent / 100 > item.price / totalValue ? "↑" : "↓"} R\$ ${(totalValue * item.targetPercent / 100 - item.price).toStringAsFixed(0)} (${(item.targetPercent / 100 - item.price / totalValue).toPercent()}%)",
-                  style: GoogleFonts.firaSans(
-                    color: item.targetPercent / 100 > item.price / totalValue
-                        ? greenColor
-                        : redColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
         ],
       ),
     );

@@ -396,14 +396,14 @@ class _ItemDialogPageState extends State<ItemDialogPage> {
     } else {
       // Remove the previous price before adding the updated one.
       finalPercent = (moneyValue /
-          (widget.totalValue + moneyValue - widget.previousItem!.price) *
-          100)
+              (widget.totalValue + moneyValue - widget.previousItem!.price) *
+              100)
           .toStringAsFixed(2);
     }
 
     setState(() {
       relativePercentage =
-      '\$${moneyEditingController.text} is going to be $finalPercent%';
+          '\$${moneyEditingController.text} is going to be $finalPercent%';
     });
   }
 

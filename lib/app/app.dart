@@ -55,12 +55,10 @@ class App extends StatelessWidget {
         final beamState = context.currentBeamLocation.state;
         final itemId = int.tryParse(beamState.pathParameters['itemId']!)!;
 
-        final state = context
-            .read<DataCubit>()
-            .state;
+        final state = context.read<DataCubit>().state;
         if (state != null && state.allItems.isNotEmpty) {
           final previousItem =
-          state.allItems.firstWhere((element) => element.id == itemId);
+              state.allItems.firstWhere((element) => element.id == itemId);
 
           return BeamerMaterialTransitionPage(
             key: ValueKey('item-$itemId'),
@@ -83,13 +81,11 @@ class App extends StatelessWidget {
         final itemId = int.tryParse(beamState.pathParameters['itemId']!)!;
 
         // BlocProvider.of<DataCubit>(context).state;
-        final state = context
-            .read<DataCubit>()
-            .state;
+        final state = context.read<DataCubit>().state;
 
         if (state != null && state.allItems.isNotEmpty) {
           final item =
-          state.allItems.firstWhere((element) => element.id == itemId);
+              state.allItems.firstWhere((element) => element.id == itemId);
 
           return BeamerMaterialTransitionPage(
             key: ValueKey('moveItem-$itemId'),
@@ -103,7 +99,7 @@ class App extends StatelessWidget {
               totalValue: state.totalValue,
             ),
             fillColor:
-            getScaffoldDialogBackgroundColor(context, item.colorName),
+                getScaffoldDialogBackgroundColor(context, item.colorName),
           );
         } else {
           return BeamerMaterialTransitionPage(
@@ -213,7 +209,7 @@ class App extends StatelessWidget {
           routerDelegate: _routerDelegate,
           routeInformationParser: BeamerParser(),
           backButtonDispatcher:
-          BeamerBackButtonDispatcher(delegate: _routerDelegate),
+              BeamerBackButtonDispatcher(delegate: _routerDelegate),
         ),
       ),
     );
@@ -230,12 +226,12 @@ class BeamerMaterialTransitionPage extends BeamPage {
     String popToNamed = '/',
     this.fillColor,
   }) : super(
-    key: key,
-    child: child,
-    title: title,
-    popToNamed: popToNamed,
-    // + all other you might need
-  );
+          key: key,
+          child: child,
+          title: title,
+          popToNamed: popToNamed,
+          // + all other you might need
+        );
 
   @override
   Route createRoute(BuildContext context) {
@@ -255,19 +251,21 @@ class SharedAxisPageRoute extends PageRouteBuilder<Object> {
     required RouteSettings? settings,
     Color? fillColor,
   }) : super(
-    pageBuilder: (context, primaryAnimation, secondaryAnimation) => page,
-    settings: settings,
-    transitionsBuilder: (context,
-        primaryAnimation,
-        secondaryAnimation,
-        child,) {
-      return SharedAxisTransition(
-        animation: primaryAnimation,
-        secondaryAnimation: secondaryAnimation,
-        transitionType: transitionType,
-        child: child,
-        fillColor: fillColor,
-      );
-    },
-  );
+          pageBuilder: (context, primaryAnimation, secondaryAnimation) => page,
+          settings: settings,
+          transitionsBuilder: (
+            context,
+            primaryAnimation,
+            secondaryAnimation,
+            child,
+          ) {
+            return SharedAxisTransition(
+              animation: primaryAnimation,
+              secondaryAnimation: secondaryAnimation,
+              transitionType: transitionType,
+              child: child,
+              fillColor: fillColor,
+            );
+          },
+        );
 }

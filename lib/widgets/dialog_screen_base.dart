@@ -35,53 +35,58 @@ class DialogScreenBase extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: getScaffoldDialogBackgroundColor(context, colorName),
-      body: Shortcuts(
-        shortcuts: <LogicalKeySet, Intent>{
-          LogicalKeySet(LogicalKeyboardKey.escape): PopIntent(),
-        },
-        child: Actions(
-          actions: <Type, Action<Intent>>{
-            PopIntent: CallbackAction<PopIntent>(
-              onInvoke: (_) => Navigator.of(context).pop(),
-            ),
+      body: SafeArea(
+        top: true,
+        bottom: true,
+        child: Shortcuts(
+          shortcuts: <LogicalKeySet, Intent>{
+            LogicalKeySet(LogicalKeyboardKey.escape): PopIntent(),
           },
-          child: Center(
-            child: SizedBox(
-              width: 400,
-              child: Container(
-                clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
-                  color: backgroundDialogColor ??
-                      (Theme.of(context).brightness == Brightness.dark
-                          ? Color.alphaBlend(
-                              Colors.black.withOpacity(0.60),
-                              tailwindColors[colorName]![900]!,
-                            )
-                          : tailwindColors[colorName]![100]!),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    AppBar(
-                      foregroundColor: Theme.of(context).colorScheme.onSurface,
-                      backwardsCompatibility: false,
-                      title: Text(appBarTitle),
-                      elevation: 0,
-                      backgroundColor:
-                          Theme.of(context).brightness == Brightness.dark
-                              ? tailwindColors[colorName]![900]!
-                              : tailwindColors[colorName]![200],
-                      actions: appBarActions,
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 24),
-                      child: ListView(
-                        shrinkWrap: true,
-                        children: children,
+          child: Actions(
+            actions: <Type, Action<Intent>>{
+              PopIntent: CallbackAction<PopIntent>(
+                onInvoke: (_) => Navigator.of(context).pop(),
+              ),
+            },
+            child: Center(
+              child: SizedBox(
+                width: 400,
+                child: Container(
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    color: backgroundDialogColor ??
+                        (Theme.of(context).brightness == Brightness.dark
+                            ? Color.alphaBlend(
+                                Colors.black.withOpacity(0.60),
+                                tailwindColors[colorName]![900]!,
+                              )
+                            : tailwindColors[colorName]![100]!),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AppBar(
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onSurface,
+                        backwardsCompatibility: false,
+                        title: Text(appBarTitle),
+                        elevation: 0,
+                        backgroundColor:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? tailwindColors[colorName]![900]!
+                                : tailwindColors[colorName]![200],
+                        actions: appBarActions,
                       ),
-                    ),
-                  ],
+                      Flexible(
+                        child: ListView(
+                          padding: EdgeInsets.symmetric(horizontal: 24),
+                          shrinkWrap: true,
+                          children: children,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
