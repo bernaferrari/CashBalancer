@@ -7,6 +7,16 @@
   "addGroup": "Add Group",
   "addAGroup": "Add a Group",
   "editGroup": "Edit a Group",
+  "moveGroup": "Move \"{itemName}\"",
+  "@moveGroup": {
+    "description": "Used on dialogs for moving items from one group into another",
+    "placeholders": {
+      "itemName": {
+        "type": "String",
+        "example": "XRP"
+      }
+    }
+  },
   "addAsset": "Add an Asset",
   "editAsset": "Edit an Asset",
   "dialogAssetName": "Name",

@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,7 +8,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../blocs/data_bloc.dart';
 import '../database/database.dart';
 import '../details_screen/details_page.dart';
-import '../details_screen/item_dialog.dart';
+import '../details_screen/dialog_screen_base.dart';
+import '../details_screen/item_page.dart';
+import '../details_screen/move_item_page.dart';
 import '../l10n/l10n.dart';
 import '../settings/settings_page.dart';
 
@@ -23,27 +26,90 @@ class App extends StatelessWidget {
         final groupId = int.tryParse(beamState.pathParameters['groupId']!)!;
         final userId = int.tryParse(beamState.pathParameters['userId']!)!;
 
-        // Widgets and BeamPages can be mixed!
-        return BeamPage(
-          key: ValueKey('addItem-$groupId$userId'),
-          title: 'Add Item',
-          popToNamed: '/',
-          type: BeamPageType.cupertino,
-          child: AddItemPage(groupId: groupId, userId: userId),
-        );
+        final state = context
+            .read<DataCubit>()
+            .state;
+        if (state != null) {
+          final String colorName = state.groupsMap[groupId]!.colorName;
+
+          // Widgets and BeamPages can be mixed!
+          return BeamerMaterialTransitionPage(
+            key: ValueKey('addItem-$groupId$userId'),
+            title: 'Add Item',
+            popToNamed: '/',
+            child: ItemDialogPage(
+              userId: state.userId,
+              previousItem: null,
+              colorName: colorName,
+              groupId: groupId,
+              totalValue: state.totalValue,
+            ),
+            fillColor: getScaffoldDialogBackgroundColor(context, colorName),
+          );
+        }
       },
       '/editItem/:itemId': (context) {
         final beamState = context.currentBeamLocation.state;
         final itemId = int.tryParse(beamState.pathParameters['itemId']!)!;
 
-        // Widgets and BeamPages can be mixed!
-        return BeamPage(
-          key: ValueKey('item-$itemId'),
-          title: 'Item #$itemId',
-          popToNamed: '/',
-          type: BeamPageType.cupertino,
-          child: EditItemPage(itemId: itemId),
-        );
+        final state = context
+            .read<DataCubit>()
+            .state;
+        if (state != null && state.allItems.isNotEmpty) {
+          final previousItem =
+          state.allItems.firstWhere((element) => element.id == itemId);
+
+          return BeamerMaterialTransitionPage(
+            key: ValueKey('item-$itemId'),
+            title: 'Edit Item',
+            popToNamed: '/',
+            child: ItemDialogPage(
+              userId: state.userId,
+              previousItem: previousItem,
+              colorName: previousItem.colorName,
+              groupId: previousItem.groupId,
+              totalValue: state.totalValue,
+            ),
+            fillColor: getScaffoldDialogBackgroundColor(
+                context, previousItem.colorName),
+          );
+        }
+      },
+      '/moveItem/:itemId': (context) {
+        final beamState = context.currentBeamLocation.state;
+        final itemId = int.tryParse(beamState.pathParameters['itemId']!)!;
+
+        // BlocProvider.of<DataCubit>(context).state;
+        final state = context
+            .read<DataCubit>()
+            .state;
+
+        if (state != null && state.allItems.isNotEmpty) {
+          final item =
+          state.allItems.firstWhere((element) => element.id == itemId);
+
+          return BeamerMaterialTransitionPage(
+            key: ValueKey('moveItem-$itemId'),
+            title: 'Move Item',
+            popToNamed: '/editItem/$itemId',
+            child: MoveItemPage(
+              userId: state.userId,
+              item: item,
+              groups: state.groupsMap.values.toList(),
+              bloc: context.read<DataCubit>(),
+              totalValue: state.totalValue,
+            ),
+            fillColor:
+            getScaffoldDialogBackgroundColor(context, item.colorName),
+          );
+        } else {
+          return BeamerMaterialTransitionPage(
+            key: ValueKey('moveItem-$itemId'),
+            title: 'Move Item',
+            popToNamed: '/editItem/$itemId',
+            child: Text("Error!"),
+          );
+        }
       }
     }),
   );
@@ -144,9 +210,61 @@ class App extends StatelessWidget {
           routerDelegate: _routerDelegate,
           routeInformationParser: BeamerParser(),
           backButtonDispatcher:
-              BeamerBackButtonDispatcher(delegate: _routerDelegate),
+          BeamerBackButtonDispatcher(delegate: _routerDelegate),
         ),
       ),
     );
   }
+}
+
+class BeamerMaterialTransitionPage extends BeamPage {
+  final Color? fillColor;
+
+  BeamerMaterialTransitionPage({
+    LocalKey? key,
+    required Widget child,
+    String title = 'hello',
+    String popToNamed = '/',
+    this.fillColor,
+  }) : super(
+    key: key,
+    child: child,
+    title: title,
+    popToNamed: popToNamed,
+    // + all other you might need
+  );
+
+  @override
+  Route createRoute(BuildContext context) {
+    return SharedAxisPageRoute(
+      page: child,
+      transitionType: SharedAxisTransitionType.horizontal,
+      settings: this,
+      fillColor: fillColor,
+    );
+  }
+}
+
+class SharedAxisPageRoute extends PageRouteBuilder<Object> {
+  SharedAxisPageRoute({
+    required Widget page,
+    required SharedAxisTransitionType transitionType,
+    required RouteSettings? settings,
+    Color? fillColor,
+  }) : super(
+    pageBuilder: (context, primaryAnimation, secondaryAnimation) => page,
+    settings: settings,
+    transitionsBuilder: (context,
+        primaryAnimation,
+        secondaryAnimation,
+        child,) {
+      return SharedAxisTransition(
+        animation: primaryAnimation,
+        secondaryAnimation: secondaryAnimation,
+        transitionType: transitionType,
+        child: child,
+        fillColor: fillColor,
+      );
+    },
+  );
 }

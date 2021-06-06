@@ -296,6 +296,13 @@ class Database extends _$Database {
     ));
   }
 
+  Future<bool> updateItemGroup({
+    required Item item,
+    required int groupId,
+  }) {
+    return update(items).replace(item.copyWith(groupId: groupId));
+  }
+
   Future<int> deleteItem(Item item) {
     return (delete(items)..where((t) => t.id.equals(item.id))).go();
   }

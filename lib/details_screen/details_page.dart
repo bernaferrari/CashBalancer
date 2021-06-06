@@ -14,7 +14,6 @@ import '../util/row_column_spacer.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/circle_percentage_painter.dart';
 import 'group_dialog.dart';
-import 'item_dialog.dart';
 
 extension Percent on double {
   String toPercent() => (this * 100).toStringAsFixed(0);
@@ -38,8 +37,6 @@ class DetailsPageImpl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("data is $data");
-
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
@@ -146,14 +143,17 @@ class MainList extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: spaceColumn(
                       20,
-                      data.groupsMap.entries.map(
-                        (e) => GroupCard(
-                          itemsList: data.groupedItems[e.key]
+                      (data.groupsMap.values.toList()
+                            ..sort((a, b) => a.name.compareTo(b.name)))
+                          .map(
+                        (group) => GroupCard(
+                          itemsList: data.groupedItems[group.id]
                             ?..sort(
                               (a, b) => (b.price * a.quantity)
                                   .compareTo(a.price * a.quantity),
                             ),
-                          group: e.value,
+                          group: group,
+                          allTotalValue: data.totalValue,
                           userId: data.userId,
                         ),
                       ),
@@ -203,18 +203,20 @@ class VerticalProgressBar extends StatelessWidget {
                       elevation: 0,
                     ),
                     onPressed: () {
-                      showDialog<Object>(
-                        context: context,
-                        builder: (_) => ItemDialogImpl(
-                          totalValue: totalValue,
-                          bloc: context.read<DataCubit>(),
-                          colorName: data
-                              .groupsMap[data.allItems[i].groupId]!.colorName,
-                          previousItem: data.allItems[i],
-                          userId: data.allItems[i].id,
-                          groupId: data.allItems[i].groupId,
-                        ),
-                      );
+                      Beamer.of(context)
+                          .beamToNamed('/editItem/${data.allItems[i].id}');
+                      // showDialog<Object>(
+                      //   context: context,
+                      //   builder: (_) => ItemDialogImpl(
+                      //     totalValue: totalValue,
+                      //     bloc: context.read<DataCubit>(),
+                      //     colorName: data
+                      //        .groupsMap[data.allItems[i].groupId]!.colorName,
+                      //     previousItem: data.allItems[i],
+                      //     userId: data.allItems[i].id,
+                      //     groupId: data.allItems[i].groupId,
+                      //   ),
+                      // );
                     },
                     child: SizedBox.shrink(),
                   ),
@@ -235,12 +237,14 @@ class GroupCard extends StatelessWidget {
   final List<ItemData>? itemsList;
   final GroupData group;
   final int userId;
+  final double allTotalValue;
 
   const GroupCard({
     Key? key,
     required this.itemsList,
     required this.group,
     required this.userId,
+    required this.allTotalValue,
   }) : super(key: key);
 
   // Make it reusable.
@@ -277,13 +281,7 @@ class GroupCard extends StatelessWidget {
             children: [
               EditGroup(color: color, group: group),
               SizedBox(width: 8),
-              AddItem(
-                color: color,
-                userId: userId,
-                groupId: group.id,
-                colorName: group.colorName,
-                totalValue: group.totalValue,
-              ),
+              AddItem(color: color, userId: userId, groupId: group.id),
             ],
           ),
         ),
@@ -293,8 +291,7 @@ class GroupCard extends StatelessWidget {
           .map((e) => e.price * e.quantity)
           .fold(0.0, (previous, current) => previous + current);
 
-      final double totalLocalPercent =
-          100.0 * totalLocalPrice / group.totalValue;
+      final double totalLocalPercent = (group.totalValue / allTotalValue) * 100;
 
       return customContainer(
         context: context,
@@ -305,7 +302,7 @@ class GroupCard extends StatelessWidget {
           children: [
             GroupCardTitleBar(
               title: group.name,
-              subtitle: "Total: R\$ $totalLocalPrice",
+              subtitle: "Total: R\$ ${totalLocalPrice.toStringAsFixed(2)}",
               widget: CircularProgress(
                 totalLocalPercent: totalLocalPercent,
                 color: color,
@@ -337,13 +334,7 @@ class GroupCard extends StatelessWidget {
                 children: [
                   EditGroup(color: color, group: group),
                   SizedBox(width: 8),
-                  AddItem(
-                    color: color,
-                    userId: userId,
-                    groupId: group.id,
-                    colorName: group.colorName,
-                    totalValue: group.totalValue,
-                  ),
+                  AddItem(color: color, userId: userId, groupId: group.id),
                 ],
               ),
             ),
@@ -356,18 +347,14 @@ class GroupCard extends StatelessWidget {
 
 class AddItem extends StatelessWidget {
   final Color color;
-  final String colorName;
   final int userId;
   final int groupId;
-  final double totalValue;
 
   const AddItem({
     Key? key,
     required this.color,
-    required this.colorName,
     required this.userId,
     required this.groupId,
-    required this.totalValue,
   }) : super(key: key);
 
   @override
@@ -578,13 +565,14 @@ class ItemCard extends StatelessWidget {
                   item.name,
                   style: GoogleFonts.firaSans(
                     color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.w400,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
+                SizedBox(height: 4),
                 Text(
-                  "R\$ ${item.price} (${(item.price / totalValue).toPercent()}%)",
+                  "R\$ ${item.price.toStringAsFixed(2)} (${(item.price / totalValue).toPercent()}%)",
                   style: GoogleFonts.firaSans(
                     color: Theme.of(context)
                         .colorScheme

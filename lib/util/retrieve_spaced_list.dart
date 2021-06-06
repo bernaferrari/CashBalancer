@@ -8,7 +8,9 @@ List<double> retrieveSpacedList(List<Item> data, double maxSize) {
 
   final double totalValue = data
       .map((d) => d.price * d.quantity)
-      .fold(0.0, (previous, current) => previous + current);
+      .fold(0.0, (previous, current) => previous + current.abs());
 
-  return data.map((d) => maxWH * (d.price * d.quantity) / totalValue).toList();
+  return data
+      .map((d) => maxWH * (d.price * d.quantity).abs() / totalValue)
+      .toList();
 }
