@@ -15,9 +15,13 @@ part 'database.g.dart';
 class Groups extends Table {
   IntColumn get id => integer().autoIncrement()();
 
+  IntColumn get userId => integer()();
+
   TextColumn get name => text()();
 
   TextColumn get colorName => text()();
+
+  RealColumn get targetPercent => real()();
 }
 
 class Users extends Table {
@@ -61,11 +65,7 @@ class Database extends _$Database {
       onCreate: (m) {
         return m.createAll();
       },
-      onUpgrade: (m, from, to) async {
-        // if (from == 1) {
-        //   await m.addColumn(todos, todos.targetDate);
-        // }
-      },
+      onUpgrade: (m, from, to) async {},
       beforeOpen: (details) async {
         if (details.wasCreated) {
           await into(users).insert(UsersCompanion.insert(name: 'Wallet #1'));
@@ -76,7 +76,8 @@ class Database extends _$Database {
 
   // Users, Groups : [Items]
   Stream<FullData> watchGroups(int userId) {
-    final groupsQuery = select(groups);
+    final groupsQuery = select(groups)
+      ..where((item) => item.userId.equals(userId));
 
     final itemsQuery = select(items)
       ..where((item) => item.userId.equals(userId));
@@ -255,10 +256,12 @@ class Database extends _$Database {
     return update(users).replace(user);
   }
 
-  Future<int> createGroup(String description, String colorName) {
+  Future<int> createGroup(int userId, String description, String colorName) {
     return into(groups).insert(GroupsCompanion.insert(
       name: description,
       colorName: colorName,
+      userId: userId,
+      targetPercent: 0,
     ));
   }
 

@@ -15,6 +15,33 @@ Color getScaffoldDialogBackgroundColor(BuildContext context, String colorName) {
         );
 }
 
+Color getPrimaryColor(BuildContext context, String colorName) {
+  return Theme.of(context).brightness == Brightness.dark
+      ? tailwindColors[colorName]![200]!
+      : tailwindColors[colorName]![800]!;
+}
+
+Color getPrimaryColorWeaker(BuildContext context, String colorName) {
+  return Theme.of(context).brightness == Brightness.dark
+      ? tailwindColors[colorName]![300]!
+      : tailwindColors[colorName]![700]!;
+}
+
+Color getBackgroundDialogColor(BuildContext context, String colorName) {
+  return Theme.of(context).brightness == Brightness.dark
+      ? Color.alphaBlend(
+          Colors.black.withOpacity(0.60),
+          tailwindColors[colorName]![900]!,
+        )
+      : tailwindColors[colorName]![100]!;
+}
+
+InputBorder getInputDecorationBorder(Color primaryColorWeaker) =>
+    OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: primaryColorWeaker),
+    );
+
 class DialogScreenBase extends StatelessWidget {
   final String colorName;
   final List<Widget> children;
@@ -80,7 +107,7 @@ class DialogScreenBase extends StatelessWidget {
                       ),
                       Flexible(
                         child: ListView(
-                          padding: EdgeInsets.symmetric(horizontal: 24),
+                          padding: EdgeInsets.all(24),
                           shrinkWrap: true,
                           children: children,
                         ),

@@ -27,7 +27,13 @@ class GroupData extends Group {
   GroupData(
     Group group,
     this.totalValue,
-  ) : super(id: group.id, name: group.name, colorName: group.colorName);
+  ) : super(
+          id: group.id,
+          userId: group.userId,
+          name: group.name,
+          colorName: group.colorName,
+          targetPercent: group.targetPercent,
+        );
 }
 
 class FullData {

@@ -13,7 +13,6 @@ import '../util/retrieve_spaced_list.dart';
 import '../util/row_column_spacer.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/circle_percentage_painter.dart';
-import 'group_dialog.dart';
 
 extension Percent on double {
   String toPercent() => (this * 100).toStringAsFixed(0);
@@ -25,13 +24,17 @@ class DetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DataCubit, FullData?>(builder: (context, state) {
-      return DetailsPageImpl(state);
+      if (state == null) {
+        return SizedBox();
+      } else {
+        return DetailsPageImpl(state);
+      }
     });
   }
 }
 
 class DetailsPageImpl extends StatelessWidget {
-  final FullData? data;
+  final FullData data;
 
   const DetailsPageImpl(this.data);
 
@@ -59,19 +62,8 @@ class DetailsPageImpl extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          showDialog<Object>(
-            context: context,
-            builder: (_) => GroupDialog(
-              onSavePressed: (text, colorName) {
-                // Preserve the Bloc's context.
-                BlocProvider.of<DataCubit>(context)
-                    .db
-                    .createGroup(text, colorName);
-              },
-            ),
-          );
-        },
+        onPressed: () =>
+            Beamer.of(context).beamToNamed("/addGroup/${data.userId}"),
         label: Text(
           AppLocalizations.of(context)!.addGroup,
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
@@ -81,13 +73,13 @@ class DetailsPageImpl extends StatelessWidget {
           color: Theme.of(context).colorScheme.onPrimary,
         ),
       ),
-      body: (data == null || data?.groupsMap.isEmpty == true)
+      body: (data.groupsMap.isEmpty == true)
           ? WhenEmptyCard(
               title: AppLocalizations.of(context)!.mainEmptyTitle,
               subtitle: AppLocalizations.of(context)!.mainEmptySubtitle,
               icon: Icons.account_balance_sharp,
             )
-          : MainList(data: data!),
+          : MainList(data: data),
     );
   }
 }
@@ -202,22 +194,8 @@ class VerticalProgressBar extends StatelessWidget {
                       shape: RoundedRectangleBorder(),
                       elevation: 0,
                     ),
-                    onPressed: () {
-                      Beamer.of(context)
-                          .beamToNamed('/editItem/${data.allItems[i].id}');
-                      // showDialog<Object>(
-                      //   context: context,
-                      //   builder: (_) => ItemDialogImpl(
-                      //     totalValue: totalValue,
-                      //     bloc: context.read<DataCubit>(),
-                      //     colorName: data
-                      //        .groupsMap[data.allItems[i].groupId]!.colorName,
-                      //     previousItem: data.allItems[i],
-                      //     userId: data.allItems[i].id,
-                      //     groupId: data.allItems[i].groupId,
-                      //   ),
-                      // );
-                    },
+                    onPressed: () => Beamer.of(context)
+                        .beamToNamed('/editItem/${data.allItems[i].id}'),
                     child: SizedBox.shrink(),
                   ),
                 ),
@@ -279,7 +257,7 @@ class GroupCard extends StatelessWidget {
           subtitle: "Press + to add.",
           widget: Row(
             children: [
-              EditGroup(color: color, group: group),
+              EditGroup(color: color, groupId: group.id),
               SizedBox(width: 8),
               AddItem(color: color, userId: userId, groupId: group.id),
             ],
@@ -332,7 +310,7 @@ class GroupCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  EditGroup(color: color, group: group),
+                  EditGroup(color: color, groupId: group.id),
                   SizedBox(width: 8),
                   AddItem(color: color, userId: userId, groupId: group.id),
                 ],
@@ -367,31 +345,20 @@ class AddItem extends StatelessWidget {
         fixedSize: Size(64, 40),
       ),
       child: Icon(Icons.add_rounded),
-      onPressed: () {
-        Beamer.of(context).beamToNamed('/addItem/$groupId/$userId');
-        // showDialog<Object>(
-        //   context: context,
-        //   builder: (_) => ItemDialogImpl(
-        //     colorName: colorName,
-        //     totalValue: totalValue,
-        //     bloc: context.read<DataCubit>(),
-        //     groupId: groupId,
-        //     userId: userId,
-        //   ),
-        // );
-      },
+      onPressed: () =>
+          Beamer.of(context).beamToNamed('/addItem/$groupId/$userId'),
     );
   }
 }
 
 class EditGroup extends StatelessWidget {
   final Color color;
-  final GroupData group;
+  final int groupId;
 
   const EditGroup({
     Key? key,
     required this.color,
-    required this.group,
+    required this.groupId,
   }) : super(key: key);
 
   @override
@@ -401,31 +368,11 @@ class EditGroup extends StatelessWidget {
         primary: color,
         minimumSize: Size.zero,
         padding: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         fixedSize: Size(40, 40),
       ),
       child: Icon(Icons.edit_rounded),
-      onPressed: () {
-        showDialog<Object>(
-          context: context,
-          builder: (_) => GroupDialog(
-            previousGroup: group,
-            onDeletePressed: () async =>
-                await context.read<DataCubit>().db.deleteGroup(group.id),
-            onSavePressed: (name, colorName) {
-              // Preserve the Bloc's context.
-              context.read<DataCubit>().db.editGroup(
-                    group.copyWith(
-                      name: name,
-                      colorName: colorName,
-                    ),
-                  );
-            },
-          ),
-        );
-      },
+      onPressed: () => Beamer.of(context).beamToNamed("/editGroup/$groupId"),
     );
   }
 }

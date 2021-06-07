@@ -176,8 +176,8 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   User map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
-    return User.fromData(data, _db, prefix: effectivePrefix);
+    return User.fromData(data, _db,
+        prefix: tablePrefix != null ? '$tablePrefix.' : null);
   }
 
   @override
@@ -188,35 +188,52 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
 
 class Group extends DataClass implements Insertable<Group> {
   final int id;
+  final int userId;
   final String name;
   final String colorName;
-  Group({required this.id, required this.name, required this.colorName});
+  final double targetPercent;
+
+  Group(
+      {required this.id,
+      required this.userId,
+      required this.name,
+      required this.colorName,
+      required this.targetPercent});
+
   factory Group.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String? prefix}) {
     final effectivePrefix = prefix ?? '';
     return Group(
       id: const IntType()
           .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
+      userId: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}user_id'])!,
       name: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
       colorName: const StringType()
           .mapFromDatabaseResponse(data['${effectivePrefix}color_name'])!,
+      targetPercent: const RealType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}target_percent'])!,
     );
   }
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
+    map['user_id'] = Variable<int>(userId);
     map['name'] = Variable<String>(name);
     map['color_name'] = Variable<String>(colorName);
+    map['target_percent'] = Variable<double>(targetPercent);
     return map;
   }
 
   GroupsCompanion toCompanion(bool nullToAbsent) {
     return GroupsCompanion(
       id: Value(id),
+      userId: Value(userId),
       name: Value(name),
       colorName: Value(colorName),
+      targetPercent: Value(targetPercent),
     );
   }
 
@@ -225,8 +242,10 @@ class Group extends DataClass implements Insertable<Group> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return Group(
       id: serializer.fromJson<int>(json['id']),
+      userId: serializer.fromJson<int>(json['userId']),
       name: serializer.fromJson<String>(json['name']),
       colorName: serializer.fromJson<String>(json['colorName']),
+      targetPercent: serializer.fromJson<double>(json['targetPercent']),
     );
   }
   @override
@@ -234,71 +253,110 @@ class Group extends DataClass implements Insertable<Group> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'userId': serializer.toJson<int>(userId),
       'name': serializer.toJson<String>(name),
       'colorName': serializer.toJson<String>(colorName),
+      'targetPercent': serializer.toJson<double>(targetPercent),
     };
   }
 
-  Group copyWith({int? id, String? name, String? colorName}) => Group(
+  Group copyWith(
+          {int? id,
+          int? userId,
+          String? name,
+          String? colorName,
+          double? targetPercent}) =>
+      Group(
         id: id ?? this.id,
+        userId: userId ?? this.userId,
         name: name ?? this.name,
         colorName: colorName ?? this.colorName,
+        targetPercent: targetPercent ?? this.targetPercent,
       );
+
   @override
   String toString() {
     return (StringBuffer('Group(')
           ..write('id: $id, ')
+          ..write('userId: $userId, ')
           ..write('name: $name, ')
-          ..write('colorName: $colorName')
+          ..write('colorName: $colorName, ')
+          ..write('targetPercent: $targetPercent')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      $mrjf($mrjc(id.hashCode, $mrjc(name.hashCode, colorName.hashCode)));
+  int get hashCode => $mrjf($mrjc(
+      id.hashCode,
+      $mrjc(
+          userId.hashCode,
+          $mrjc(name.hashCode,
+              $mrjc(colorName.hashCode, targetPercent.hashCode)))));
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Group &&
           other.id == this.id &&
+          other.userId == this.userId &&
           other.name == this.name &&
-          other.colorName == this.colorName);
+          other.colorName == this.colorName &&
+          other.targetPercent == this.targetPercent);
 }
 
 class GroupsCompanion extends UpdateCompanion<Group> {
   final Value<int> id;
+  final Value<int> userId;
   final Value<String> name;
   final Value<String> colorName;
+  final Value<double> targetPercent;
+
   const GroupsCompanion({
     this.id = const Value.absent(),
+    this.userId = const Value.absent(),
     this.name = const Value.absent(),
     this.colorName = const Value.absent(),
+    this.targetPercent = const Value.absent(),
   });
+
   GroupsCompanion.insert({
     this.id = const Value.absent(),
+    required int userId,
     required String name,
     required String colorName,
-  })  : name = Value(name),
-        colorName = Value(colorName);
+    required double targetPercent,
+  })  : userId = Value(userId),
+        name = Value(name),
+        colorName = Value(colorName),
+        targetPercent = Value(targetPercent);
   static Insertable<Group> custom({
     Expression<int>? id,
+    Expression<int>? userId,
     Expression<String>? name,
     Expression<String>? colorName,
+    Expression<double>? targetPercent,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
       if (name != null) 'name': name,
       if (colorName != null) 'color_name': colorName,
+      if (targetPercent != null) 'target_percent': targetPercent,
     });
   }
 
   GroupsCompanion copyWith(
-      {Value<int>? id, Value<String>? name, Value<String>? colorName}) {
+      {Value<int>? id,
+      Value<int>? userId,
+      Value<String>? name,
+      Value<String>? colorName,
+      Value<double>? targetPercent}) {
     return GroupsCompanion(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       name: name ?? this.name,
       colorName: colorName ?? this.colorName,
+      targetPercent: targetPercent ?? this.targetPercent,
     );
   }
 
@@ -308,11 +366,17 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
     if (colorName.present) {
       map['color_name'] = Variable<String>(colorName.value);
+    }
+    if (targetPercent.present) {
+      map['target_percent'] = Variable<double>(targetPercent.value);
     }
     return map;
   }
@@ -321,8 +385,10 @@ class GroupsCompanion extends UpdateCompanion<Group> {
   String toString() {
     return (StringBuffer('GroupsCompanion(')
           ..write('id: $id, ')
+          ..write('userId: $userId, ')
           ..write('name: $name, ')
-          ..write('colorName: $colorName')
+          ..write('colorName: $colorName, ')
+          ..write('targetPercent: $targetPercent')
           ..write(')'))
         .toString();
   }
@@ -331,18 +397,34 @@ class GroupsCompanion extends UpdateCompanion<Group> {
 class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   final GeneratedDatabase _db;
   final String? _alias;
+
   $GroupsTable(this._db, [this._alias]);
+
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedIntColumn id = _constructId();
+
   GeneratedIntColumn _constructId() {
     return GeneratedIntColumn('id', $tableName, false,
         hasAutoIncrement: true, declaredAsPrimaryKey: true);
   }
 
+  final VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedIntColumn userId = _constructUserId();
+
+  GeneratedIntColumn _constructUserId() {
+    return GeneratedIntColumn(
+      'user_id',
+      $tableName,
+      false,
+    );
+  }
+
   final VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedTextColumn name = _constructName();
+
   GeneratedTextColumn _constructName() {
     return GeneratedTextColumn(
       'name',
@@ -354,6 +436,7 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   final VerificationMeta _colorNameMeta = const VerificationMeta('colorName');
   @override
   late final GeneratedTextColumn colorName = _constructColorName();
+
   GeneratedTextColumn _constructColorName() {
     return GeneratedTextColumn(
       'color_name',
@@ -362,14 +445,31 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
     );
   }
 
+  final VerificationMeta _targetPercentMeta =
+      const VerificationMeta('targetPercent');
   @override
-  List<GeneratedColumn> get $columns => [id, name, colorName];
+  late final GeneratedRealColumn targetPercent = _constructTargetPercent();
+
+  GeneratedRealColumn _constructTargetPercent() {
+    return GeneratedRealColumn(
+      'target_percent',
+      $tableName,
+      false,
+    );
+  }
+
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, userId, name, colorName, targetPercent];
+
   @override
   $GroupsTable get asDslTable => this;
+
   @override
   String get $tableName => _alias ?? '"groups"';
   @override
   final String actualTableName = '"groups"';
+
   @override
   VerificationContext validateIntegrity(Insertable<Group> instance,
       {bool isInserting = false}) {
@@ -377,6 +477,12 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -390,6 +496,14 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
     } else if (isInserting) {
       context.missing(_colorNameMeta);
     }
+    if (data.containsKey('target_percent')) {
+      context.handle(
+          _targetPercentMeta,
+          targetPercent.isAcceptableOrUnknown(
+              data['target_percent']!, _targetPercentMeta));
+    } else if (isInserting) {
+      context.missing(_targetPercentMeta);
+    }
     return context;
   }
 
@@ -397,8 +511,8 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Group map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
-    return Group.fromData(data, _db, prefix: effectivePrefix);
+    return Group.fromData(data, _db,
+        prefix: tablePrefix != null ? '$tablePrefix.' : null);
   }
 
   @override
@@ -803,8 +917,8 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Item map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
-    return Item.fromData(data, _db, prefix: effectivePrefix);
+    return Item.fromData(data, _db,
+        prefix: tablePrefix != null ? '$tablePrefix.' : null);
   }
 
   @override
