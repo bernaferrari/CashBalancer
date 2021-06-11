@@ -6,7 +6,8 @@ class ColorPicker extends StatefulWidget {
   final String initialSelection;
   final ValueChanged<String> onChanged;
 
-  const ColorPicker(this.initialSelection, this.onChanged);
+  const ColorPicker(this.initialSelection, this.onChanged, {Key? key})
+      : super(key: key);
 
   @override
   _ColorPickerState createState() => _ColorPickerState();
@@ -21,7 +22,7 @@ class _ColorPickerState extends State<ColorPicker> {
       height: 56,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         child: Row(
           children: [
             for (String colorName in tailwindColorsNames)
@@ -51,7 +52,8 @@ class AnimatedColorItem extends StatelessWidget {
     required this.color,
     required this.isSelected,
     this.onSelected,
-  });
+    Key? key,
+  }) : super(key: key);
 
   final maxSize = 36.0;
 
@@ -60,7 +62,7 @@ class AnimatedColorItem extends StatelessWidget {
     final _size = isSelected ? maxSize - 4 : maxSize;
 
     return InkWell(
-      customBorder: CircleBorder(),
+      customBorder: const CircleBorder(),
       onTap: onSelected,
       child: SizedBox(
         width: 48,
@@ -69,7 +71,7 @@ class AnimatedColorItem extends StatelessWidget {
           children: [
             Center(
               child: AnimatedContainer(
-                duration: Duration(milliseconds: 150),
+                duration: const Duration(milliseconds: 150),
                 width: _size,
                 height: _size,
                 decoration: BoxDecoration(
@@ -80,7 +82,7 @@ class AnimatedColorItem extends StatelessWidget {
             ),
             Center(
               child: AnimatedContainer(
-                duration: Duration(milliseconds: 150),
+                duration: const Duration(milliseconds: 150),
                 width: _size - 8,
                 height: _size - 8,
                 // padding: isSelected ? EdgeInsets.all(4) : EdgeInsets.zero,

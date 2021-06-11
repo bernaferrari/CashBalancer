@@ -7,7 +7,8 @@ class HomeInputDialog extends StatefulWidget {
   final ValueChanged<String>? onSavePressed;
   final String? initialValue;
 
-  const HomeInputDialog({this.onSavePressed, this.initialValue});
+  const HomeInputDialog({this.onSavePressed, this.initialValue, Key? key})
+      : super(key: key);
 
   @override
   _HomeInputDialogState createState() => _HomeInputDialogState();
@@ -57,7 +58,7 @@ class _HomeInputDialogState extends State<HomeInputDialog> {
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -70,7 +71,7 @@ class _HomeInputDialogState extends State<HomeInputDialog> {
                 onPressed: onSubmit,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
               child: TextButton(

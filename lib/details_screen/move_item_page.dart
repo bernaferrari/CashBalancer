@@ -16,13 +16,14 @@ class MoveItemPage extends StatefulWidget {
   final List<GroupData> groups;
   final int userId;
 
-  const MoveItemPage({
-    required this.totalValue,
-    required this.bloc,
-    required this.userId,
-    required this.item,
-    required this.groups,
-  });
+  const MoveItemPage(
+      {required this.totalValue,
+      required this.bloc,
+      required this.userId,
+      required this.item,
+      required this.groups,
+      Key? key})
+      : super(key: key);
 
   @override
   _MoveItemPageState createState() => _MoveItemPageState();
@@ -66,7 +67,7 @@ class _MoveItemPageState extends State<MoveItemPage> {
       appBarTitle: AppLocalizations.of(context)!.moveGroup(widget.item.name),
       colorName: colorName,
       children: [
-        SizedBox(height: 24),
+        const SizedBox(height: 24),
         for (final group in widget.groups)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -97,24 +98,24 @@ class _MoveItemPageState extends State<MoveItemPage> {
               },
             ),
           ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
             primary: primaryColor,
             onPrimary: backgroundDialogColor,
           ),
-          icon: Icon(Icons.check_rounded),
+          icon: const Icon(Icons.check_rounded),
           label: Text(AppLocalizations.of(context)!.dialogSave),
           onPressed: onSubmit,
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         TextButton.icon(
           style: TextButton.styleFrom(primary: primaryColorWeaker),
-          icon: Icon(Icons.close_rounded),
+          icon: const Icon(Icons.close_rounded),
           label: Text(AppLocalizations.of(context)!.dialogCancel),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        SizedBox(height: 24),
+        const SizedBox(height: 24),
       ],
     );
   }

@@ -67,7 +67,7 @@ class DialogScreenBase extends StatelessWidget {
         bottom: true,
         child: Shortcuts(
           shortcuts: <LogicalKeySet, Intent>{
-            LogicalKeySet(LogicalKeyboardKey.escape): PopIntent(),
+            LogicalKeySet(LogicalKeyboardKey.escape): const PopIntent(),
           },
           child: Actions(
             actions: <Type, Action<Intent>>{
@@ -107,7 +107,7 @@ class DialogScreenBase extends StatelessWidget {
                       ),
                       Flexible(
                         child: ListView(
-                          padding: EdgeInsets.all(24),
+                          padding: const EdgeInsets.all(24),
                           shrinkWrap: true,
                           children: children,
                         ),

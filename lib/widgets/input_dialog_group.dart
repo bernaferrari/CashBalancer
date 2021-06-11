@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class InputDialogGroup extends StatefulWidget {
   final Function(String)? onSavePressed;
 
-  const InputDialogGroup({this.onSavePressed});
+  const InputDialogGroup({this.onSavePressed, Key? key}) : super(key: key);
 
   @override
   _InputDialogGroupState createState() => _InputDialogGroupState();
@@ -21,18 +21,18 @@ class _InputDialogGroupState extends State<InputDialogGroup> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("Create a Group"),
+      title: const Text("Create a Group"),
       content: TextFormField(
         controller: textEditingController,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           border: OutlineInputBorder(),
           labelText: 'Enter the name',
         ),
       ),
-      contentPadding: EdgeInsets.only(left: 24, right: 24, top: 16),
+      contentPadding: const EdgeInsets.only(left: 24, right: 24, top: 16),
       actions: <Widget>[
         ElevatedButton(
-          child: Text('Save'),
+          child: const Text('Save'),
           onPressed: () {
             widget.onSavePressed?.call(textEditingController.text);
 

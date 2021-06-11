@@ -18,7 +18,8 @@ class CRUDGroupPage extends StatefulWidget {
   const CRUDGroupPage({
     required this.userId,
     this.previousGroup,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   _CRUDGroupPageState createState() => _CRUDGroupPageState();
@@ -82,22 +83,22 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
               enabledBorder: getInputDecorationBorder(primaryColor),
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 400),
+            constraints: const BoxConstraints(maxWidth: 400),
             child: ColorPicker(colorName, (changed) {
               setState(() {
                 colorName = changed;
               });
             }),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Container(
             decoration: BoxDecoration(
               color: primaryColorWeaker.withOpacity(0.10),
               borderRadius: BorderRadius.circular(16.0),
             ),
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Row(
               children: [
                 Expanded(
@@ -113,7 +114,7 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
                             .overline!
                             .copyWith(color: primaryColor),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         "How much percentage you want this to be.",
                         style: Theme.of(context).textTheme.caption,
@@ -121,7 +122,7 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
                     ],
                   ),
                 ),
-                SizedBox(width: 24),
+                const SizedBox(width: 24),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -163,30 +164,30 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
               ],
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               primary: primaryColor,
               onPrimary: backgroundDialogColor,
             ),
             label: Text(AppLocalizations.of(context)!.dialogSave),
-            icon: Icon(Icons.check_rounded),
+            icon: const Icon(Icons.check_rounded),
             onPressed: onSubmit,
           ),
           if (widget.previousGroup != null) ...[
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(primary: primaryColor),
               label: Text(AppLocalizations.of(context)!.dialogDelete),
-              icon: Icon(Icons.delete_outline_outlined),
+              icon: const Icon(Icons.delete_outline_outlined),
               onPressed: onDelete,
             ),
           ],
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           TextButton.icon(
             style: TextButton.styleFrom(primary: primaryColor),
             label: Text(AppLocalizations.of(context)!.dialogCancel),
-            icon: Icon(Icons.close_rounded),
+            icon: const Icon(Icons.close_rounded),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],

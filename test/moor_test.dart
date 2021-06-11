@@ -35,7 +35,6 @@ void main() {
 
     final result = await query.get();
     print("result is $result");
-
     // print(await (db.watchItems(id)));
   });
 }

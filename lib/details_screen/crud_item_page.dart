@@ -24,7 +24,8 @@ class CRUDItemPage extends StatefulWidget {
     required this.groupId,
     required this.userId,
     this.previousItem,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   _CRUDItemPageState createState() => _CRUDItemPageState();
@@ -88,7 +89,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                 Beamer.of(context)
                     .beamToNamed('/moveItem/${widget.previousItem!.id}');
               },
-              icon: Icon(Icons.low_priority),
+              icon: const Icon(Icons.low_priority),
               tooltip: "Move",
             ),
         ],
@@ -129,7 +130,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                         enabledBorder: getInputDecorationBorder(primaryColor),
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       "The asset’s name, such as savings or bitcoin.",
                       style: Theme.of(context).textTheme.caption,
@@ -137,7 +138,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                   ],
                 ),
               ),
-              SizedBox(width: 24),
+              const SizedBox(width: 24),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -179,7 +180,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                         enabledBorder: getInputDecorationBorder(primaryColor),
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       "The total amount you own.",
                       style: Theme.of(context).textTheme.caption,
@@ -189,13 +190,13 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
               ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Container(
             decoration: BoxDecoration(
               color: primaryColorWeaker.withOpacity(0.10),
               borderRadius: BorderRadius.circular(16.0),
             ),
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Column(
               children: [
                 Row(
@@ -213,7 +214,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                                 .overline!
                                 .copyWith(color: primaryColor),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Text(
                             "How much percentage you want this to be.",
                             style: Theme.of(context).textTheme.caption,
@@ -221,7 +222,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                         ],
                       ),
                     ),
-                    SizedBox(width: 24),
+                    const SizedBox(width: 24),
                     Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -260,7 +261,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Text(
                   "Right now, $relativePercentage",
                   style: Theme.of(context).textTheme.caption,
@@ -268,35 +269,35 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
               ],
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               primary: primaryColor,
               onPrimary: backgroundDialogColor,
             ),
-            icon: Icon(Icons.check_rounded),
+            icon: const Icon(Icons.check_rounded),
             label: Text(AppLocalizations.of(context)!.dialogSave),
             onPressed: onSubmit,
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           if (widget.previousItem == null)
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(primary: primaryColor),
-              icon: Icon(Icons.checklist_outlined),
+              icon: const Icon(Icons.checklist_outlined),
               label: Text(AppLocalizations.of(context)!.dialogSaveAddMore),
               onPressed: onSaveAddMore,
             )
           else
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(primary: primaryColor),
-              icon: Icon(Icons.delete_outline_outlined),
+              icon: const Icon(Icons.delete_outline_outlined),
               label: Text(AppLocalizations.of(context)!.dialogDelete),
               onPressed: onDelete,
             ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           TextButton.icon(
             style: TextButton.styleFrom(primary: primaryColorWeaker),
-            icon: Icon(Icons.close_rounded),
+            icon: const Icon(Icons.close_rounded),
             label: Text(AppLocalizations.of(context)!.dialogCancel),
             onPressed: () => Navigator.of(context).pop(),
           ),

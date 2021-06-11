@@ -23,18 +23,18 @@ class App extends StatelessWidget {
 
   final _routerDelegate = BeamerDelegate(
     locationBuilder: SimpleLocationBuilder(routes: {
-      '/': (context) => BeamPage(
-            key: ValueKey('home'),
+      '/': (context, state) => BeamPage(
+            key: const ValueKey('home'),
             title: 'Cash Balancer',
-            child: DetailsPage(),
+            child: const DetailsPage(),
           ),
-      '/settings': (context) => BeamerMaterialTransitionPage(
-            key: ValueKey('settings'),
+      '/settings': (context, state) => BeamerMaterialTransitionPage(
+            key: const ValueKey('settings'),
             title: 'Settings',
-            child: SettingsPage(),
+            child: const SettingsPage(),
             fillColor: getScaffoldDialogBackgroundColor(context, 'warmGray'),
           ),
-      '/addGroup/:userId': (context) {
+      '/addGroup/:userId': (context, state) {
         final beamState = context.currentBeamLocation.state;
         final userId = int.tryParse(beamState.pathParameters['userId']!)!;
         final state = context.read<DataCubit>().state;
@@ -48,7 +48,7 @@ class App extends StatelessWidget {
           return beamerLoadingPage();
         }
       },
-      '/editGroup/:groupId': (context) {
+      '/editGroup/:groupId': (context, state) {
         final beamState = context.currentBeamLocation.state;
         final groupId = int.tryParse(beamState.pathParameters['groupId']!)!;
 
@@ -69,7 +69,7 @@ class App extends StatelessWidget {
           return beamerLoadingPage();
         }
       },
-      '/addItem/:groupId/:userId': (context) {
+      '/addItem/:groupId/:userId': (context, state) {
         final beamState = context.currentBeamLocation.state;
         final groupId = int.tryParse(beamState.pathParameters['groupId']!)!;
         final userId = int.tryParse(beamState.pathParameters['userId']!)!;
@@ -95,14 +95,14 @@ class App extends StatelessWidget {
           return beamerLoadingPage();
         }
       },
-      '/editItem/:itemId': (context) {
+      '/editItem/:itemId': (context, state) {
         final beamState = context.currentBeamLocation.state;
         final itemId = int.tryParse(beamState.pathParameters['itemId']!)!;
 
         final state = context.read<DataCubit>().state;
         if (state != null && state.allItems.isNotEmpty) {
           final previousItem =
-          state.allItems.firstWhere((element) => element.id == itemId);
+              state.allItems.firstWhere((element) => element.id == itemId);
 
           return BeamerMaterialTransitionPage(
             key: ValueKey('item-$itemId'),
@@ -121,7 +121,7 @@ class App extends StatelessWidget {
           return beamerLoadingPage();
         }
       },
-      '/moveItem/:itemId': (context) {
+      '/moveItem/:itemId': (context, state) {
         final beamState = context.currentBeamLocation.state;
         final itemId = int.tryParse(beamState.pathParameters['itemId']!)!;
 
@@ -130,7 +130,7 @@ class App extends StatelessWidget {
 
         if (state != null && state.allItems.isNotEmpty) {
           final item =
-          state.allItems.firstWhere((element) => element.id == itemId);
+              state.allItems.firstWhere((element) => element.id == itemId);
 
           return BeamerMaterialTransitionPage(
             key: ValueKey('moveItem-$itemId'),
@@ -165,14 +165,14 @@ class App extends StatelessWidget {
 
     final textButtonTheme = TextButtonThemeData(
       style: TextButton.styleFrom(
-        minimumSize: Size(48, 48),
+        minimumSize: const Size(48, 48),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
 
     final elevatedButtonTheme = ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        minimumSize: Size(48, 48),
+        minimumSize: const Size(48, 48),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         textStyle: GoogleFonts.rubik(fontWeight: FontWeight.w700),
       ),
@@ -180,7 +180,7 @@ class App extends StatelessWidget {
 
     final outlinedButtonTheme = OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        minimumSize: Size(48, 48),
+        minimumSize: const Size(48, 48),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         textStyle: GoogleFonts.rubik(fontWeight: FontWeight.w700),
       ),
@@ -195,14 +195,14 @@ class App extends StatelessWidget {
         },
         child: MaterialApp.router(
           theme: ThemeData(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: Color(0xff162783),
               secondary: Color(0xff168342),
               // background: Color(0xff18170f),
               // surface: Color(0xff201f15),
             ),
             dialogTheme: DialogTheme(
-              backgroundColor: Color(0xff18170f),
+              backgroundColor: const Color(0xff18170f),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
@@ -219,7 +219,7 @@ class App extends StatelessWidget {
           ),
           darkTheme: ThemeData(
             brightness: Brightness.dark,
-            colorScheme: ColorScheme.dark(
+            colorScheme: const ColorScheme.dark(
               primary: Color(0xffe4d75a),
               secondary: Color(0xff5ae492),
               background: Color(0xff121212),
@@ -239,7 +239,7 @@ class App extends StatelessWidget {
             textButtonTheme: textButtonTheme,
             textTheme: textTheme,
           ),
-          localizationsDelegates: [
+          localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
           ],
@@ -261,16 +261,15 @@ BeamPage beamerLoadingPage() {
       tailwindColorsNames[_random.nextInt(tailwindColorsNames.length)];
 
   return BeamPage(
-    key: ValueKey("Loading Screen"),
+    key: const ValueKey("Loading Screen"),
     title: "Loading...",
     type: BeamPageType.noTransition,
     child: Center(
-      child: Container(
-          child: CircularProgressIndicator(
+      child: CircularProgressIndicator(
         valueColor: AlwaysStoppedAnimation<Color>(
           tailwindColors[colorName]![500]!,
         ),
-      )),
+      ),
     ),
   );
 }
@@ -285,12 +284,12 @@ class BeamerMaterialTransitionPage extends BeamPage {
     String popToNamed = '/',
     this.fillColor,
   }) : super(
-    key: key,
-    child: child,
-    title: title,
-    popToNamed: popToNamed,
-    // + all other you might need
-  );
+          key: key,
+          child: child,
+          title: title,
+          popToNamed: popToNamed,
+          // + all other you might need
+        );
 
   @override
   Route createRoute(BuildContext context) {
@@ -310,19 +309,21 @@ class SharedAxisPageRoute extends PageRouteBuilder<Object> {
     required RouteSettings? settings,
     Color? fillColor,
   }) : super(
-    pageBuilder: (context, primaryAnimation, secondaryAnimation) => page,
-    settings: settings,
-    transitionsBuilder: (context,
-        primaryAnimation,
-        secondaryAnimation,
-        child,) {
-      return SharedAxisTransition(
-        animation: primaryAnimation,
-        secondaryAnimation: secondaryAnimation,
-        transitionType: transitionType,
-        child: child,
-        fillColor: fillColor,
-      );
-    },
-  );
+          pageBuilder: (context, primaryAnimation, secondaryAnimation) => page,
+          settings: settings,
+          transitionsBuilder: (
+            context,
+            primaryAnimation,
+            secondaryAnimation,
+            child,
+          ) {
+            return SharedAxisTransition(
+              animation: primaryAnimation,
+              secondaryAnimation: secondaryAnimation,
+              transitionType: transitionType,
+              child: child,
+              fillColor: fillColor,
+            );
+          },
+        );
 }

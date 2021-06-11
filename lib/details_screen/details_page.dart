@@ -19,13 +19,13 @@ extension Percent on double {
 }
 
 class DetailsPage extends StatelessWidget {
-  const DetailsPage();
+  const DetailsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DataCubit, FullData?>(builder: (context, state) {
       if (state == null) {
-        return SizedBox();
+        return const SizedBox();
       } else {
         return DetailsPageImpl(state);
       }
@@ -36,7 +36,7 @@ class DetailsPage extends StatelessWidget {
 class DetailsPageImpl extends StatelessWidget {
   final FullData data;
 
-  const DetailsPageImpl(this.data);
+  const DetailsPageImpl(this.data, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +57,7 @@ class DetailsPageImpl extends StatelessWidget {
           // ),
           IconButton(
             onPressed: () => Beamer.of(context).beamToNamed('/settings'),
-            icon: Icon(Icons.settings_outlined),
+            icon: const Icon(Icons.settings_outlined),
           ),
         ],
       ),
@@ -103,14 +103,14 @@ class MainList extends StatelessWidget {
 
     return Center(
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 500),
+        constraints: const BoxConstraints(maxWidth: 500),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               height: double.infinity,
-              margin: EdgeInsets.all(margin),
+              margin: const EdgeInsets.all(margin),
               width: longWidth ? 30 : 20,
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
@@ -168,7 +168,8 @@ class VerticalProgressBar extends StatelessWidget {
   const VerticalProgressBar({
     required this.data,
     required this.totalValue,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -184,19 +185,19 @@ class VerticalProgressBar extends StatelessWidget {
             [
               for (int i = 0; i < data.allItems.length; i++)
                 Tooltip(
-                  message: "${data.allItems[i].name}",
+                  message: data.allItems[i].name,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       primary: data.allItems[i].color,
                       padding: EdgeInsets.zero,
                       minimumSize: Size.zero,
                       fixedSize: Size(100, spacedList[i]),
-                      shape: RoundedRectangleBorder(),
+                      shape: const RoundedRectangleBorder(),
                       elevation: 0,
                     ),
                     onPressed: () => Beamer.of(context)
                         .beamToNamed('/editItem/${data.allItems[i].id}'),
-                    child: SizedBox.shrink(),
+                    child: const SizedBox.shrink(),
                   ),
                 ),
             ],
@@ -232,7 +233,7 @@ class GroupCard extends StatelessWidget {
     required BuildContext context,
   }) =>
       Container(
-        padding: EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(10.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.0),
           border: Border.all(color: color.withOpacity(0.20)),
@@ -258,7 +259,7 @@ class GroupCard extends StatelessWidget {
           widget: Row(
             children: [
               EditGroup(color: color, groupId: group.id),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               AddItem(color: color, userId: userId, groupId: group.id),
             ],
           ),
@@ -286,7 +287,7 @@ class GroupCard extends StatelessWidget {
                 color: color,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             for (int i = 0; i < itemsList!.length; i++) ...[
               SizedBox(
                 width: double.infinity,
@@ -299,19 +300,19 @@ class GroupCard extends StatelessWidget {
               if (i < itemsList!.length - 1)
                 Container(
                   height: 1,
-                  margin: EdgeInsets.symmetric(horizontal: 8),
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
                   color:
                       Theme.of(context).colorScheme.onPrimary.withOpacity(0.10),
                 ),
             ],
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Align(
               alignment: Alignment.centerRight,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   EditGroup(color: color, groupId: group.id),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   AddItem(color: color, userId: userId, groupId: group.id),
                 ],
               ),
@@ -342,9 +343,9 @@ class AddItem extends StatelessWidget {
         primary: color,
         padding: EdgeInsets.zero,
         minimumSize: Size.zero,
-        fixedSize: Size(64, 40),
+        fixedSize: const Size(64, 40),
       ),
-      child: Icon(Icons.add_rounded),
+      child: const Icon(Icons.add_rounded),
       onPressed: () =>
           Beamer.of(context).beamToNamed('/addItem/$groupId/$userId'),
     );
@@ -369,9 +370,9 @@ class EditGroup extends StatelessWidget {
         minimumSize: Size.zero,
         padding: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        fixedSize: Size(40, 40),
+        fixedSize: const Size(40, 40),
       ),
-      child: Icon(Icons.edit_rounded),
+      child: const Icon(Icons.edit_rounded),
       onPressed: () => Beamer.of(context).beamToNamed("/editGroup/$groupId"),
     );
   }
@@ -393,7 +394,7 @@ class CircularProgress extends StatelessWidget {
       width: 40,
       height: 40,
       // StrokeWidth is 3.
-      padding: EdgeInsets.all(3),
+      padding: const EdgeInsets.all(3),
       child: CustomPaint(
         isComplex: false,
         painter: CirclePercentagePainter(
@@ -465,21 +466,22 @@ class ItemCard extends StatelessWidget {
   final double totalValue;
   final String nameColor;
 
-  const ItemCard(this.item, this.totalValue, this.nameColor);
+  const ItemCard(this.item, this.totalValue, this.nameColor, {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final greenColor = Theme.of(context).brightness == Brightness.dark
-        ? Color(0xff77d874)
-        : Color(0xff2A8B27);
+        ? const Color(0xff77d874)
+        : const Color(0xff2A8B27);
 
     final redColor = Theme.of(context).brightness == Brightness.dark
-        ? Color(0xffff5a74)
-        : Color(0xffCC0020);
+        ? const Color(0xffff5a74)
+        : const Color(0xffCC0020);
 
     return TextButton(
       style: TextButton.styleFrom(
-        padding: EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(10.0),
         backgroundColor: Theme.of(context).brightness == Brightness.dark
             ? item.color.withOpacity(0.05)
             : item.color.withOpacity(0.25),
@@ -550,7 +552,7 @@ class ItemCard extends StatelessWidget {
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          fontFeatures: [
+                          fontFeatures: const [
                             FontFeature.enable('calc'),
                           ],
                         ),
@@ -558,7 +560,7 @@ class ItemCard extends StatelessWidget {
                     ],
                   ],
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

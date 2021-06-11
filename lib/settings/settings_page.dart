@@ -11,22 +11,22 @@ class SettingsPage extends StatelessWidget {
       colorName: 'warmGray',
       appBarTitle: "Settings",
       children: [
-        SizedBox(height: 24),
+        const SizedBox(height: 24),
         SwitchListTile(
-          title: Text("Relative Target"),
-          subtitle: Text(
+          title: const Text("Relative Target"),
+          subtitle: const Text(
             "Sum up to 100% in each section, instead of considering all sections.",
           ),
           value: true,
           onChanged: (value) {},
         ),
-        ListTile(
+        const ListTile(
           title: Text("Currency Symbol"),
           subtitle: Text(
             "E.g. \$, € or R\$",
           ),
         ),
-        ListTile(
+        const ListTile(
           title: Text("Sort by"),
           subtitle: Text(
             "Name / Max Price / Min Price",

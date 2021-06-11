@@ -34,13 +34,11 @@ class CirclePercentagePainter extends CustomPainter {
       paint,
     );
 
-    if (circleColor != null) {
-      canvas.drawCircle(
-        Offset(size.width / 2, size.height / 2),
-        size.width / 2 - 3,
-        Paint()..color = circleColor,
-      );
-    }
+    canvas.drawCircle(
+      Offset(size.width / 2, size.height / 2),
+      size.width / 2 - 3,
+      Paint()..color = circleColor,
+    );
   }
 
   @override

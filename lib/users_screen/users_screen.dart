@@ -14,7 +14,8 @@ class WhenEmptyCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.icon,
-  });
+    Key? key,
+  }) : super(key: key);
 
   final String title;
   final String subtitle;
@@ -24,8 +25,8 @@ class WhenEmptyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        padding: EdgeInsets.all(24),
-        margin: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
+        margin: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
@@ -34,7 +35,7 @@ class WhenEmptyCard extends StatelessWidget {
           ),
         ),
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 300),
+          constraints: const BoxConstraints(maxWidth: 300),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +45,7 @@ class WhenEmptyCard extends StatelessWidget {
                 size: 32,
                 color: Theme.of(context).colorScheme.secondary,
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 title,
                 style: GoogleFonts.rubik(
@@ -52,7 +53,7 @@ class WhenEmptyCard extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 subtitle,
                 style: Theme.of(context)
@@ -69,6 +70,8 @@ class WhenEmptyCard extends StatelessWidget {
 }
 
 class GroupsScreen extends StatelessWidget {
+  const GroupsScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,7 +90,7 @@ class GroupsScreen extends StatelessWidget {
         onPressed: () {
           showAddEditDialog(context);
         },
-        icon: Icon(Icons.add),
+        icon: const Icon(Icons.add),
         label: Text(AppLocalizations.of(context)!.mainFAB),
       ),
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -261,7 +264,8 @@ class HomeScreenEmptyCard extends StatelessWidget {
     this.title,
     this.onClicked,
     this.onLongPress,
-  );
+    Key? key,
+  ) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -274,7 +278,7 @@ class HomeScreenEmptyCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
               colors: [Color(0x14c6ffdd), Color(0x14fbd786), Color(0x14f7797d)],
@@ -288,13 +292,13 @@ class HomeScreenEmptyCard extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Container(
                 width: double.infinity,
                 height: 25,
@@ -307,8 +311,8 @@ class HomeScreenEmptyCard extends StatelessWidget {
                 //   isProportional: false,
                 // ),
               ),
-              SizedBox(height: 10),
-              Container(
+              const SizedBox(height: 10),
+              SizedBox(
                 width: double.infinity,
                 child: ClipRect(
                   clipBehavior: Clip.antiAlias,
@@ -377,7 +381,7 @@ class MiniName extends StatelessWidget {
   final String title;
   final Color color;
 
-  const MiniName(this.title, this.color);
+  const MiniName(this.title, this.color, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -394,10 +398,10 @@ class MiniName extends StatelessWidget {
             color: color,
           ),
         ),
-        SizedBox(width: 10),
+        const SizedBox(width: 10),
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 14,
             fontWeight: FontWeight.w500,
