@@ -64,7 +64,7 @@ class _MoveItemPageState extends State<MoveItemPage> {
 
     return DialogScreenBase(
       backgroundDialogColor: backgroundDialogColor,
-      appBarTitle: AppLocalizations.of(context)!.moveGroup(widget.item.name),
+      appBarTitle: AppLocalizations.of(context).moveGroup(widget.item.name),
       colorName: colorName,
       children: [
         const SizedBox(height: 24),
@@ -105,14 +105,14 @@ class _MoveItemPageState extends State<MoveItemPage> {
             onPrimary: backgroundDialogColor,
           ),
           icon: const Icon(Icons.check_rounded),
-          label: Text(AppLocalizations.of(context)!.dialogSave),
+          label: Text(AppLocalizations.of(context).dialogSave),
           onPressed: onSubmit,
         ),
         const SizedBox(height: 8),
         TextButton.icon(
           style: TextButton.styleFrom(primary: primaryColorWeaker),
           icon: const Icon(Icons.close_rounded),
-          label: Text(AppLocalizations.of(context)!.dialogCancel),
+          label: Text(AppLocalizations.of(context).dialogCancel),
           onPressed: () => Navigator.of(context).pop(),
         ),
         const SizedBox(height: 24),

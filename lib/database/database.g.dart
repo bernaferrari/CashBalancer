@@ -192,14 +192,12 @@ class Group extends DataClass implements Insertable<Group> {
   final String name;
   final String colorName;
   final double targetPercent;
-
   Group(
       {required this.id,
       required this.userId,
       required this.name,
       required this.colorName,
       required this.targetPercent});
-
   factory Group.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String? prefix}) {
     final effectivePrefix = prefix ?? '';
@@ -273,7 +271,6 @@ class Group extends DataClass implements Insertable<Group> {
         colorName: colorName ?? this.colorName,
         targetPercent: targetPercent ?? this.targetPercent,
       );
-
   @override
   String toString() {
     return (StringBuffer('Group(')
@@ -310,7 +307,6 @@ class GroupsCompanion extends UpdateCompanion<Group> {
   final Value<String> name;
   final Value<String> colorName;
   final Value<double> targetPercent;
-
   const GroupsCompanion({
     this.id = const Value.absent(),
     this.userId = const Value.absent(),
@@ -318,7 +314,6 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     this.colorName = const Value.absent(),
     this.targetPercent = const Value.absent(),
   });
-
   GroupsCompanion.insert({
     this.id = const Value.absent(),
     required int userId,
@@ -397,13 +392,10 @@ class GroupsCompanion extends UpdateCompanion<Group> {
 class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   final GeneratedDatabase _db;
   final String? _alias;
-
   $GroupsTable(this._db, [this._alias]);
-
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedIntColumn id = _constructId();
-
   GeneratedIntColumn _constructId() {
     return GeneratedIntColumn('id', $tableName, false,
         hasAutoIncrement: true, declaredAsPrimaryKey: true);
@@ -412,7 +404,6 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   final VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
   late final GeneratedIntColumn userId = _constructUserId();
-
   GeneratedIntColumn _constructUserId() {
     return GeneratedIntColumn(
       'user_id',
@@ -424,7 +415,6 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   final VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedTextColumn name = _constructName();
-
   GeneratedTextColumn _constructName() {
     return GeneratedTextColumn(
       'name',
@@ -436,7 +426,6 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   final VerificationMeta _colorNameMeta = const VerificationMeta('colorName');
   @override
   late final GeneratedTextColumn colorName = _constructColorName();
-
   GeneratedTextColumn _constructColorName() {
     return GeneratedTextColumn(
       'color_name',
@@ -449,7 +438,6 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
       const VerificationMeta('targetPercent');
   @override
   late final GeneratedRealColumn targetPercent = _constructTargetPercent();
-
   GeneratedRealColumn _constructTargetPercent() {
     return GeneratedRealColumn(
       'target_percent',
@@ -461,15 +449,12 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   @override
   List<GeneratedColumn> get $columns =>
       [id, userId, name, colorName, targetPercent];
-
   @override
   $GroupsTable get asDslTable => this;
-
   @override
   String get $tableName => _alias ?? '"groups"';
   @override
   final String actualTableName = '"groups"';
-
   @override
   VerificationContext validateIntegrity(Insertable<Group> instance,
       {bool isInserting = false}) {

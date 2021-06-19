@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/database.dart';
@@ -80,8 +81,8 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
         colorName: widget.colorName,
         backgroundDialogColor: backgroundDialogColor,
         appBarTitle: widget.previousItem == null
-            ? AppLocalizations.of(context)!.addAsset
-            : AppLocalizations.of(context)!.editAsset,
+            ? AppLocalizations.of(context).addAsset
+            : AppLocalizations.of(context).editAsset,
         appBarActions: [
           if (widget.previousItem != null)
             IconButton(
@@ -112,15 +113,14 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                       textCapitalization: TextCapitalization.sentences,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return AppLocalizations.of(context)!
+                          return AppLocalizations.of(context)
                               .mainDialogValidator;
                         }
                         return null;
                       },
                       decoration: InputDecoration(
                         filled: true,
-                        labelText:
-                            AppLocalizations.of(context)!.dialogAssetName,
+                        labelText: AppLocalizations.of(context).dialogAssetName,
                         labelStyle: TextStyle(color: primaryColor),
                         // border is used when there is an error
                         border: getInputDecorationBorder(primaryColor),
@@ -152,7 +152,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                       autofocus: widget.previousItem != null,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return AppLocalizations.of(context)!
+                          return AppLocalizations.of(context)
                               .mainDialogValidator;
                         }
                         return null;
@@ -243,7 +243,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                                   RegExp(r'^-?[0-9]*')),
                             ],
                             decoration: InputDecoration(
-                              labelText: AppLocalizations.of(context)!
+                              labelText: AppLocalizations.of(context)
                                   .dialogAssetTarget,
                               filled: true,
                               suffixText: ".00 %",
@@ -276,7 +276,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
               onPrimary: backgroundDialogColor,
             ),
             icon: const Icon(Icons.check_rounded),
-            label: Text(AppLocalizations.of(context)!.dialogSave),
+            label: Text(AppLocalizations.of(context).dialogSave),
             onPressed: onSubmit,
           ),
           const SizedBox(height: 8),
@@ -284,21 +284,21 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(primary: primaryColor),
               icon: const Icon(Icons.checklist_outlined),
-              label: Text(AppLocalizations.of(context)!.dialogSaveAddMore),
+              label: Text(AppLocalizations.of(context).dialogSaveAddMore),
               onPressed: onSaveAddMore,
             )
           else
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(primary: primaryColor),
               icon: const Icon(Icons.delete_outline_outlined),
-              label: Text(AppLocalizations.of(context)!.dialogDelete),
+              label: Text(AppLocalizations.of(context).dialogDelete),
               onPressed: onDelete,
             ),
           const SizedBox(height: 8),
           TextButton.icon(
             style: TextButton.styleFrom(primary: primaryColorWeaker),
             icon: const Icon(Icons.close_rounded),
-            label: Text(AppLocalizations.of(context)!.dialogCancel),
+            label: Text(AppLocalizations.of(context).dialogCancel),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
@@ -348,7 +348,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
 
     setState(() {
       relativePercentage =
-          '\$${moneyEditingController.text} is going to be $finalPercent%';
+          '\$${toCurrencyString(moneyEditingController.text)} is going to be $finalPercent%';
     });
   }
 

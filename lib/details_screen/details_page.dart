@@ -44,7 +44,7 @@ class DetailsPageImpl extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context)!.appTitle,
+          AppLocalizations.of(context).appTitle,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         backgroundColor: Colors.transparent,
@@ -65,7 +65,7 @@ class DetailsPageImpl extends StatelessWidget {
         onPressed: () =>
             Beamer.of(context).beamToNamed("/addGroup/${data.userId}"),
         label: Text(
-          AppLocalizations.of(context)!.addGroup,
+          AppLocalizations.of(context).addGroup,
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
         ),
         icon: Icon(
@@ -75,8 +75,8 @@ class DetailsPageImpl extends StatelessWidget {
       ),
       body: (data.groupsMap.isEmpty == true)
           ? WhenEmptyCard(
-              title: AppLocalizations.of(context)!.mainEmptyTitle,
-              subtitle: AppLocalizations.of(context)!.mainEmptySubtitle,
+              title: AppLocalizations.of(context).mainEmptyTitle,
+              subtitle: AppLocalizations.of(context).mainEmptySubtitle,
               icon: Icons.account_balance_sharp,
             )
           : MainList(data: data),

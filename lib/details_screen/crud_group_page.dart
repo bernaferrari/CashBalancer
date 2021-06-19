@@ -55,8 +55,8 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
       key: _formKey,
       child: DialogScreenBase(
         appBarTitle: widget.previousGroup == null
-            ? AppLocalizations.of(context)!.addAGroup
-            : AppLocalizations.of(context)!.editGroup,
+            ? AppLocalizations.of(context).addAGroup
+            : AppLocalizations.of(context).editGroup,
         backgroundDialogColor: backgroundDialogColor,
         colorName: colorName,
         children: [
@@ -67,13 +67,13 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
             textCapitalization: TextCapitalization.sentences,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return AppLocalizations.of(context)!.mainDialogValidator;
+                return AppLocalizations.of(context).mainDialogValidator;
               }
               return null;
             },
             decoration: InputDecoration(
               filled: true,
-              labelText: AppLocalizations.of(context)!.dialogAssetName,
+              labelText: AppLocalizations.of(context).dialogAssetName,
               labelStyle: TextStyle(color: primaryColor),
               // border is used when there is an error
               border: getInputDecorationBorder(primaryColor),
@@ -144,7 +144,7 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
                         ],
                         decoration: InputDecoration(
                           labelText:
-                              AppLocalizations.of(context)!.dialogAssetTarget,
+                              AppLocalizations.of(context).dialogAssetTarget,
                           filled: true,
                           suffixText: ".00 %",
                           labelStyle: TextStyle(color: primaryColorWeaker),
@@ -170,7 +170,7 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
               primary: primaryColor,
               onPrimary: backgroundDialogColor,
             ),
-            label: Text(AppLocalizations.of(context)!.dialogSave),
+            label: Text(AppLocalizations.of(context).dialogSave),
             icon: const Icon(Icons.check_rounded),
             onPressed: onSubmit,
           ),
@@ -178,7 +178,7 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
             const SizedBox(height: 8),
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(primary: primaryColor),
-              label: Text(AppLocalizations.of(context)!.dialogDelete),
+              label: Text(AppLocalizations.of(context).dialogDelete),
               icon: const Icon(Icons.delete_outline_outlined),
               onPressed: onDelete,
             ),
@@ -186,7 +186,7 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
           const SizedBox(height: 8),
           TextButton.icon(
             style: TextButton.styleFrom(primary: primaryColor),
-            label: Text(AppLocalizations.of(context)!.dialogCancel),
+            label: Text(AppLocalizations.of(context).dialogCancel),
             icon: const Icon(Icons.close_rounded),
             onPressed: () => Navigator.of(context).pop(),
           ),

@@ -91,7 +91,7 @@ class GroupsScreen extends StatelessWidget {
           showAddEditDialog(context);
         },
         icon: const Icon(Icons.add),
-        label: Text(AppLocalizations.of(context)!.mainFAB),
+        label: Text(AppLocalizations.of(context).mainFAB),
       ),
       backgroundColor: Theme.of(context).colorScheme.background,
       // TODO uncomment. This was changed because now we listen to groups from individual users.

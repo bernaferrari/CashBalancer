@@ -30,8 +30,8 @@ class _HomeInputDialogState extends State<HomeInputDialog> {
     return AlertDialog(
       title: Text(
         widget.initialValue == null
-            ? AppLocalizations.of(context)!.addAGroup
-            : AppLocalizations.of(context)!.editGroup,
+            ? AppLocalizations.of(context).addAGroup
+            : AppLocalizations.of(context).editGroup,
       ),
       content: Form(
         key: _formKey,
@@ -43,13 +43,13 @@ class _HomeInputDialogState extends State<HomeInputDialog> {
               onFieldSubmitted: onSubmit,
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return AppLocalizations.of(context)!.mainDialogValidator;
+                  return AppLocalizations.of(context).mainDialogValidator;
                 }
                 return null;
               },
               decoration: InputDecoration(
                 filled: true,
-                labelText: AppLocalizations.of(context)!.dialogAssetName,
+                labelText: AppLocalizations.of(context).dialogAssetName,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
@@ -63,7 +63,7 @@ class _HomeInputDialogState extends State<HomeInputDialog> {
               width: double.infinity,
               child: ElevatedButton(
                 child: Text(
-                  AppLocalizations.of(context)!.dialogSave,
+                  AppLocalizations.of(context).dialogSave,
                   style: GoogleFonts.rubik(
                     fontWeight: FontWeight.w800,
                   ),
@@ -76,7 +76,7 @@ class _HomeInputDialogState extends State<HomeInputDialog> {
               width: double.infinity,
               child: TextButton(
                 child: Text(
-                  AppLocalizations.of(context)!.dialogCancel,
+                  AppLocalizations.of(context).dialogCancel,
                   style: GoogleFonts.rubik(),
                 ),
                 onPressed: () {
