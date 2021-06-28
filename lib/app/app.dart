@@ -9,9 +9,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/database.dart';
-import '../details_screen/crud_group_page.dart';
-import '../details_screen/crud_item_page.dart';
 import '../details_screen/details_page.dart';
+import '../details_screen/group_page.dart';
+import '../details_screen/item_page.dart';
 import '../details_screen/move_item_page.dart';
 import '../l10n/l10n.dart';
 import '../settings/settings_page.dart';
@@ -207,11 +207,10 @@ class App extends StatelessWidget {
                 borderRadius: BorderRadius.circular(24),
               ),
             ),
-            accentColor: const Color(0xff5ae492),
             appBarTheme: const AppBarTheme(color: Color(0xFF13B9FF)),
             typography: Typography.material2018(),
             visualDensity: VisualDensity.standard,
-            applyElevationOverlayColor: true,
+            applyElevationOverlayColor: false,
             elevatedButtonTheme: elevatedButtonTheme,
             outlinedButtonTheme: outlinedButtonTheme,
             textButtonTheme: textButtonTheme,
@@ -230,10 +229,9 @@ class App extends StatelessWidget {
                 borderRadius: BorderRadius.circular(24),
               ),
             ),
-            accentColor: const Color(0xff5ae492),
             typography: Typography.material2018(),
             visualDensity: VisualDensity.standard,
-            applyElevationOverlayColor: true,
+            applyElevationOverlayColor: false,
             elevatedButtonTheme: elevatedButtonTheme,
             outlinedButtonTheme: outlinedButtonTheme,
             textButtonTheme: textButtonTheme,

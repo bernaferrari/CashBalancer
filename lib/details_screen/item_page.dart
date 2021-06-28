@@ -332,7 +332,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
   void onChanged([String? value]) {
     final moneyValue = double.tryParse(moneyEditingController.text) ?? 0;
 
-    late final String finalPercent;
+    final String finalPercent;
     if (moneyValue == 0 && widget.totalValue == 0) {
       finalPercent = '0';
     } else if (widget.previousItem == null) {

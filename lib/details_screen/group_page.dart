@@ -31,7 +31,7 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
   late String colorName = widget.previousGroup?.colorName ??
       tailwindColorsNames[Random().nextInt(tailwindColorsNames.length)];
 
-  late final TextEditingController textEditingController =
+  late final TextEditingController nameEditingController =
       TextEditingController(text: widget.previousGroup?.name);
 
   late final TextEditingController targetEditingController =
@@ -40,7 +40,7 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
 
   @override
   void dispose() {
-    textEditingController.dispose();
+    nameEditingController.dispose();
     targetEditingController.dispose();
     super.dispose();
   }
@@ -50,6 +50,8 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
     final primaryColor = getPrimaryColor(context, colorName);
     final primaryColorWeaker = getPrimaryColorWeaker(context, colorName);
     final backgroundDialogColor = getBackgroundDialogColor(context, colorName);
+
+    print("target is ${widget.previousGroup?.targetPercent}");
 
     return Form(
       key: _formKey,
@@ -61,7 +63,7 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
         colorName: colorName,
         children: [
           TextFormField(
-            controller: textEditingController,
+            controller: nameEditingController,
             onFieldSubmitted: onSubmit,
             autofocus: true,
             textCapitalization: TextCapitalization.sentences,
@@ -202,12 +204,14 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
       if (widget.previousGroup == null) {
         BlocProvider.of<DataCubit>(context)
             .db
-            .createGroup(widget.userId, textEditingController.text, colorName);
+            .createGroup(widget.userId, nameEditingController.text, colorName);
       } else {
         context.read<DataCubit>().db.editGroup(
               widget.previousGroup!.copyWith(
-                name: textEditingController.text,
+                name: nameEditingController.text,
                 colorName: colorName,
+                targetPercent:
+                    double.tryParse(targetEditingController.text) ?? 0,
               ),
             );
       }

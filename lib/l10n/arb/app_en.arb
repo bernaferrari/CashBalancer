@@ -26,6 +26,13 @@
   "dialogSaveAddMore": "SAVE AND ADD MORE",
   "dialogCancel": "CANCEL",
   "dialogDelete": "DELETE",
+  "settings": "Settings",
+  "currencySymbol": "Currency Symbol",
+  "relativeTarget": "Relative Target",
+  "sortBy": "Sort by",
+  "sortBy0": "Value",
+  "sortBy1": "Name",
+  "pleaseEnterCurrency": "Please enter the currency ($, €, etc.)",
   "@counterAppBarTitle": {
     "description": "Text shown in the AppBar of the Counter Page"
   }

@@ -1,8 +1,10 @@
 import 'dart:ui';
 
 import 'package:beamer/beamer.dart';
+import 'package:cash_balancer/details_screen/pie_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_multi_formatter/formatters/money_input_formatter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../blocs/data_bloc.dart';
@@ -118,40 +120,40 @@ class MainList extends StatelessWidget {
                 color:
                     Theme.of(context).colorScheme.onSurface.withOpacity(0.10),
               ),
-              child: VerticalProgressBar(
-                data: data,
-                totalValue: totalValue,
-              ),
+              child: VerticalProgressBar(data: data, totalValue: totalValue),
             ),
             Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    right: margin,
-                    top: margin,
-                    bottom: margin,
+              child: ListView(
+                padding: const EdgeInsets.only(
+                  right: margin,
+                  top: margin,
+                  bottom: margin,
+                ),
+                children: [
+                  CustomPieChart(data),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "Total: ${data.settings.currencySymbol} ${toCurrency(data.totalValue)}",
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: spaceColumn(
-                      20,
-                      (data.groupsMap.values.toList()
-                            ..sort((a, b) => a.name.compareTo(b.name)))
-                          .map(
-                        (group) => GroupCard(
-                          itemsList: data.groupedItems[group.id]
-                            ?..sort(
-                              (a, b) => (b.price * a.quantity)
-                                  .compareTo(a.price * a.quantity),
-                            ),
-                          group: group,
-                          allTotalValue: data.totalValue,
-                          userId: data.userId,
-                        ),
+                  const Divider(height: 40),
+                  ...spaceColumn(
+                    20,
+                    data.groupsMap.values.map(
+                      (group) => GroupCard(
+                        itemsList: data.groupedItems[group.id],
+                        group: group,
+                        allTotalValue: data.totalValue,
+                        userId: data.userId,
+                        settings: data.settings,
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
           ],
@@ -175,20 +177,23 @@ class VerticalProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final List<ItemData> nonZeroItems =
+            data.allItems.where((element) => element.price != 0).toList();
+
         final List<double> spacedList =
-            retrieveSpacedList(data.allItems, constraints.maxHeight);
+            retrieveSpacedList(nonZeroItems, constraints.maxHeight);
 
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: spaceColumn(
             2,
             [
-              for (int i = 0; i < data.allItems.length; i++)
+              for (int i = 0; i < nonZeroItems.length; i++)
                 Tooltip(
-                  message: data.allItems[i].name,
+                  message: nonZeroItems[i].name,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: data.allItems[i].color,
+                      primary: nonZeroItems[i].color,
                       padding: EdgeInsets.zero,
                       minimumSize: Size.zero,
                       fixedSize: Size(100, spacedList[i]),
@@ -196,7 +201,7 @@ class VerticalProgressBar extends StatelessWidget {
                       elevation: 0,
                     ),
                     onPressed: () => Beamer.of(context)
-                        .beamToNamed('/editItem/${data.allItems[i].id}'),
+                        .beamToNamed('/editItem/${nonZeroItems[i].id}'),
                     child: const SizedBox.shrink(),
                   ),
                 ),
@@ -217,6 +222,7 @@ class GroupCard extends StatelessWidget {
   final GroupData group;
   final int userId;
   final double allTotalValue;
+  final SettingsData settings;
 
   const GroupCard({
     Key? key,
@@ -224,6 +230,7 @@ class GroupCard extends StatelessWidget {
     required this.group,
     required this.userId,
     required this.allTotalValue,
+    required this.settings,
   }) : super(key: key);
 
   // Make it reusable.
@@ -281,7 +288,8 @@ class GroupCard extends StatelessWidget {
           children: [
             GroupCardTitleBar(
               title: group.name,
-              subtitle: "Total: R\$ ${totalLocalPrice.toStringAsFixed(2)}",
+              subtitle:
+                  "Total: ${settings.currencySymbol}${toCurrency(totalLocalPrice)}",
               widget: CircularProgress(
                 totalLocalPercent: totalLocalPercent,
                 color: color,
@@ -293,8 +301,9 @@ class GroupCard extends StatelessWidget {
                 width: double.infinity,
                 child: ItemCard(
                   itemsList![i],
-                  group.totalValue,
+                  settings.relativeTarget ? group.totalValue : allTotalValue,
                   group.colorName,
+                  settings.currencySymbol,
                 ),
               ),
               if (i < itemsList!.length - 1)
@@ -465,8 +474,11 @@ class ItemCard extends StatelessWidget {
   final ItemData item;
   final double totalValue;
   final String nameColor;
+  final String currencySymbol;
 
-  const ItemCard(this.item, this.totalValue, this.nameColor, {Key? key})
+  const ItemCard(
+      this.item, this.totalValue, this.nameColor, this.currencySymbol,
+      {Key? key})
       : super(key: key);
 
   @override
@@ -566,7 +578,7 @@ class ItemCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        "R\$ ${item.price.toStringAsFixed(2)} (${(item.price / totalValue).toPercent()}%)",
+                        "$currencySymbol${toCurrency(item.price)} (${(item.price / totalValue).toPercent()}%)",
                         style: GoogleFonts.firaSans(
                           color: Theme.of(context)
                               .colorScheme
@@ -580,7 +592,7 @@ class ItemCard extends StatelessWidget {
                     ),
                     if (item.targetPercent > 0)
                       Text(
-                        "${item.targetPercent / 100 > item.price / totalValue ? "↑" : "↓"} R\$ ${(totalValue * item.targetPercent / 100 - item.price).toStringAsFixed(0)} (${(item.targetPercent / 100 - item.price / totalValue).toPercent()}%)",
+                        "${item.targetPercent / 100 > item.price / totalValue ? "↑" : "↓"} $currencySymbol ${toCurrency(totalValue * item.targetPercent / 100 - item.price)} (${(item.targetPercent / 100 - item.price / totalValue).toPercent()}%)",
                         style: GoogleFonts.firaSans(
                           color:
                               item.targetPercent / 100 > item.price / totalValue
@@ -600,3 +612,5 @@ class ItemCard extends StatelessWidget {
     );
   }
 }
+
+String toCurrency(double value) => toCurrencyString(value.toString());

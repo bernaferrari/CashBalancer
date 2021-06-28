@@ -33,16 +33,7 @@ class _MoveItemPageState extends State<MoveItemPage> {
   // late String relativePercentage;
   late int selectedGroupId = widget.groups.first.id;
 
-  // Reset focus to name's TextInput on save and add more.
-  late final FocusNode nameFocusNode = FocusNode();
-
   late final String colorName = widget.item.colorName;
-
-  @override
-  void dispose() {
-    nameFocusNode.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {

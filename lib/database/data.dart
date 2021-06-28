@@ -43,10 +43,12 @@ class FullData {
     required this.allItems,
     required this.groupedItems,
     required this.groupsMap,
+    required this.settings,
   });
 
   final int userId;
   final double totalValue;
+  final SettingsData settings;
 
   // List of Items
   final List<ItemData> allItems;
@@ -56,4 +58,16 @@ class FullData {
 
   // groupID -> Groups
   final Map<int, GroupData> groupsMap;
+}
+
+class SettingsData {
+  const SettingsData({
+    required this.relativeTarget,
+    required this.currencySymbol,
+    required this.sortBy,
+  });
+
+  final bool relativeTarget;
+  final String currencySymbol;
+  final int sortBy;
 }

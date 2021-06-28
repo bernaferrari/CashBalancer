@@ -1,8 +1,10 @@
 // don't import moor_web.dart or moor_flutter/moor_flutter.dart in shared code
+import 'dart:collection';
 import 'dart:ui';
 
 import 'package:moor/moor.dart';
 import 'package:moor_flutter/moor_flutter.dart';
+import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../util/get_color_by_quantile.dart';
@@ -82,8 +84,34 @@ class Database extends _$Database {
     final itemsQuery = select(items)
       ..where((item) => item.userId.equals(userId));
 
-    return Rx.combineLatest2<List<Group>, List<Item>, FullData>(
-        groupsQuery.watch(), itemsQuery.watch(), (groupList, itemsList) {
+    final rxPrefs = RxSharedPreferences.getInstance();
+    final relativeTargetStream = rxPrefs.getBoolStream('relativeTarget');
+    final currencySymbolStream = rxPrefs.getStringStream('currencySymbol');
+    final sortBy = rxPrefs.getIntStream('sortBy');
+
+    final settingsData = Rx.combineLatest3<bool?, String?, int?, SettingsData>(
+        relativeTargetStream, currencySymbolStream, sortBy, (
+      relativeTarget,
+      currencySymbol,
+      sortBy,
+    ) {
+      // if (relativeTarget == null || currencySymbol == null || sortBy == null) {
+      //   return null;
+      // }
+
+      print(
+          "relativeTarget: $relativeTarget, currencySymbol: $currencySymbol, sortBy: $sortBy");
+
+      return SettingsData(
+        relativeTarget: relativeTarget ?? false,
+        currencySymbol: currencySymbol ?? "\$",
+        sortBy: sortBy ?? 0,
+      );
+    });
+
+    return Rx.combineLatest3<List<Group>, List<Item>, SettingsData, FullData>(
+        groupsQuery.watch(), itemsQuery.watch(), settingsData,
+        (groupList, itemsList, settings) {
       final List<Item> sortedItems = [...itemsList]..sort((a, b) {
           return (b.price * b.quantity).compareTo((a.price * a.quantity));
         });
@@ -116,6 +144,22 @@ class Database extends _$Database {
               ))
           .toList();
 
+      // Keep the Groups sorted, so the front can just display them.
+      final List<GroupData> sortedGroupsList;
+      if (settings.sortBy == 0) {
+        sortedGroupsList = groupsMap.values.toList()
+          ..sort((a, b) => b.totalValue.compareTo(a.totalValue));
+      } else {
+        sortedGroupsList = groupsMap.values.toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
+      }
+
+      final LinkedHashMap<int, GroupData> sortedGroupsMap = LinkedHashMap();
+
+      for (var group in sortedGroupsList) {
+        sortedGroupsMap[group.id] = group;
+      }
+
       final Map<int, List<ItemData>> groupedItemData =
           groupItemDataByGroupID(allItemData);
 
@@ -124,7 +168,8 @@ class Database extends _$Database {
         totalValue: totalValue,
         allItems: allItemData,
         groupedItems: groupedItemData,
-        groupsMap: groupsMap,
+        groupsMap: sortedGroupsMap,
+        settings: settings,
       );
     });
   }
