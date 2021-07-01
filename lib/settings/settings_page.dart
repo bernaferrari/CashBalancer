@@ -26,40 +26,83 @@ class SettingsPage extends StatelessWidget {
           colorName: 'warmGray',
           appBarTitle: AppLocalizations.of(context).settings,
           children: [
-            const SizedBox(height: 24),
             SwitchListTile(
               title: Text(AppLocalizations.of(context).relativeTarget),
-              subtitle: const Text(
+              subtitle: Text(
                 "Sum up to 100% in each section, instead of considering all sections.",
+                style: Theme.of(context).textTheme.caption,
               ),
               value: state.settings.relativeTarget,
-              onChanged: (value) {
-                rxPrefs.setBool("relativeTarget", value);
+              onChanged: (value) async {
+                await rxPrefs.setBool("relativeTarget", value);
               },
             ),
-            const Divider(),
-            ListTile(
-              title: Text(AppLocalizations.of(context).currencySymbol),
-              subtitle: Text(state.settings.currencySymbol),
-              onTap: () {
-                showDialog<Object>(
-                  context: context,
-                  builder: (_) => CurrencySymbolDialog(
-                      initialValue: state.settings.currencySymbol),
-                );
-              },
-            ),
-            const Divider(),
-            ListTile(
-              title: Text(AppLocalizations.of(context).sortBy),
-              subtitle: Text(getSortByString(context, state.settings.sortBy)),
-              onTap: () {
-                showDialog<Object>(
-                  context: context,
-                  builder: (_) =>
-                      SortByDialog(initialValue: state.settings.sortBy),
-                );
-              },
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      // shape: RoundedRectangleBorder(
+                      //   borderRadius: BorderRadius.circular(5),
+                      //   side: BorderSide(color: Colors.red, width: 2),
+                      // ),
+                      padding: const EdgeInsets.all(10),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          AppLocalizations.of(context).currencySymbol,
+                          style: Theme.of(context).textTheme.subtitle1,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          state.settings.currencySymbol,
+                          style: Theme.of(context).textTheme.caption?.copyWith(
+                              color: Theme.of(context).colorScheme.primary),
+                        ),
+                      ],
+                    ),
+                    onPressed: () {
+                      showDialog<Object>(
+                        context: context,
+                        builder: (_) => CurrencySymbolDialog(
+                          initialValue: state.settings.currencySymbol,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.all(10),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          AppLocalizations.of(context).sortBy,
+                          style: Theme.of(context).textTheme.subtitle1,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          getSortByString(context, state.settings.sortBy),
+                          style: Theme.of(context).textTheme.caption?.copyWith(
+                              color: Theme.of(context).colorScheme.primary),
+                        ),
+                      ],
+                    ),
+                    onPressed: () {
+                      showDialog<Object>(
+                        context: context,
+                        builder: (_) =>
+                            SortByDialog(initialValue: state.settings.sortBy),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ],
         );

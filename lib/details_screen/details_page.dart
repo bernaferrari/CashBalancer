@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:beamer/beamer.dart';
 import 'package:cash_balancer/details_screen/pie_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_multi_formatter/formatters/money_input_formatter.dart';
@@ -59,7 +60,10 @@ class DetailsPageImpl extends StatelessWidget {
           // ),
           IconButton(
             onPressed: () => Beamer.of(context).beamToNamed('/settings'),
-            icon: const Icon(Icons.settings_outlined),
+            icon: Icon(
+              Icons.settings_outlined,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
           ),
         ],
       ),
@@ -105,7 +109,7 @@ class MainList extends StatelessWidget {
 
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 500),
+        constraints: const BoxConstraints(maxWidth: 550),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,20 +131,33 @@ class MainList extends StatelessWidget {
                 padding: const EdgeInsets.only(
                   right: margin,
                   top: margin,
-                  bottom: margin,
+                  // On Android the FAB may get on top of it.
+                  bottom: 6 * margin,
                 ),
                 children: [
-                  CustomPieChart(data),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "Total: ${data.settings.currencySymbol} ${toCurrency(data.totalValue)}",
-                        style: const TextStyle(fontSize: 12),
+                  if (data.allItems.isNotEmpty) ...[
+                    TextButton(
+                      onPressed: () {
+                        Beamer.of(context)
+                            .beamToNamed("/overview/${data.userId}");
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CustomPieChart(data),
+                          const SizedBox(height: 16),
+                          Text(
+                            "Total: ${data.settings.currencySymbol} ${toCurrency(data.totalValue)}",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context).colorScheme.onBackground,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  const Divider(height: 40),
+                    ),
+                    const Divider(height: 40),
+                  ],
                   ...spaceColumn(
                     20,
                     data.groupsMap.values.map(
@@ -183,6 +200,20 @@ class VerticalProgressBar extends StatelessWidget {
         final List<double> spacedList =
             retrieveSpacedList(nonZeroItems, constraints.maxHeight);
 
+        print("spacedList is $spacedList");
+        print("constraints.maxHeight is ${constraints.maxHeight}");
+
+        // return Column(
+        //   children: [
+        //     for (int i = 0; i < 5; i++)
+        //       Container(
+        //         color: Colors.red,
+        //         width: 100,
+        //         height: 8,
+        //       ),
+        //   ],
+        // );
+
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: spaceColumn(
@@ -191,18 +222,21 @@ class VerticalProgressBar extends StatelessWidget {
               for (int i = 0; i < nonZeroItems.length; i++)
                 Tooltip(
                   message: nonZeroItems[i].name,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: nonZeroItems[i].color,
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      fixedSize: Size(100, spacedList[i]),
-                      shape: const RoundedRectangleBorder(),
-                      elevation: 0,
+                  child: SizedBox(
+                    height: spacedList[i],
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: nonZeroItems[i].color,
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        fixedSize: Size(100, spacedList[i]),
+                        shape: const RoundedRectangleBorder(),
+                        elevation: 0,
+                      ),
+                      onPressed: () => Beamer.of(context)
+                          .beamToNamed('/editItem/${nonZeroItems[i].id}'),
+                      child: Container(),
                     ),
-                    onPressed: () => Beamer.of(context)
-                        .beamToNamed('/editItem/${nonZeroItems[i].id}'),
-                    child: const SizedBox.shrink(),
                   ),
                 ),
             ],
@@ -273,10 +307,6 @@ class GroupCard extends StatelessWidget {
         ),
       );
     } else {
-      final double totalLocalPrice = itemsList!
-          .map((e) => e.price * e.quantity)
-          .fold(0.0, (previous, current) => previous + current);
-
       final double totalLocalPercent = (group.totalValue / allTotalValue) * 100;
 
       return customContainer(
@@ -289,10 +319,14 @@ class GroupCard extends StatelessWidget {
             GroupCardTitleBar(
               title: group.name,
               subtitle:
-                  "Total: ${settings.currencySymbol}${toCurrency(totalLocalPrice)}",
-              widget: CircularProgress(
-                totalLocalPercent: totalLocalPercent,
-                color: color,
+                  "Total: ${settings.currencySymbol} ${toCurrency(group.totalValue)}",
+              widget: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  EditGroup(color: color, groupId: group.id),
+                  const SizedBox(width: 8),
+                  AddItem(color: color, userId: userId, groupId: group.id),
+                ],
               ),
             ),
             const SizedBox(height: 8),
@@ -315,16 +349,63 @@ class GroupCard extends StatelessWidget {
                 ),
             ],
             const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  EditGroup(color: color, groupId: group.id),
-                  const SizedBox(width: 8),
-                  AddItem(color: color, userId: userId, groupId: group.id),
-                ],
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Expanded(child: SizedBox.shrink()),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (group.targetPercent != -1) ...[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          PercentArrow(
+                            itemValue: group.totalValue,
+                            totalValue: allTotalValue,
+                            targetPercent: group.targetPercent,
+                          ),
+                          const SizedBox(height: 4),
+                          UpDownDiffText(
+                            currencySymbol: settings.currencySymbol,
+                            itemValue: group.totalValue,
+                            targetPercent: group.targetPercent,
+                            totalValue: allTotalValue,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 16),
+                      SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: Stack(
+                          children: [
+                            Center(
+                              child: CircularProgress(
+                                totalLocalPercent: totalLocalPercent,
+                                color: localTailwindColor[500]!,
+                                hasText: false,
+                              ),
+                            ),
+                            Center(
+                              child: CircularProgress(
+                                totalLocalPercent: group.targetPercent,
+                                color: localTailwindColor[200]!,
+                                size: 25,
+                                hasText: false,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else
+                      CircularProgress(
+                        totalLocalPercent: totalLocalPercent,
+                        color: color,
+                      ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -390,18 +471,22 @@ class EditGroup extends StatelessWidget {
 class CircularProgress extends StatelessWidget {
   final double totalLocalPercent;
   final Color color;
+  final double size;
+  final bool hasText;
 
   const CircularProgress({
     Key? key,
     required this.totalLocalPercent,
     required this.color,
+    this.size = 40,
+    this.hasText = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 40,
-      height: 40,
+      width: size,
+      height: size,
       // StrokeWidth is 3.
       padding: const EdgeInsets.all(3),
       child: CustomPaint(
@@ -413,18 +498,22 @@ class CircularProgress extends StatelessWidget {
           backgroundColor:
               Theme.of(context).colorScheme.onSurface.withOpacity(0.15),
         ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                "${totalLocalPercent.toStringAsFixed(0)}%",
-                style:
-                    Theme.of(context).textTheme.overline!.copyWith(fontSize: 8),
-              ),
-            ],
-          ),
-        ),
+        child: hasText
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      "${totalLocalPercent.toStringAsFixed(0)}%",
+                      style: Theme.of(context)
+                          .textTheme
+                          .overline!
+                          .copyWith(fontSize: 8),
+                    ),
+                  ],
+                ),
+              )
+            : null,
       ),
     );
   }
@@ -483,14 +572,6 @@ class ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final greenColor = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xff77d874)
-        : const Color(0xff2A8B27);
-
-    final redColor = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xffff5a74)
-        : const Color(0xffCC0020);
-
     return TextButton(
       style: TextButton.styleFrom(
         padding: const EdgeInsets.all(10.0),
@@ -535,80 +616,135 @@ class ItemCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (item.targetPercent > 0) ...[
-                      Text(
-                        "${(item.price / totalValue).toPercent()}%",
-                        style: GoogleFonts.firaSans(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.50),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                        ),
+                    if (item.targetPercent != -1)
+                      PercentArrow(
+                        itemValue: item.price,
+                        totalValue: totalValue,
+                        targetPercent: item.targetPercent,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: Icon(
-                          Icons.arrow_forward_rounded,
-                          size: 16,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.50),
-                        ),
-                      ),
-                      Text(
-                        "${item.targetPercent.toStringAsFixed(0)}%",
-                        style: GoogleFonts.firaSans(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          fontFeatures: const [
-                            FontFeature.enable('calc'),
-                          ],
-                        ),
-                      ),
-                    ],
                   ],
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        "$currencySymbol${toCurrency(item.price)} (${(item.price / totalValue).toPercent()}%)",
-                        style: GoogleFonts.firaSans(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.75),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                UpDownDiffText(
+                  currencySymbol: currencySymbol,
+                  itemValue: item.price,
+                  targetPercent: item.targetPercent,
+                  totalValue: totalValue,
+                  leftWidget: Expanded(
+                    child: Text(
+                      "$currencySymbol ${toCurrency(item.price)} (${(item.price / totalValue).toPercent()}%)",
+                      style: GoogleFonts.firaSans(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.75),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    if (item.targetPercent > 0)
-                      Text(
-                        "${item.targetPercent / 100 > item.price / totalValue ? "↑" : "↓"} $currencySymbol ${toCurrency(totalValue * item.targetPercent / 100 - item.price)} (${(item.targetPercent / 100 - item.price / totalValue).toPercent()}%)",
-                        style: GoogleFonts.firaSans(
-                          color:
-                              item.targetPercent / 100 > item.price / totalValue
-                                  ? greenColor
-                                  : redColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                  ],
+                  ),
                 ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class PercentArrow extends StatelessWidget {
+  final double itemValue;
+  final double totalValue;
+  final double targetPercent;
+
+  const PercentArrow({
+    required this.itemValue,
+    required this.totalValue,
+    required this.targetPercent,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          "${(itemValue / totalValue).toPercent()}%",
+          style: GoogleFonts.firaSans(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.50),
+            fontSize: 18,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Icon(
+            Icons.arrow_forward_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.50),
+          ),
+        ),
+        Text(
+          "${targetPercent.toStringAsFixed(0)}%",
+          style: GoogleFonts.firaSans(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            fontFeatures: const [
+              FontFeature.enable('calc'),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class UpDownDiffText extends StatelessWidget {
+  final String currencySymbol;
+  final double itemValue;
+  final double targetPercent;
+  final double totalValue;
+  final Widget? leftWidget;
+
+  const UpDownDiffText({
+    required this.currencySymbol,
+    required this.itemValue,
+    required this.targetPercent,
+    required this.totalValue,
+    this.leftWidget,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final greenColor = Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xff77d874)
+        : const Color(0xff2A8B27);
+
+    final redColor = Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xffff5a74)
+        : const Color(0xffCC0020);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        if (leftWidget != null) leftWidget!,
+        if (targetPercent > 0)
+          Text(
+            "${targetPercent / 100 > itemValue / totalValue ? "↑" : "↓"} $currencySymbol ${toCurrency(totalValue * targetPercent / 100 - itemValue)} (${(targetPercent / 100 - itemValue / totalValue).toPercent()}%)",
+            style: GoogleFonts.firaSans(
+              color: targetPercent / 100 > itemValue / totalValue
+                  ? greenColor
+                  : redColor,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+      ],
     );
   }
 }

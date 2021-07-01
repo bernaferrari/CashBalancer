@@ -84,9 +84,10 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
     );
   }
 
-  void onSubmit([String? value]) {
+  Future<void> onSubmit([String? value]) async {
     if (_formKey.currentState!.validate()) {
-      RxSharedPreferences.getInstance().setString('currencySymbol', value);
+      await RxSharedPreferences.getInstance()
+          .setString('currencySymbol', currencyEditingController.text);
       Navigator.of(context).pop();
     }
   }

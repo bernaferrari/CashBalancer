@@ -301,12 +301,17 @@ class Database extends _$Database {
     return update(users).replace(user);
   }
 
-  Future<int> createGroup(int userId, String description, String colorName) {
+  Future<int> createGroup({
+    required int id,
+    required String name,
+    required String colorName,
+    required double targetPercent,
+  }) {
     return into(groups).insert(GroupsCompanion.insert(
-      name: description,
+      userId: id,
+      name: name,
       colorName: colorName,
-      userId: userId,
-      targetPercent: 0,
+      targetPercent: targetPercent,
     ));
   }
 
@@ -327,7 +332,7 @@ class Database extends _$Database {
       name: name,
       quantity: 1,
       price: double.parse(value),
-      targetPercent: double.tryParse(target) ?? 0,
+      targetPercent: double.tryParse(target) ?? -1,
     ));
   }
 
@@ -340,7 +345,7 @@ class Database extends _$Database {
     return update(items).replace(item.copyWith(
       name: name,
       price: double.parse(price),
-      targetPercent: double.tryParse(target) ?? 0,
+      targetPercent: double.tryParse(target) ?? -1,
     ));
   }
 

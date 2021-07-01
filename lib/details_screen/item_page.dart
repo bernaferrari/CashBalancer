@@ -40,7 +40,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
           text: widget.previousItem?.price.toInt().toString());
 
   late final TextEditingController targetEditingController =
-      (widget.previousItem?.targetPercent != 0)
+      (widget.previousItem?.targetPercent != -1)
           ? TextEditingController(
               text: widget.previousItem?.targetPercent.toInt().toString())
           : TextEditingController();

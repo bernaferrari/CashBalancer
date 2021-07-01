@@ -35,8 +35,10 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
       TextEditingController(text: widget.previousGroup?.name);
 
   late final TextEditingController targetEditingController =
-      TextEditingController(
-          text: widget.previousGroup?.targetPercent.toInt().toString());
+      (widget.previousGroup?.targetPercent != -1)
+          ? TextEditingController(
+              text: widget.previousGroup?.targetPercent.toInt().toString())
+          : TextEditingController();
 
   @override
   void dispose() {
@@ -202,16 +204,20 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
       context.read<DataCubit>().db;
 
       if (widget.previousGroup == null) {
-        BlocProvider.of<DataCubit>(context)
-            .db
-            .createGroup(widget.userId, nameEditingController.text, colorName);
+        BlocProvider.of<DataCubit>(context).db.createGroup(
+              id: widget.userId,
+              name: nameEditingController.text,
+              colorName: colorName,
+              targetPercent:
+                  double.tryParse(targetEditingController.text) ?? -1,
+            );
       } else {
         context.read<DataCubit>().db.editGroup(
               widget.previousGroup!.copyWith(
                 name: nameEditingController.text,
                 colorName: colorName,
                 targetPercent:
-                    double.tryParse(targetEditingController.text) ?? 0,
+                    double.tryParse(targetEditingController.text) ?? -1,
               ),
             );
       }

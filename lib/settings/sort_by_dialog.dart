@@ -1,4 +1,5 @@
 import 'package:cash_balancer/l10n/l10n.dart';
+import 'package:cash_balancer/util/row_column_spacer.dart';
 import 'package:cash_balancer/util/tailwind_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
@@ -13,7 +14,7 @@ class SortByDialog extends StatefulWidget {
 }
 
 class _SortByDialogState extends State<SortByDialog> {
-  final String colorName = 'yellow';
+  final String colorName = 'green';
   late int selectedSortId = widget.initialValue;
   static const sortByValues = [0, 1];
 
@@ -30,37 +31,42 @@ class _SortByDialogState extends State<SortByDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          for (final sortId in sortByValues)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: selectedSortId == sortId
-                      ? Theme.of(context).brightness == Brightness.dark
-                          ? tailwindColors[colorName]![800]!
-                          : tailwindColors[colorName]![200]!
-                      : null,
-                  side: BorderSide(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? tailwindColors[colorName]![700]!
-                        : tailwindColors[colorName]![200]!,
-                    width: 1,
+          Row(
+            children: spaceRow(
+              16,
+              [
+                for (final sortId in sortByValues)
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: selectedSortId == sortId
+                            ? Theme.of(context).brightness == Brightness.dark
+                                ? tailwindColors[colorName]![800]!
+                                : tailwindColors[colorName]![200]!
+                            : null,
+                        side: BorderSide(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? tailwindColors[colorName]![700]!
+                              : tailwindColors[colorName]![200]!,
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        getSortByString(context, sortId),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onBackground,
+                        ),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          selectedSortId = sortId;
+                        });
+                      },
+                    ),
                   ),
-                ),
-                child: Text(
-                  getSortByString(context, sortId),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onBackground,
-                  ),
-                ),
-                onPressed: () {
-                  setState(() {
-                    selectedSortId = sortId;
-                  });
-                },
-              ),
+              ],
             ),
+          ),
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
@@ -79,8 +85,8 @@ class _SortByDialogState extends State<SortByDialog> {
     );
   }
 
-  void onSubmit() {
-    RxSharedPreferences.getInstance().setInt('sortBy', selectedSortId);
+  Future<void> onSubmit() async {
+    await RxSharedPreferences.getInstance().setInt('sortBy', selectedSortId);
     Navigator.of(context).pop();
   }
 }
