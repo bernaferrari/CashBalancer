@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:animations/animations.dart';
 import 'package:beamer/beamer.dart';
+import 'package:cash_balancer/details_screen/analysis_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -32,6 +33,12 @@ class App extends StatelessWidget {
             key: const ValueKey('settings'),
             title: 'Settings',
             child: const SettingsPage(),
+            fillColor: getScaffoldDialogBackgroundColor(context, 'warmGray'),
+          ),
+      '/analysis': (context, state) => BeamerMaterialTransitionPage(
+            key: const ValueKey('analysis'),
+            title: 'Analysis',
+            child: const AnalysisPage(),
             fillColor: getScaffoldDialogBackgroundColor(context, 'warmGray'),
           ),
       '/addGroup/:userId': (context, state) {

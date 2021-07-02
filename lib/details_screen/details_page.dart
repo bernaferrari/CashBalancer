@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:beamer/beamer.dart';
-import 'package:cash_balancer/details_screen/pie_chart.dart';
+import 'package:cash_balancer/details_screen/pie_chart_groups.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,7 +11,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
 import '../l10n/l10n.dart';
-import '../users_screen/users_screen.dart';
 import '../util/retrieve_spaced_list.dart';
 import '../util/row_column_spacer.dart';
 import '../util/tailwind_colors.dart';
@@ -90,6 +89,66 @@ class DetailsPageImpl extends StatelessWidget {
   }
 }
 
+class WhenEmptyCard extends StatelessWidget {
+  const WhenEmptyCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    Key? key,
+  }) : super(key: key);
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        margin: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            width: 2,
+            color: Theme.of(context).colorScheme.secondary,
+          ),
+        ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 300),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                icon,
+                size: 32,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: GoogleFonts.rubik(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                subtitle,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyText1!
+                    .copyWith(fontSize: 14),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class MainList extends StatelessWidget {
   final FullData data;
 
@@ -138,13 +197,12 @@ class MainList extends StatelessWidget {
                   if (data.allItems.isNotEmpty) ...[
                     TextButton(
                       onPressed: () {
-                        Beamer.of(context)
-                            .beamToNamed("/overview/${data.userId}");
+                        Beamer.of(context).beamToNamed("/analysis");
                       },
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          CustomPieChart(data),
+                          PieChartGroups(data),
                           const SizedBox(height: 16),
                           Text(
                             "Total: ${data.settings.currencySymbol} ${toCurrency(data.totalValue)}",
@@ -200,20 +258,6 @@ class VerticalProgressBar extends StatelessWidget {
         final List<double> spacedList =
             retrieveSpacedList(nonZeroItems, constraints.maxHeight);
 
-        print("spacedList is $spacedList");
-        print("constraints.maxHeight is ${constraints.maxHeight}");
-
-        // return Column(
-        //   children: [
-        //     for (int i = 0; i < 5; i++)
-        //       Container(
-        //         color: Colors.red,
-        //         width: 100,
-        //         height: 8,
-        //       ),
-        //   ],
-        // );
-
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: spaceColumn(
@@ -245,10 +289,6 @@ class VerticalProgressBar extends StatelessWidget {
       },
     );
   }
-}
-
-Map<int, Color> getColor(String colorType) {
-  return tailwindColors[colorType]!;
 }
 
 class GroupCard extends StatelessWidget {
@@ -287,7 +327,7 @@ class GroupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Map<int, Color> localTailwindColor = getColor(group.colorName);
+    final Map<int, Color> localTailwindColor = tailwindColors[group.colorName]!;
     final color = localTailwindColor[500]!;
 
     if (itemsList == null) {
@@ -732,7 +772,7 @@ class UpDownDiffText extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         if (leftWidget != null) leftWidget!,
-        if (targetPercent > 0)
+        if (targetPercent != -1)
           Text(
             "${targetPercent / 100 > itemValue / totalValue ? "↑" : "↓"} $currencySymbol ${toCurrency(totalValue * targetPercent / 100 - itemValue)} (${(targetPercent / 100 - itemValue / totalValue).toPercent()}%)",
             style: GoogleFonts.firaSans(
