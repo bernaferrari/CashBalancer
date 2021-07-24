@@ -28,11 +28,7 @@ Map<int, Color> getColorByQuantile(
         colors[item.id] = _getColor(colorName)[500]!;
       } else if (item.price >= quartile33) {
         colors[item.id] = _getColor(colorName)[300]!;
-      }
-      // else if (item.price >= quartile25) {
-      //   colors[item.id] = _getColor(colorName)[300]!;
-      // }
-      else {
+      } else {
         colors[item.id] = _getColor(colorName)[200]!;
       }
     }

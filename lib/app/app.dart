@@ -2,7 +2,12 @@ import 'dart:math';
 
 import 'package:animations/animations.dart';
 import 'package:beamer/beamer.dart';
-import 'package:cash_balancer/details_screen/analysis_page.dart';
+import 'package:cash_balancer/page_analysis/analysis_page.dart';
+import 'package:cash_balancer/page_crud/crud_item_page.dart';
+import 'package:cash_balancer/page_crud/crud_wallet_page.dart';
+import 'package:cash_balancer/page_crud/move_item_page.dart';
+import 'package:cash_balancer/page_home/details_page.dart';
+import 'package:cash_balancer/page_settings/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -10,12 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/database.dart';
-import '../details_screen/details_page.dart';
-import '../details_screen/item_page.dart';
-import '../details_screen/move_item_page.dart';
-import '../details_screen/wallet_page.dart';
 import '../l10n/l10n.dart';
-import '../settings/settings_page.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/dialog_screen_base.dart';
 
@@ -24,7 +24,7 @@ final simpleBuilder = SimpleLocationBuilder(routes: {
     return const BeamPage(
       key: ValueKey('home'),
       title: 'Cash Balancer',
-      child: DetailsPage(),
+      child: HomePage(),
     );
   },
   '/settings': (context, state) => BeamerMaterialTransitionPage(
@@ -86,12 +86,11 @@ final simpleBuilder = SimpleLocationBuilder(routes: {
       return beamerLoadingPage();
     }
   },
-  '/addItem/:walletId/:userId': (context, state) {
+  '/addItem/:walletId': (context, state) {
     final beamState = context.currentBeamLocation.state as BeamState;
     final walletId = int.tryParse(beamState.pathParameters['walletId'] ?? '');
-    final userId = int.tryParse(beamState.pathParameters['userId'] ?? '');
 
-    if (walletId == null || userId == null) {
+    if (walletId == null) {
       return const ErrorPage();
     }
 
@@ -101,7 +100,7 @@ final simpleBuilder = SimpleLocationBuilder(routes: {
 
       // Widgets and BeamPages can be mixed!
       return BeamerMaterialTransitionPage(
-        key: ValueKey('addItem-$walletId$userId'),
+        key: ValueKey('addItem-$walletId'),
         title: 'Add Item',
         child: CRUDItemPage(
           userId: state.userId,
@@ -109,6 +108,7 @@ final simpleBuilder = SimpleLocationBuilder(routes: {
           colorName: colorName,
           walletId: walletId,
           totalValue: state.totalValue,
+          currency: state.settings.currencySymbol,
         ),
         fillColor: getScaffoldDialogBackgroundColor(context, colorName),
       );
@@ -138,6 +138,7 @@ final simpleBuilder = SimpleLocationBuilder(routes: {
           colorName: previousItem.colorName,
           walletId: previousItem.walletId,
           totalValue: state.totalValue,
+          currency: state.settings.currencySymbol,
         ),
         fillColor:
             getScaffoldDialogBackgroundColor(context, previousItem.colorName),
@@ -234,7 +235,7 @@ class App extends StatelessWidget {
           theme: ThemeData(
             colorScheme: const ColorScheme.light(
               primary: Color(0xff162783),
-              secondary: Color(0xff168342),
+              secondary: Color(0xff059669),
               // background: Color(0xff18170f),
               // surface: Color(0xff201f15),
             ),
@@ -315,7 +316,7 @@ class BeamerMaterialTransitionPage extends BeamPage {
   const BeamerMaterialTransitionPage({
     LocalKey? key,
     required Widget child,
-    String title = 'hello',
+    String title = '',
     String? popToNamed,
     this.fillColor,
   }) : super(
