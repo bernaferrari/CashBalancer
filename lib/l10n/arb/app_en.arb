@@ -1,15 +1,25 @@
 {
   "appTitle": "Cash Balancer",
   "mainEmptyTitle": "Add your first wallet.",
-  "mainEmptySubtitle": "Tap the + to add a group, where you'll be able to add your cash.",
+  "mainEmptySubtitle": "Tap the + to add a wallet, where you'll be able to add your assets.",
   "mainDialogValidator": "Please enter some text",
   "addWallet": "Add Wallet",
   "addAWallet": "Add a Wallet",
   "editWallet": "Edit a Wallet",
   "allItems": "All items",
+  "targetSettings": "Sum up to 100% in each wallet, instead of considering the sum of all wallets.",
+  "theAssetsName": "The asset’s name, such as savings or bitcoin.",
+  "pressToAdd": "Press + to add.",
+  "rightNow": "Right now",
+  "isGoingToBe": "is going to be",
+  "howMuchTarget": "How much percentage you want this to be.",
+  "optional": "OPTIONAL",
+  "totalAmount": "The total amount you own.",
+  "value": "Value",
+  "move": "Move",
   "moveWallet": "Move \"{itemName}\"",
   "@moveWallet": {
-    "description": "Used on dialogs for moving items from one group into another",
+    "description": "Used on dialogs for moving items from one wallet into another",
     "placeholders": {
       "itemName": {
         "type": "String",
@@ -32,5 +42,6 @@
   "sortBy": "Sort by",
   "sortBy0": "Value",
   "sortBy1": "Name",
-  "pleaseEnterCurrency": "Please enter the currency ($, €, etc.)"
+  "pleaseEnterCurrency": "Please enter the currency ($, €, etc.)",
+  "designedDeveloped": "Designed & developed by Bernardo Ferrari."
 }

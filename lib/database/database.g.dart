@@ -131,12 +131,14 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   $UsersTable(this._db, [this._alias]);
 
   final VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
   late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
       'id', aliasedName, false,
       typeName: 'INTEGER',
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
   late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
       'name', aliasedName, false,
       typeName: 'TEXT', requiredDuringInsert: true);
@@ -396,25 +398,30 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
   $WalletsTable(this._db, [this._alias]);
 
   final VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
   late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
       'id', aliasedName, false,
       typeName: 'INTEGER',
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
   late final GeneratedColumn<int?> userId = GeneratedColumn<int?>(
       'user_id', aliasedName, false,
       typeName: 'INTEGER', requiredDuringInsert: true);
   final VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
   late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
       'name', aliasedName, false,
       typeName: 'TEXT', requiredDuringInsert: true);
   final VerificationMeta _colorNameMeta = const VerificationMeta('colorName');
+  @override
   late final GeneratedColumn<String?> colorName = GeneratedColumn<String?>(
       'color_name', aliasedName, false,
       typeName: 'TEXT', requiredDuringInsert: true);
   final VerificationMeta _targetPercentMeta =
       const VerificationMeta('targetPercent');
+  @override
   late final GeneratedColumn<double?> targetPercent = GeneratedColumn<double?>(
       'target_percent', aliasedName, false,
       typeName: 'REAL', requiredDuringInsert: true);
@@ -746,33 +753,40 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   $ItemsTable(this._db, [this._alias]);
 
   final VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
   late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
       'id', aliasedName, false,
       typeName: 'INTEGER',
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _walletIdMeta = const VerificationMeta('walletId');
+  @override
   late final GeneratedColumn<int?> walletId = GeneratedColumn<int?>(
       'wallet_id', aliasedName, false,
       typeName: 'INTEGER', requiredDuringInsert: true);
   final VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
   late final GeneratedColumn<int?> userId = GeneratedColumn<int?>(
       'user_id', aliasedName, false,
       typeName: 'INTEGER', requiredDuringInsert: true);
   final VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
   late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
       'name', aliasedName, false,
       typeName: 'TEXT', requiredDuringInsert: true);
   final VerificationMeta _quantityMeta = const VerificationMeta('quantity');
+  @override
   late final GeneratedColumn<double?> quantity = GeneratedColumn<double?>(
       'quantity', aliasedName, false,
       typeName: 'REAL', requiredDuringInsert: true);
   final VerificationMeta _priceMeta = const VerificationMeta('price');
+  @override
   late final GeneratedColumn<double?> price = GeneratedColumn<double?>(
       'price', aliasedName, false,
       typeName: 'REAL', requiredDuringInsert: true);
   final VerificationMeta _targetPercentMeta =
       const VerificationMeta('targetPercent');
+  @override
   late final GeneratedColumn<double?> targetPercent = GeneratedColumn<double?>(
       'target_percent', aliasedName, false,
       typeName: 'REAL', requiredDuringInsert: true);

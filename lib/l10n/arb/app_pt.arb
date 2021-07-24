@@ -1,0 +1,47 @@
+{
+  "appTitle": "Cash Balancer",
+  "mainEmptyTitle": "Adicione a sua primeira carteira",
+  "mainEmptySubtitle": "Toque no + para adicionar uma carteira, onde você vai poder adicionar os seus ativos.",
+  "mainDialogValidator": "Por favor digite algo",
+  "addWallet": "Adicionar Carteira",
+  "addAWallet": "Adicionar uma Carteira",
+  "editWallet": "Editar Carteira",
+  "allItems": "Todos os items",
+  "targetSettings": "Somar até 100% em cada carteira, em vez de considerar a soma total de todas as carteiras.",
+  "theAssetsName": "O nome do ativo, como poupança ou bitcoin.",
+  "pressToAdd": "Toque no + para adicionar.",
+  "rightNow": "Agora",
+  "isGoingToBe": "será",
+  "howMuchTarget": "A porcentagem alvo que você desejar.",
+  "optional": "OPCIONAL",
+  "totalAmount": "A quantia total que você possui.",
+  "value": "Valor",
+  "move": "Mover",
+  "moveWallet": "Mover \"{itemName}\"",
+  "@moveWallet": {
+    "description": "Used on dialogs for moving items from one group into another",
+    "placeholders": {
+      "itemName": {
+        "type": "String",
+        "example": "XRP"
+      }
+    }
+  },
+  "addAsset": "Adicionar Ativo",
+  "editAsset": "Editar Ativo",
+  "dialogAssetName": "Nome",
+  "dialogAssetValue": "Valor",
+  "dialogAssetTarget": "Alvo",
+  "dialogSave": "SALVAR",
+  "dialogSaveAddMore": "SALVAR E ADICIONAR MAIS",
+  "dialogCancel": "CANCELAR",
+  "dialogDelete": "DELETAR",
+  "settings": "Configurações",
+  "currencySymbol": "Moeda",
+  "relativeTarget": "Alvo relativo",
+  "sortBy": "Ordenar por",
+  "sortBy0": "Valor",
+  "sortBy1": "Nome",
+  "pleaseEnterCurrency": "Por favor digite uma moeda ($, €, etc.)",
+  "designedDeveloped": "Desenhado e desenvolvido por Bernardo Ferrari."
+}
