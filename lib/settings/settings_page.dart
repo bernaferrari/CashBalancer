@@ -104,6 +104,18 @@ class SettingsPage extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 16),
+            Text(
+              "Designed & developed by Bernardo Ferrari.",
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.subtitle2,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "@bernaferrari",
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.subtitle2,
+            ),
           ],
         );
       },

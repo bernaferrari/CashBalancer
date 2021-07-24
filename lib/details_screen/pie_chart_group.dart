@@ -25,7 +25,7 @@ class PieChartGroups extends StatelessWidget {
   }
 
   List<PieChartSectionData> showingSections(FullData data) {
-    return data.groupsMap.values.map((groupData) {
+    return data.walletsMap.values.map((groupData) {
       return PieChartSectionData(
         color: tailwindColors[groupData.colorName]![500]!,
         value: groupData.totalValue / data.totalValue * 100,

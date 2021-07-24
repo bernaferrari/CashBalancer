@@ -14,7 +14,7 @@ export 'database/shared.dart';
 
 part 'database.g.dart';
 
-class Groups extends Table {
+class Wallets extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   IntColumn get userId => integer()();
@@ -35,7 +35,7 @@ class Users extends Table {
 class Items extends Table {
   IntColumn get id => integer().autoIncrement()();
 
-  IntColumn get groupId => integer()();
+  IntColumn get walletId => integer()();
 
   IntColumn get userId => integer()();
 
@@ -49,7 +49,7 @@ class Items extends Table {
 }
 
 @UseMoor(
-  tables: [Users, Groups, Items],
+  tables: [Users, Wallets, Items],
   queries: {
     // '_resetCategory': 'UPDATE todos SET category = NULL WHERE category = ?',
     'userExists': """SELECT count(1) where exists (select * from users)"""
@@ -76,9 +76,9 @@ class Database extends _$Database {
     );
   }
 
-  // Users, Groups : [Items]
-  Stream<FullData> watchGroups(int userId) {
-    final groupsQuery = select(groups)
+  // Users, Wallets : [Items]
+  Stream<FullData> watchWallets(int userId) {
+    final walletsQuery = select(wallets)
       ..where((item) => item.userId.equals(userId));
 
     final itemsQuery = select(items)
@@ -95,13 +95,6 @@ class Database extends _$Database {
       currencySymbol,
       sortBy,
     ) {
-      // if (relativeTarget == null || currencySymbol == null || sortBy == null) {
-      //   return null;
-      // }
-
-      print(
-          "relativeTarget: $relativeTarget, currencySymbol: $currencySymbol, sortBy: $sortBy");
-
       return SettingsData(
         relativeTarget: relativeTarget ?? false,
         currencySymbol: currencySymbol ?? "\$",
@@ -109,66 +102,67 @@ class Database extends _$Database {
       );
     });
 
-    return Rx.combineLatest3<List<Group>, List<Item>, SettingsData, FullData>(
-        groupsQuery.watch(), itemsQuery.watch(), settingsData,
-        (groupList, itemsList, settings) {
+    return Rx.combineLatest3<List<Wallet>, List<Item>, SettingsData, FullData>(
+        walletsQuery.watch(), itemsQuery.watch(), settingsData,
+        (walletsList, itemsList, settings) {
       final List<Item> sortedItems = [...itemsList]..sort((a, b) {
           return (b.price * b.quantity).compareTo((a.price * a.quantity));
         });
-      final Map<int, List<Item>> groupedItems = groupItemByGroupID(sortedItems);
+      final Map<int, List<Item>> groupedItems =
+          groupItemByWalletId(sortedItems);
 
-      final groupsMap = <int, GroupData>{};
+      final walletsMap = <int, WalletData>{};
       double totalValue = 0;
-      for (final group in groupList) {
-        final double groupValue;
-        if (groupedItems[group.id] != null) {
-          groupValue = groupedItems[group.id]!
+      for (final wallet in walletsList) {
+        final double walletValue;
+        if (groupedItems[wallet.id] != null) {
+          walletValue = groupedItems[wallet.id]!
               .fold(0, (a, b) => a + (b.price * b.quantity));
         } else {
-          groupValue = 0;
+          walletValue = 0;
         }
 
-        totalValue += groupValue;
+        totalValue += walletValue;
 
-        groupsMap[group.id] = GroupData(group, groupValue);
+        walletsMap[wallet.id] = WalletData(wallet, walletValue);
       }
 
       final Map<int, Color> colors =
-          getColorByQuantile(groupedItems, groupsMap, sortedItems);
+          getColorByQuantile(groupedItems, walletsMap, sortedItems);
 
       final allItemData = sortedItems
           .map((d) => ItemData(
                 item: d,
-                colorName: groupsMap[d.groupId]!.colorName,
+                colorName: walletsMap[d.walletId]!.colorName,
                 color: colors[d.id]!,
               ))
           .toList();
 
       // Keep the Groups sorted, so the front can just display them.
-      final List<GroupData> sortedGroupsList;
+      final List<WalletData> sortedWalletsList;
       if (settings.sortBy == 0) {
-        sortedGroupsList = groupsMap.values.toList()
+        sortedWalletsList = walletsMap.values.toList()
           ..sort((a, b) => b.totalValue.compareTo(a.totalValue));
       } else {
-        sortedGroupsList = groupsMap.values.toList()
+        sortedWalletsList = walletsMap.values.toList()
           ..sort((a, b) => a.name.compareTo(b.name));
       }
 
-      final LinkedHashMap<int, GroupData> sortedGroupsMap = LinkedHashMap();
+      final LinkedHashMap<int, WalletData> sortedWalletsMap = LinkedHashMap();
 
-      for (var group in sortedGroupsList) {
-        sortedGroupsMap[group.id] = group;
+      for (var group in sortedWalletsList) {
+        sortedWalletsMap[group.id] = group;
       }
 
       final Map<int, List<ItemData>> groupedItemData =
-          groupItemDataByGroupID(allItemData);
+          groupItemDataByWalletId(allItemData);
 
       return FullData(
         userId: userId,
         totalValue: totalValue,
         allItems: allItemData,
-        groupedItems: groupedItemData,
-        groupsMap: sortedGroupsMap,
+        walletsItems: groupedItemData,
+        walletsMap: sortedWalletsMap,
         settings: settings,
       );
     });
@@ -236,33 +230,33 @@ class Database extends _$Database {
 //       return FullDataExtended(groupedData, colors, sortedData);
 //     });
 
-  Map<int, List<Item>> groupItemByGroupID(List<Item> itemList) {
+  Map<int, List<Item>> groupItemByWalletId(List<Item> itemList) {
     final groupedList = <int, List<Item>>{};
 
     for (int i = 0; i < itemList.length; i++) {
-      final groupId = itemList[i].groupId;
+      final walletId = itemList[i].walletId;
 
-      if (groupedList[groupId] != null) {
-        groupedList[groupId]!.add(itemList[i]);
+      if (groupedList[walletId] != null) {
+        groupedList[walletId]!.add(itemList[i]);
       } else {
-        groupedList[groupId] = [itemList[i]];
+        groupedList[walletId] = [itemList[i]];
       }
     }
 
     return groupedList;
   }
 
-  Map<int, List<ItemData>> groupItemDataByGroupID(List<ItemData> itemList) {
+  Map<int, List<ItemData>> groupItemDataByWalletId(List<ItemData> itemList) {
     final groupedList = <int, List<ItemData>>{};
 
     for (int i = 0; i < itemList.length; i++) {
-      final groupId = itemList[i].groupId;
+      final walletId = itemList[i].walletId;
 
-      final groupPosition = groupedList[groupId];
+      final groupPosition = groupedList[walletId];
       if (groupPosition != null) {
         groupPosition.add(itemList[i]);
       } else {
-        groupedList[groupId] = [itemList[i]];
+        groupedList[walletId] = [itemList[i]];
       }
     }
 
@@ -307,7 +301,7 @@ class Database extends _$Database {
     required String colorName,
     required double targetPercent,
   }) {
-    return into(groups).insert(GroupsCompanion.insert(
+    return into(wallets).insert(WalletsCompanion.insert(
       userId: id,
       name: name,
       colorName: colorName,
@@ -315,19 +309,19 @@ class Database extends _$Database {
     ));
   }
 
-  Future<bool> editGroup(Group group) {
-    return update(groups).replace(group);
+  Future<bool> editWallet(Wallet group) {
+    return update(wallets).replace(group);
   }
 
   Future<int> createItem({
-    required int groupId,
+    required int walletId,
     required int userId,
     required String name,
     required String value,
     required String target,
   }) {
     return into(items).insert(ItemsCompanion.insert(
-      groupId: groupId,
+      walletId: walletId,
       userId: userId,
       name: name,
       quantity: 1,
@@ -349,20 +343,20 @@ class Database extends _$Database {
     ));
   }
 
-  Future<bool> updateItemGroup({
+  Future<bool> updateItemWallet({
     required Item item,
-    required int groupId,
+    required int walletId,
   }) {
-    return update(items).replace(item.copyWith(groupId: groupId));
+    return update(items).replace(item.copyWith(walletId: walletId));
   }
 
   Future<int> deleteItem(Item item) {
     return (delete(items)..where((t) => t.id.equals(item.id))).go();
   }
 
-  Future<void> deleteGroup(int groupId) async {
-    await (delete(items)..where((t) => t.groupId.equals(groupId))).go();
-    await (delete(groups)..where((t) => t.id.equals(groupId))).go();
+  Future<void> deleteWallet(int walletId) async {
+    await (delete(items)..where((t) => t.walletId.equals(walletId))).go();
+    await (delete(wallets)..where((t) => t.id.equals(walletId))).go();
   }
 
   Future<int> getDefaultUser() async => (await select(users).get())[0].id;

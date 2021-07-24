@@ -18,8 +18,7 @@ environment:
   sdk: ">=2.13.0 <3.0.0"
 
 dependencies:
-  animations: ^2.0.0
-  beamer: ^0.14.1
+  animations: ^2.0.1
   equatable: ^2.0.3
   flutter:
     sdk: flutter
@@ -28,22 +27,27 @@ dependencies:
   flutter_bloc: ^7.0.1
   google_fonts: ^2.1.0
   intl: ^0.17.0
-  moor: ^4.3.2
+  moor: ^4.4.1
   moor_flutter: ^4.0.0
   path_provider: ^2.0.2
   path: ^1.8.0
   rxdart: ^0.27.1
   sqlite3_flutter_libs: ^0.5.0
   storybook_flutter: ^0.5.0+1
-  flutter_multi_formatter: ^2.2.0
+  flutter_multi_formatter: ^2.3.2
   shared_preferences: ^2.0.6
   rx_shared_preferences: ^2.1.0
-  fl_chart: ^0.36.2
+  fl_chart: ^0.36.3
+  beamer:
+    git:
+      url: https://github.com/slovnicki/beamer.git
+      ref: 42f29467b3e24b2c703b542d9889f83fc6f41da2
+      path: package
 
 dev_dependencies:
-  moor_generator: ^4.3.1
-  build_runner: ^2.0.5
-  flutter_lints: ^1.0.3
+  moor_generator: ^4.4.1
+  build_runner: ^2.0.6
+  flutter_lints: ^1.0.4
   flutter_test:
     sdk: flutter
 

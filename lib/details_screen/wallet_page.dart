@@ -11,33 +11,33 @@ import '../util/tailwind_colors.dart';
 import '../widgets/color_picker.dart';
 import '../widgets/dialog_screen_base.dart';
 
-class CRUDGroupPage extends StatefulWidget {
-  final GroupData? previousGroup;
+class CRUDWalletPage extends StatefulWidget {
+  final WalletData? previousWallet;
   final int userId;
 
-  const CRUDGroupPage({
+  const CRUDWalletPage({
     required this.userId,
-    this.previousGroup,
+    this.previousWallet,
     Key? key,
   }) : super(key: key);
 
   @override
-  _CRUDGroupPageState createState() => _CRUDGroupPageState();
+  _CRUDWalletPageState createState() => _CRUDWalletPageState();
 }
 
-class _CRUDGroupPageState extends State<CRUDGroupPage> {
+class _CRUDWalletPageState extends State<CRUDWalletPage> {
   final _formKey = GlobalKey<FormState>();
 
-  late String colorName = widget.previousGroup?.colorName ??
+  late String colorName = widget.previousWallet?.colorName ??
       tailwindColorsNames[Random().nextInt(tailwindColorsNames.length)];
 
   late final TextEditingController nameEditingController =
-      TextEditingController(text: widget.previousGroup?.name);
+      TextEditingController(text: widget.previousWallet?.name);
 
   late final TextEditingController targetEditingController =
-      (widget.previousGroup?.targetPercent != -1)
+      (widget.previousWallet?.targetPercent != -1)
           ? TextEditingController(
-              text: widget.previousGroup?.targetPercent.toInt().toString())
+              text: widget.previousWallet?.targetPercent.toInt().toString())
           : TextEditingController();
 
   @override
@@ -53,14 +53,12 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
     final primaryColorWeaker = getPrimaryColorWeaker(context, colorName);
     final backgroundDialogColor = getBackgroundDialogColor(context, colorName);
 
-    print("target is ${widget.previousGroup?.targetPercent}");
-
     return Form(
       key: _formKey,
       child: DialogScreenBase(
-        appBarTitle: widget.previousGroup == null
-            ? AppLocalizations.of(context).addAGroup
-            : AppLocalizations.of(context).editGroup,
+        appBarTitle: widget.previousWallet == null
+            ? AppLocalizations.of(context).addAWallet
+            : AppLocalizations.of(context).editWallet,
         backgroundDialogColor: backgroundDialogColor,
         colorName: colorName,
         children: [
@@ -178,7 +176,7 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
             icon: const Icon(Icons.check_rounded),
             onPressed: onSubmit,
           ),
-          if (widget.previousGroup != null) ...[
+          if (widget.previousWallet != null) ...[
             const SizedBox(height: 8),
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(primary: primaryColor),
@@ -203,7 +201,7 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
     if (_formKey.currentState!.validate()) {
       context.read<DataCubit>().db;
 
-      if (widget.previousGroup == null) {
+      if (widget.previousWallet == null) {
         BlocProvider.of<DataCubit>(context).db.createGroup(
               id: widget.userId,
               name: nameEditingController.text,
@@ -212,8 +210,8 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
                   double.tryParse(targetEditingController.text) ?? -1,
             );
       } else {
-        context.read<DataCubit>().db.editGroup(
-              widget.previousGroup!.copyWith(
+        context.read<DataCubit>().db.editWallet(
+              widget.previousWallet!.copyWith(
                 name: nameEditingController.text,
                 colorName: colorName,
                 targetPercent:
@@ -227,7 +225,7 @@ class _CRUDGroupPageState extends State<CRUDGroupPage> {
   }
 
   void onDelete() {
-    context.read<DataCubit>().db.deleteGroup(widget.previousGroup!.id);
+    context.read<DataCubit>().db.deleteWallet(widget.previousWallet!.id);
     Navigator.of(context).pop();
   }
 }

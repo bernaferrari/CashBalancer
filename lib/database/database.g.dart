@@ -127,34 +127,29 @@ class UsersCompanion extends UpdateCompanion<User> {
 class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   final GeneratedDatabase _db;
   final String? _alias;
-  $UsersTable(this._db, [this._alias]);
-  final VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedIntColumn id = _constructId();
-  GeneratedIntColumn _constructId() {
-    return GeneratedIntColumn('id', $tableName, false,
-        hasAutoIncrement: true, declaredAsPrimaryKey: true);
-  }
 
+  $UsersTable(this._db, [this._alias]);
+
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
+      'id', aliasedName, false,
+      typeName: 'INTEGER',
+      requiredDuringInsert: false,
+      defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
-  late final GeneratedTextColumn name = _constructName();
-  GeneratedTextColumn _constructName() {
-    return GeneratedTextColumn(
-      'name',
-      $tableName,
-      false,
-    );
-  }
+  late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
+      'name', aliasedName, false,
+      typeName: 'TEXT', requiredDuringInsert: true);
 
   @override
   List<GeneratedColumn> get $columns => [id, name];
+
   @override
-  $UsersTable get asDslTable => this;
+  String get aliasedName => _alias ?? 'users';
+
   @override
-  String get $tableName => _alias ?? 'users';
-  @override
-  final String actualTableName = 'users';
+  String get actualTableName => 'users';
+
   @override
   VerificationContext validateIntegrity(Insertable<User> instance,
       {bool isInserting = false}) {
@@ -186,22 +181,24 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   }
 }
 
-class Group extends DataClass implements Insertable<Group> {
+class Wallet extends DataClass implements Insertable<Wallet> {
   final int id;
   final int userId;
   final String name;
   final String colorName;
   final double targetPercent;
-  Group(
+
+  Wallet(
       {required this.id,
       required this.userId,
       required this.name,
       required this.colorName,
       required this.targetPercent});
-  factory Group.fromData(Map<String, dynamic> data, GeneratedDatabase db,
+
+  factory Wallet.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String? prefix}) {
     final effectivePrefix = prefix ?? '';
-    return Group(
+    return Wallet(
       id: const IntType()
           .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
       userId: const IntType()
@@ -225,8 +222,8 @@ class Group extends DataClass implements Insertable<Group> {
     return map;
   }
 
-  GroupsCompanion toCompanion(bool nullToAbsent) {
-    return GroupsCompanion(
+  WalletsCompanion toCompanion(bool nullToAbsent) {
+    return WalletsCompanion(
       id: Value(id),
       userId: Value(userId),
       name: Value(name),
@@ -235,10 +232,10 @@ class Group extends DataClass implements Insertable<Group> {
     );
   }
 
-  factory Group.fromJson(Map<String, dynamic> json,
+  factory Wallet.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= moorRuntimeOptions.defaultSerializer;
-    return Group(
+    return Wallet(
       id: serializer.fromJson<int>(json['id']),
       userId: serializer.fromJson<int>(json['userId']),
       name: serializer.fromJson<String>(json['name']),
@@ -258,13 +255,13 @@ class Group extends DataClass implements Insertable<Group> {
     };
   }
 
-  Group copyWith(
+  Wallet copyWith(
           {int? id,
           int? userId,
           String? name,
           String? colorName,
           double? targetPercent}) =>
-      Group(
+      Wallet(
         id: id ?? this.id,
         userId: userId ?? this.userId,
         name: name ?? this.name,
@@ -273,7 +270,7 @@ class Group extends DataClass implements Insertable<Group> {
       );
   @override
   String toString() {
-    return (StringBuffer('Group(')
+    return (StringBuffer('Wallet(')
           ..write('id: $id, ')
           ..write('userId: $userId, ')
           ..write('name: $name, ')
@@ -293,7 +290,7 @@ class Group extends DataClass implements Insertable<Group> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Group &&
+          (other is Wallet &&
           other.id == this.id &&
           other.userId == this.userId &&
           other.name == this.name &&
@@ -301,20 +298,22 @@ class Group extends DataClass implements Insertable<Group> {
           other.targetPercent == this.targetPercent);
 }
 
-class GroupsCompanion extends UpdateCompanion<Group> {
+class WalletsCompanion extends UpdateCompanion<Wallet> {
   final Value<int> id;
   final Value<int> userId;
   final Value<String> name;
   final Value<String> colorName;
   final Value<double> targetPercent;
-  const GroupsCompanion({
+
+  const WalletsCompanion({
     this.id = const Value.absent(),
     this.userId = const Value.absent(),
     this.name = const Value.absent(),
     this.colorName = const Value.absent(),
     this.targetPercent = const Value.absent(),
   });
-  GroupsCompanion.insert({
+
+  WalletsCompanion.insert({
     this.id = const Value.absent(),
     required int userId,
     required String name,
@@ -324,7 +323,8 @@ class GroupsCompanion extends UpdateCompanion<Group> {
         name = Value(name),
         colorName = Value(colorName),
         targetPercent = Value(targetPercent);
-  static Insertable<Group> custom({
+
+  static Insertable<Wallet> custom({
     Expression<int>? id,
     Expression<int>? userId,
     Expression<String>? name,
@@ -340,13 +340,13 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     });
   }
 
-  GroupsCompanion copyWith(
+  WalletsCompanion copyWith(
       {Value<int>? id,
       Value<int>? userId,
       Value<String>? name,
       Value<String>? colorName,
       Value<double>? targetPercent}) {
-    return GroupsCompanion(
+    return WalletsCompanion(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       name: name ?? this.name,
@@ -378,7 +378,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
 
   @override
   String toString() {
-    return (StringBuffer('GroupsCompanion(')
+    return (StringBuffer('WalletsCompanion(')
           ..write('id: $id, ')
           ..write('userId: $userId, ')
           ..write('name: $name, ')
@@ -389,74 +389,48 @@ class GroupsCompanion extends UpdateCompanion<Group> {
   }
 }
 
-class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
+class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
   final GeneratedDatabase _db;
   final String? _alias;
-  $GroupsTable(this._db, [this._alias]);
+
+  $WalletsTable(this._db, [this._alias]);
+
   final VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedIntColumn id = _constructId();
-  GeneratedIntColumn _constructId() {
-    return GeneratedIntColumn('id', $tableName, false,
-        hasAutoIncrement: true, declaredAsPrimaryKey: true);
-  }
-
+  late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
+      'id', aliasedName, false,
+      typeName: 'INTEGER',
+      requiredDuringInsert: false,
+      defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _userIdMeta = const VerificationMeta('userId');
-  @override
-  late final GeneratedIntColumn userId = _constructUserId();
-  GeneratedIntColumn _constructUserId() {
-    return GeneratedIntColumn(
-      'user_id',
-      $tableName,
-      false,
-    );
-  }
-
+  late final GeneratedColumn<int?> userId = GeneratedColumn<int?>(
+      'user_id', aliasedName, false,
+      typeName: 'INTEGER', requiredDuringInsert: true);
   final VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
-  late final GeneratedTextColumn name = _constructName();
-  GeneratedTextColumn _constructName() {
-    return GeneratedTextColumn(
-      'name',
-      $tableName,
-      false,
-    );
-  }
-
+  late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
+      'name', aliasedName, false,
+      typeName: 'TEXT', requiredDuringInsert: true);
   final VerificationMeta _colorNameMeta = const VerificationMeta('colorName');
-  @override
-  late final GeneratedTextColumn colorName = _constructColorName();
-  GeneratedTextColumn _constructColorName() {
-    return GeneratedTextColumn(
-      'color_name',
-      $tableName,
-      false,
-    );
-  }
-
+  late final GeneratedColumn<String?> colorName = GeneratedColumn<String?>(
+      'color_name', aliasedName, false,
+      typeName: 'TEXT', requiredDuringInsert: true);
   final VerificationMeta _targetPercentMeta =
       const VerificationMeta('targetPercent');
-  @override
-  late final GeneratedRealColumn targetPercent = _constructTargetPercent();
-  GeneratedRealColumn _constructTargetPercent() {
-    return GeneratedRealColumn(
-      'target_percent',
-      $tableName,
-      false,
-    );
-  }
+  late final GeneratedColumn<double?> targetPercent = GeneratedColumn<double?>(
+      'target_percent', aliasedName, false,
+      typeName: 'REAL', requiredDuringInsert: true);
 
   @override
   List<GeneratedColumn> get $columns =>
       [id, userId, name, colorName, targetPercent];
+
   @override
-  $GroupsTable get asDslTable => this;
+  String get aliasedName => _alias ?? 'wallets';
+
   @override
-  String get $tableName => _alias ?? '"groups"';
+  String get actualTableName => 'wallets';
+
   @override
-  final String actualTableName = '"groups"';
-  @override
-  VerificationContext validateIntegrity(Insertable<Group> instance,
+  VerificationContext validateIntegrity(Insertable<Wallet> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -494,29 +468,31 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
+
   @override
-  Group map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return Group.fromData(data, _db,
+  Wallet map(Map<String, dynamic> data, {String? tablePrefix}) {
+    return Wallet.fromData(data, _db,
         prefix: tablePrefix != null ? '$tablePrefix.' : null);
   }
 
   @override
-  $GroupsTable createAlias(String alias) {
-    return $GroupsTable(_db, alias);
+  $WalletsTable createAlias(String alias) {
+    return $WalletsTable(_db, alias);
   }
 }
 
 class Item extends DataClass implements Insertable<Item> {
   final int id;
-  final int groupId;
+  final int walletId;
   final int userId;
   final String name;
   final double quantity;
   final double price;
   final double targetPercent;
+
   Item(
       {required this.id,
-      required this.groupId,
+      required this.walletId,
       required this.userId,
       required this.name,
       required this.quantity,
@@ -528,8 +504,8 @@ class Item extends DataClass implements Insertable<Item> {
     return Item(
       id: const IntType()
           .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      groupId: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}group_id'])!,
+      walletId: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}wallet_id'])!,
       userId: const IntType()
           .mapFromDatabaseResponse(data['${effectivePrefix}user_id'])!,
       name: const StringType()
@@ -546,7 +522,7 @@ class Item extends DataClass implements Insertable<Item> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['group_id'] = Variable<int>(groupId);
+    map['wallet_id'] = Variable<int>(walletId);
     map['user_id'] = Variable<int>(userId);
     map['name'] = Variable<String>(name);
     map['quantity'] = Variable<double>(quantity);
@@ -558,7 +534,7 @@ class Item extends DataClass implements Insertable<Item> {
   ItemsCompanion toCompanion(bool nullToAbsent) {
     return ItemsCompanion(
       id: Value(id),
-      groupId: Value(groupId),
+      walletId: Value(walletId),
       userId: Value(userId),
       name: Value(name),
       quantity: Value(quantity),
@@ -572,7 +548,7 @@ class Item extends DataClass implements Insertable<Item> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return Item(
       id: serializer.fromJson<int>(json['id']),
-      groupId: serializer.fromJson<int>(json['groupId']),
+      walletId: serializer.fromJson<int>(json['walletId']),
       userId: serializer.fromJson<int>(json['userId']),
       name: serializer.fromJson<String>(json['name']),
       quantity: serializer.fromJson<double>(json['quantity']),
@@ -585,7 +561,7 @@ class Item extends DataClass implements Insertable<Item> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'groupId': serializer.toJson<int>(groupId),
+      'walletId': serializer.toJson<int>(walletId),
       'userId': serializer.toJson<int>(userId),
       'name': serializer.toJson<String>(name),
       'quantity': serializer.toJson<double>(quantity),
@@ -596,7 +572,7 @@ class Item extends DataClass implements Insertable<Item> {
 
   Item copyWith(
           {int? id,
-          int? groupId,
+          int? walletId,
           int? userId,
           String? name,
           double? quantity,
@@ -604,7 +580,7 @@ class Item extends DataClass implements Insertable<Item> {
           double? targetPercent}) =>
       Item(
         id: id ?? this.id,
-        groupId: groupId ?? this.groupId,
+        walletId: walletId ?? this.walletId,
         userId: userId ?? this.userId,
         name: name ?? this.name,
         quantity: quantity ?? this.quantity,
@@ -614,8 +590,8 @@ class Item extends DataClass implements Insertable<Item> {
   @override
   String toString() {
     return (StringBuffer('Item(')
-          ..write('id: $id, ')
-          ..write('groupId: $groupId, ')
+      ..write('id: $id, ')
+          ..write('walletId: $walletId, ')
           ..write('userId: $userId, ')
           ..write('name: $name, ')
           ..write('quantity: $quantity, ')
@@ -629,7 +605,7 @@ class Item extends DataClass implements Insertable<Item> {
   int get hashCode => $mrjf($mrjc(
       id.hashCode,
       $mrjc(
-          groupId.hashCode,
+          walletId.hashCode,
           $mrjc(
               userId.hashCode,
               $mrjc(
@@ -641,7 +617,7 @@ class Item extends DataClass implements Insertable<Item> {
       identical(this, other) ||
       (other is Item &&
           other.id == this.id &&
-          other.groupId == this.groupId &&
+          other.walletId == this.walletId &&
           other.userId == this.userId &&
           other.name == this.name &&
           other.quantity == this.quantity &&
@@ -651,30 +627,32 @@ class Item extends DataClass implements Insertable<Item> {
 
 class ItemsCompanion extends UpdateCompanion<Item> {
   final Value<int> id;
-  final Value<int> groupId;
+  final Value<int> walletId;
   final Value<int> userId;
   final Value<String> name;
   final Value<double> quantity;
   final Value<double> price;
   final Value<double> targetPercent;
+
   const ItemsCompanion({
     this.id = const Value.absent(),
-    this.groupId = const Value.absent(),
+    this.walletId = const Value.absent(),
     this.userId = const Value.absent(),
     this.name = const Value.absent(),
     this.quantity = const Value.absent(),
     this.price = const Value.absent(),
     this.targetPercent = const Value.absent(),
   });
+
   ItemsCompanion.insert({
     this.id = const Value.absent(),
-    required int groupId,
+    required int walletId,
     required int userId,
     required String name,
     required double quantity,
     required double price,
     required double targetPercent,
-  })  : groupId = Value(groupId),
+  })  : walletId = Value(walletId),
         userId = Value(userId),
         name = Value(name),
         quantity = Value(quantity),
@@ -682,7 +660,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
         targetPercent = Value(targetPercent);
   static Insertable<Item> custom({
     Expression<int>? id,
-    Expression<int>? groupId,
+    Expression<int>? walletId,
     Expression<int>? userId,
     Expression<String>? name,
     Expression<double>? quantity,
@@ -691,7 +669,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (groupId != null) 'group_id': groupId,
+      if (walletId != null) 'wallet_id': walletId,
       if (userId != null) 'user_id': userId,
       if (name != null) 'name': name,
       if (quantity != null) 'quantity': quantity,
@@ -702,7 +680,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
 
   ItemsCompanion copyWith(
       {Value<int>? id,
-      Value<int>? groupId,
+      Value<int>? walletId,
       Value<int>? userId,
       Value<String>? name,
       Value<double>? quantity,
@@ -710,7 +688,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
       Value<double>? targetPercent}) {
     return ItemsCompanion(
       id: id ?? this.id,
-      groupId: groupId ?? this.groupId,
+      walletId: walletId ?? this.walletId,
       userId: userId ?? this.userId,
       name: name ?? this.name,
       quantity: quantity ?? this.quantity,
@@ -725,8 +703,8 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
-    if (groupId.present) {
-      map['group_id'] = Variable<int>(groupId.value);
+    if (walletId.present) {
+      map['wallet_id'] = Variable<int>(walletId.value);
     }
     if (userId.present) {
       map['user_id'] = Variable<int>(userId.value);
@@ -749,8 +727,8 @@ class ItemsCompanion extends UpdateCompanion<Item> {
   @override
   String toString() {
     return (StringBuffer('ItemsCompanion(')
-          ..write('id: $id, ')
-          ..write('groupId: $groupId, ')
+      ..write('id: $id, ')
+          ..write('walletId: $walletId, ')
           ..write('userId: $userId, ')
           ..write('name: $name, ')
           ..write('quantity: $quantity, ')
@@ -764,91 +742,51 @@ class ItemsCompanion extends UpdateCompanion<Item> {
 class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   final GeneratedDatabase _db;
   final String? _alias;
+
   $ItemsTable(this._db, [this._alias]);
+
   final VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedIntColumn id = _constructId();
-  GeneratedIntColumn _constructId() {
-    return GeneratedIntColumn('id', $tableName, false,
-        hasAutoIncrement: true, declaredAsPrimaryKey: true);
-  }
-
-  final VerificationMeta _groupIdMeta = const VerificationMeta('groupId');
-  @override
-  late final GeneratedIntColumn groupId = _constructGroupId();
-  GeneratedIntColumn _constructGroupId() {
-    return GeneratedIntColumn(
-      'group_id',
-      $tableName,
-      false,
-    );
-  }
-
+  late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
+      'id', aliasedName, false,
+      typeName: 'INTEGER',
+      requiredDuringInsert: false,
+      defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
+  final VerificationMeta _walletIdMeta = const VerificationMeta('walletId');
+  late final GeneratedColumn<int?> walletId = GeneratedColumn<int?>(
+      'wallet_id', aliasedName, false,
+      typeName: 'INTEGER', requiredDuringInsert: true);
   final VerificationMeta _userIdMeta = const VerificationMeta('userId');
-  @override
-  late final GeneratedIntColumn userId = _constructUserId();
-  GeneratedIntColumn _constructUserId() {
-    return GeneratedIntColumn(
-      'user_id',
-      $tableName,
-      false,
-    );
-  }
-
+  late final GeneratedColumn<int?> userId = GeneratedColumn<int?>(
+      'user_id', aliasedName, false,
+      typeName: 'INTEGER', requiredDuringInsert: true);
   final VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
-  late final GeneratedTextColumn name = _constructName();
-  GeneratedTextColumn _constructName() {
-    return GeneratedTextColumn(
-      'name',
-      $tableName,
-      false,
-    );
-  }
-
+  late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
+      'name', aliasedName, false,
+      typeName: 'TEXT', requiredDuringInsert: true);
   final VerificationMeta _quantityMeta = const VerificationMeta('quantity');
-  @override
-  late final GeneratedRealColumn quantity = _constructQuantity();
-  GeneratedRealColumn _constructQuantity() {
-    return GeneratedRealColumn(
-      'quantity',
-      $tableName,
-      false,
-    );
-  }
-
+  late final GeneratedColumn<double?> quantity = GeneratedColumn<double?>(
+      'quantity', aliasedName, false,
+      typeName: 'REAL', requiredDuringInsert: true);
   final VerificationMeta _priceMeta = const VerificationMeta('price');
-  @override
-  late final GeneratedRealColumn price = _constructPrice();
-  GeneratedRealColumn _constructPrice() {
-    return GeneratedRealColumn(
-      'price',
-      $tableName,
-      false,
-    );
-  }
-
+  late final GeneratedColumn<double?> price = GeneratedColumn<double?>(
+      'price', aliasedName, false,
+      typeName: 'REAL', requiredDuringInsert: true);
   final VerificationMeta _targetPercentMeta =
       const VerificationMeta('targetPercent');
-  @override
-  late final GeneratedRealColumn targetPercent = _constructTargetPercent();
-  GeneratedRealColumn _constructTargetPercent() {
-    return GeneratedRealColumn(
-      'target_percent',
-      $tableName,
-      false,
-    );
-  }
+  late final GeneratedColumn<double?> targetPercent = GeneratedColumn<double?>(
+      'target_percent', aliasedName, false,
+      typeName: 'REAL', requiredDuringInsert: true);
 
   @override
   List<GeneratedColumn> get $columns =>
-      [id, groupId, userId, name, quantity, price, targetPercent];
+      [id, walletId, userId, name, quantity, price, targetPercent];
+
   @override
-  $ItemsTable get asDslTable => this;
+  String get aliasedName => _alias ?? 'items';
+
   @override
-  String get $tableName => _alias ?? 'items';
-  @override
-  final String actualTableName = 'items';
+  String get actualTableName => 'items';
+
   @override
   VerificationContext validateIntegrity(Insertable<Item> instance,
       {bool isInserting = false}) {
@@ -857,11 +795,11 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('group_id')) {
-      context.handle(_groupIdMeta,
-          groupId.isAcceptableOrUnknown(data['group_id']!, _groupIdMeta));
+    if (data.containsKey('wallet_id')) {
+      context.handle(_walletIdMeta,
+          walletId.isAcceptableOrUnknown(data['wallet_id']!, _walletIdMeta));
     } else if (isInserting) {
-      context.missing(_groupIdMeta);
+      context.missing(_walletIdMeta);
     }
     if (data.containsKey('user_id')) {
       context.handle(_userIdMeta,
@@ -915,16 +853,20 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   late final $UsersTable users = $UsersTable(this);
-  late final $GroupsTable groups = $GroupsTable(this);
+  late final $WalletsTable wallets = $WalletsTable(this);
   late final $ItemsTable items = $ItemsTable(this);
+
   Selectable<int> userExists() {
     return customSelect('SELECT count(1) where exists (select * from users)',
         variables: [],
-        readsFrom: {users}).map((QueryRow row) => row.read<int>('count(1)'));
+        readsFrom: {
+          users,
+        }).map((QueryRow row) => row.read<int>('count(1)'));
   }
 
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
+
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [users, groups, items];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [users, wallets, items];
 }

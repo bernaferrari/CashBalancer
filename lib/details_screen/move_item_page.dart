@@ -13,7 +13,7 @@ class MoveItemPage extends StatefulWidget {
   final ItemData item;
   final double totalValue;
   final DataCubit bloc;
-  final List<GroupData> groups;
+  final List<WalletData> wallets;
   final int userId;
 
   const MoveItemPage(
@@ -21,7 +21,7 @@ class MoveItemPage extends StatefulWidget {
       required this.bloc,
       required this.userId,
       required this.item,
-      required this.groups,
+      required this.wallets,
       Key? key})
       : super(key: key);
 
@@ -31,7 +31,7 @@ class MoveItemPage extends StatefulWidget {
 
 class _MoveItemPageState extends State<MoveItemPage> {
   // late String relativePercentage;
-  late int selectedGroupId = widget.groups.first.id;
+  late int selectedGroupId = widget.wallets.first.id;
 
   late final String colorName = widget.item.colorName;
 
@@ -55,11 +55,11 @@ class _MoveItemPageState extends State<MoveItemPage> {
 
     return DialogScreenBase(
       backgroundDialogColor: backgroundDialogColor,
-      appBarTitle: AppLocalizations.of(context).moveGroup(widget.item.name),
+      appBarTitle: AppLocalizations.of(context).moveWallet(widget.item.name),
       colorName: colorName,
       children: [
         const SizedBox(height: 24),
-        for (final group in widget.groups)
+        for (final group in widget.wallets)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: OutlinedButton(
@@ -112,11 +112,11 @@ class _MoveItemPageState extends State<MoveItemPage> {
   }
 
   void onSubmit([String? value]) {
-    widget.bloc.db.updateItemGroup(
+    widget.bloc.db.updateItemWallet(
       item: widget.item,
-      groupId: selectedGroupId,
+      walletId: selectedGroupId,
     );
 
-    Beamer.of(context).beamToNamed('/');
+    Beamer.of(context).popToNamed('/');
   }
 }

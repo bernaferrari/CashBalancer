@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:beamer/beamer.dart';
-import 'package:cash_balancer/details_screen/pie_chart_groups.dart';
+import 'package:cash_balancer/details_screen/pie_chart_group.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -68,9 +68,9 @@ class DetailsPageImpl extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () =>
-            Beamer.of(context).beamToNamed("/addGroup/${data.userId}"),
+            Beamer.of(context).beamToNamed("/addWallet/${data.userId}"),
         label: Text(
-          AppLocalizations.of(context).addGroup,
+          AppLocalizations.of(context).addWallet,
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
         ),
         icon: Icon(
@@ -78,7 +78,7 @@ class DetailsPageImpl extends StatelessWidget {
           color: Theme.of(context).colorScheme.onPrimary,
         ),
       ),
-      body: (data.groupsMap.isEmpty == true)
+      body: (data.walletsMap.isEmpty == true)
           ? WhenEmptyCard(
               title: AppLocalizations.of(context).mainEmptyTitle,
               subtitle: AppLocalizations.of(context).mainEmptySubtitle,
@@ -218,9 +218,9 @@ class MainList extends StatelessWidget {
                   ],
                   ...spaceColumn(
                     20,
-                    data.groupsMap.values.map(
+                    data.walletsMap.values.map(
                       (group) => GroupCard(
-                        itemsList: data.groupedItems[group.id],
+                        itemsList: data.walletsItems[group.id],
                         group: group,
                         allTotalValue: data.totalValue,
                         userId: data.userId,
@@ -293,7 +293,7 @@ class VerticalProgressBar extends StatelessWidget {
 
 class GroupCard extends StatelessWidget {
   final List<ItemData>? itemsList;
-  final GroupData group;
+  final WalletData group;
   final int userId;
   final double allTotalValue;
   final SettingsData settings;
@@ -339,7 +339,7 @@ class GroupCard extends StatelessWidget {
           subtitle: "Press + to add.",
           widget: Row(
             children: [
-              EditGroup(color: color, groupId: group.id),
+              EditWallet(color: color, groupId: group.id),
               const SizedBox(width: 8),
               AddItem(color: color, userId: userId, groupId: group.id),
             ],
@@ -363,7 +363,7 @@ class GroupCard extends StatelessWidget {
               widget: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  EditGroup(color: color, groupId: group.id),
+                  EditWallet(color: color, groupId: group.id),
                   const SizedBox(width: 8),
                   AddItem(color: color, userId: userId, groupId: group.id),
                 ],
@@ -482,11 +482,11 @@ class AddItem extends StatelessWidget {
   }
 }
 
-class EditGroup extends StatelessWidget {
+class EditWallet extends StatelessWidget {
   final Color color;
   final int groupId;
 
-  const EditGroup({
+  const EditWallet({
     Key? key,
     required this.color,
     required this.groupId,
@@ -503,7 +503,7 @@ class EditGroup extends StatelessWidget {
         fixedSize: const Size(40, 40),
       ),
       child: const Icon(Icons.edit_rounded),
-      onPressed: () => Beamer.of(context).beamToNamed("/editGroup/$groupId"),
+      onPressed: () => Beamer.of(context).beamToNamed("/editWallet/$groupId"),
     );
   }
 }

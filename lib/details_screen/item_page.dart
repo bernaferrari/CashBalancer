@@ -17,12 +17,12 @@ class CRUDItemPage extends StatefulWidget {
 
   // Only used when previousItem != null.
   final int userId;
-  final int groupId;
+  final int walletId;
 
   const CRUDItemPage({
     required this.colorName,
     required this.totalValue,
-    required this.groupId,
+    required this.walletId,
     required this.userId,
     this.previousItem,
     Key? key,
@@ -310,7 +310,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
     if (_formKey.currentState!.validate()) {
       if (widget.previousItem == null) {
         context.read<DataCubit>().db.createItem(
-              groupId: widget.groupId,
+          walletId: widget.walletId,
               userId: widget.userId,
               name: nameEditingController.text,
               value: moneyEditingController.text,
@@ -355,7 +355,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
   Future<void> onSaveAddMore([String? value]) async {
     if (_formKey.currentState!.validate()) {
       context.read<DataCubit>().db.createItem(
-            groupId: widget.groupId,
+        walletId: widget.walletId,
             userId: widget.userId,
             name: nameEditingController.text,
             value: moneyEditingController.text,

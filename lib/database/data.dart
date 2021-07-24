@@ -12,7 +12,7 @@ class ItemData extends Item {
     required this.color,
   }) : super(
           id: item.id,
-          groupId: item.groupId,
+          walletId: item.walletId,
           userId: item.userId,
           name: item.name,
           quantity: item.quantity,
@@ -21,18 +21,18 @@ class ItemData extends Item {
         );
 }
 
-class GroupData extends Group {
+class WalletData extends Wallet {
   final double totalValue;
 
-  GroupData(
-    Group group,
+  WalletData(
+    Wallet wallet,
     this.totalValue,
   ) : super(
-          id: group.id,
-          userId: group.userId,
-          name: group.name,
-          colorName: group.colorName,
-          targetPercent: group.targetPercent,
+          id: wallet.id,
+          userId: wallet.userId,
+          name: wallet.name,
+          colorName: wallet.colorName,
+          targetPercent: wallet.targetPercent,
         );
 }
 
@@ -41,8 +41,8 @@ class FullData {
     required this.userId,
     required this.totalValue,
     required this.allItems,
-    required this.groupedItems,
-    required this.groupsMap,
+    required this.walletsItems,
+    required this.walletsMap,
     required this.settings,
   });
 
@@ -53,11 +53,11 @@ class FullData {
   // List of Items
   final List<ItemData> allItems;
 
-  // groupID -> Items
-  final Map<int, List<ItemData>> groupedItems;
+  // walletID -> Items
+  final Map<int, List<ItemData>> walletsItems;
 
-  // groupID -> Groups
-  final Map<int, GroupData> groupsMap;
+  // walletID -> Groups
+  final Map<int, WalletData> walletsMap;
 }
 
 class SettingsData {

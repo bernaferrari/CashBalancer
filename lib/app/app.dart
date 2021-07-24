@@ -11,153 +11,183 @@ import 'package:google_fonts/google_fonts.dart';
 import '../blocs/data_bloc.dart';
 import '../database/database.dart';
 import '../details_screen/details_page.dart';
-import '../details_screen/group_page.dart';
 import '../details_screen/item_page.dart';
 import '../details_screen/move_item_page.dart';
+import '../details_screen/wallet_page.dart';
 import '../l10n/l10n.dart';
 import '../settings/settings_page.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/dialog_screen_base.dart';
 
+final simpleBuilder = SimpleLocationBuilder(routes: {
+  '/': (context, state) {
+    return const BeamPage(
+      key: ValueKey('home'),
+      title: 'Cash Balancer',
+      child: DetailsPage(),
+    );
+  },
+  '/settings': (context, state) => BeamerMaterialTransitionPage(
+        key: const ValueKey('settings'),
+        title: 'Settings',
+        child: const SettingsPage(),
+        popToNamed: '/',
+        fillColor: getScaffoldDialogBackgroundColor(context, 'warmGray'),
+      ),
+  '/analysis': (context, state) => BeamerMaterialTransitionPage(
+        key: const ValueKey('analysis'),
+        title: 'Analysis',
+        child: const AnalysisPage(),
+        popToNamed: '/',
+        fillColor: getScaffoldDialogBackgroundColor(context, 'warmGray'),
+      ),
+  '/addWallet/:userId': (context, state) {
+    final beamState = context.currentBeamLocation.state as BeamState;
+
+    final userId = int.tryParse(beamState.pathParameters['userId'] ?? '');
+    if (userId == null) {
+      return const ErrorPage();
+    }
+
+    final state = context.read<DataCubit>().state;
+    if (state != null) {
+      return BeamerMaterialTransitionPage(
+        key: ValueKey('addWallet-$userId'),
+        title: AppLocalizations.of(context).addWallet,
+        child: CRUDWalletPage(userId: state.userId),
+        popToNamed: '/',
+      );
+    } else {
+      return beamerLoadingPage();
+    }
+  },
+  '/editWallet/:walletId': (context, state) {
+    final beamState = context.currentBeamLocation.state as BeamState;
+    final walletId = int.tryParse(beamState.pathParameters['walletId'] ?? '');
+
+    if (walletId == null) {
+      return const ErrorPage();
+    }
+
+    final state = context.read<DataCubit>().state;
+    if (state != null) {
+      final String colorName = state.walletsMap[walletId]!.colorName;
+
+      return BeamerMaterialTransitionPage(
+        key: ValueKey('editWallet-$walletId'),
+        title: AppLocalizations.of(context).editWallet,
+        child: CRUDWalletPage(
+          userId: state.userId,
+          previousWallet: state.walletsMap[walletId]!,
+        ),
+        fillColor: getScaffoldDialogBackgroundColor(context, colorName),
+      );
+    } else {
+      return beamerLoadingPage();
+    }
+  },
+  '/addItem/:walletId/:userId': (context, state) {
+    final beamState = context.currentBeamLocation.state as BeamState;
+    final walletId = int.tryParse(beamState.pathParameters['walletId'] ?? '');
+    final userId = int.tryParse(beamState.pathParameters['userId'] ?? '');
+
+    if (walletId == null || userId == null) {
+      return const ErrorPage();
+    }
+
+    final state = context.read<DataCubit>().state;
+    if (state != null) {
+      final String colorName = state.walletsMap[walletId]!.colorName;
+
+      // Widgets and BeamPages can be mixed!
+      return BeamerMaterialTransitionPage(
+        key: ValueKey('addItem-$walletId$userId'),
+        title: 'Add Item',
+        child: CRUDItemPage(
+          userId: state.userId,
+          previousItem: null,
+          colorName: colorName,
+          walletId: walletId,
+          totalValue: state.totalValue,
+        ),
+        fillColor: getScaffoldDialogBackgroundColor(context, colorName),
+      );
+    } else {
+      return beamerLoadingPage();
+    }
+  },
+  '/editItem/:itemId': (context, state) {
+    final beamState = context.currentBeamLocation.state as BeamState;
+    final itemId = int.tryParse(beamState.pathParameters['itemId'] ?? '');
+
+    if (itemId == null) {
+      return const ErrorPage();
+    }
+
+    final state = context.read<DataCubit>().state;
+    if (state != null && state.allItems.isNotEmpty) {
+      final previousItem =
+          state.allItems.firstWhere((element) => element.id == itemId);
+
+      return BeamerMaterialTransitionPage(
+        key: ValueKey('item-$itemId'),
+        title: 'Edit Item',
+        child: CRUDItemPage(
+          userId: state.userId,
+          previousItem: previousItem,
+          colorName: previousItem.colorName,
+          walletId: previousItem.walletId,
+          totalValue: state.totalValue,
+        ),
+        fillColor:
+            getScaffoldDialogBackgroundColor(context, previousItem.colorName),
+      );
+    } else if (state == null) {
+      return beamerLoadingPage();
+    }
+  },
+  '/moveItem/:itemId': (context, state) {
+    final beamState = context.currentBeamLocation.state as BeamState;
+    final itemId = int.tryParse(beamState.pathParameters['itemId'] ?? '');
+
+    if (itemId == null) {
+      return const ErrorPage();
+    }
+
+    final state = context.read<DataCubit>().state;
+
+    if (state != null && state.allItems.isNotEmpty) {
+      final item = state.allItems.firstWhere((element) => element.id == itemId);
+
+      return BeamerMaterialTransitionPage(
+        key: ValueKey('moveItem-$itemId'),
+        title: 'Move Item',
+        popToNamed: '/editItem/$itemId',
+        child: MoveItemPage(
+          userId: state.userId,
+          item: item,
+          wallets: state.walletsMap.values.toList(),
+          bloc: context.read<DataCubit>(),
+          totalValue: state.totalValue,
+        ),
+        fillColor: getScaffoldDialogBackgroundColor(context, item.colorName),
+      );
+    } else if (state == null) {
+      return beamerLoadingPage();
+    }
+  }
+});
+
 class App extends StatelessWidget {
   App({Key? key}) : super(key: key);
 
   final _routerDelegate = BeamerDelegate(
-    locationBuilder: SimpleLocationBuilder(routes: {
-      '/': (context, state) => BeamPage(
-            key: const ValueKey('home'),
-            title: 'Cash Balancer',
-            child: const DetailsPage(),
-          ),
-      '/settings': (context, state) => BeamerMaterialTransitionPage(
-            key: const ValueKey('settings'),
-            title: 'Settings',
-            child: const SettingsPage(),
-            fillColor: getScaffoldDialogBackgroundColor(context, 'warmGray'),
-          ),
-      '/analysis': (context, state) => BeamerMaterialTransitionPage(
-            key: const ValueKey('analysis'),
-            title: 'Analysis',
-            child: const AnalysisPage(),
-            fillColor: getScaffoldDialogBackgroundColor(context, 'warmGray'),
-          ),
-      '/addGroup/:userId': (context, state) {
-        final beamState = context.currentBeamLocation.state;
-        final userId = int.tryParse(beamState.pathParameters['userId']!)!;
-        final state = context.read<DataCubit>().state;
-        if (state != null) {
-          return BeamerMaterialTransitionPage(
-            key: ValueKey('addGroup-$userId'),
-            title: 'Add Group',
-            child: CRUDGroupPage(userId: state.userId),
-          );
-        } else {
-          return beamerLoadingPage();
-        }
-      },
-      '/editGroup/:groupId': (context, state) {
-        final beamState = context.currentBeamLocation.state;
-        final groupId = int.tryParse(beamState.pathParameters['groupId']!)!;
-
-        final state = context.read<DataCubit>().state;
-        if (state != null) {
-          final String colorName = state.groupsMap[groupId]!.colorName;
-
-          return BeamerMaterialTransitionPage(
-            key: ValueKey('editGroup-$groupId'),
-            title: 'Add Item',
-            child: CRUDGroupPage(
-              userId: state.userId,
-              previousGroup: state.groupsMap[groupId]!,
-            ),
-            fillColor: getScaffoldDialogBackgroundColor(context, colorName),
-          );
-        } else {
-          return beamerLoadingPage();
-        }
-      },
-      '/addItem/:groupId/:userId': (context, state) {
-        final beamState = context.currentBeamLocation.state;
-        final groupId = int.tryParse(beamState.pathParameters['groupId']!)!;
-        final userId = int.tryParse(beamState.pathParameters['userId']!)!;
-
-        final state = context.read<DataCubit>().state;
-        if (state != null) {
-          final String colorName = state.groupsMap[groupId]!.colorName;
-
-          // Widgets and BeamPages can be mixed!
-          return BeamerMaterialTransitionPage(
-            key: ValueKey('addItem-$groupId$userId'),
-            title: 'Add Item',
-            child: CRUDItemPage(
-              userId: state.userId,
-              previousItem: null,
-              colorName: colorName,
-              groupId: groupId,
-              totalValue: state.totalValue,
-            ),
-            fillColor: getScaffoldDialogBackgroundColor(context, colorName),
-          );
-        } else {
-          return beamerLoadingPage();
-        }
-      },
-      '/editItem/:itemId': (context, state) {
-        final beamState = context.currentBeamLocation.state;
-        final itemId = int.tryParse(beamState.pathParameters['itemId']!)!;
-
-        final state = context.read<DataCubit>().state;
-        if (state != null && state.allItems.isNotEmpty) {
-          final previousItem =
-              state.allItems.firstWhere((element) => element.id == itemId);
-
-          return BeamerMaterialTransitionPage(
-            key: ValueKey('item-$itemId'),
-            title: 'Edit Item',
-            child: CRUDItemPage(
-              userId: state.userId,
-              previousItem: previousItem,
-              colorName: previousItem.colorName,
-              groupId: previousItem.groupId,
-              totalValue: state.totalValue,
-            ),
-            fillColor: getScaffoldDialogBackgroundColor(
-                context, previousItem.colorName),
-          );
-        } else if (state == null) {
-          return beamerLoadingPage();
-        }
-      },
-      '/moveItem/:itemId': (context, state) {
-        final beamState = context.currentBeamLocation.state;
-        final itemId = int.tryParse(beamState.pathParameters['itemId']!)!;
-
-        // BlocProvider.of<DataCubit>(context).state;
-        final state = context.read<DataCubit>().state;
-
-        if (state != null && state.allItems.isNotEmpty) {
-          final item =
-              state.allItems.firstWhere((element) => element.id == itemId);
-
-          return BeamerMaterialTransitionPage(
-            key: ValueKey('moveItem-$itemId'),
-            title: 'Move Item',
-            popToNamed: '/editItem/$itemId',
-            child: MoveItemPage(
-              userId: state.userId,
-              item: item,
-              groups: state.groupsMap.values.toList(),
-              bloc: context.read<DataCubit>(),
-              totalValue: state.totalValue,
-            ),
-            fillColor:
-                getScaffoldDialogBackgroundColor(context, item.colorName),
-          );
-        } else if (state == null) {
-          return beamerLoadingPage();
-        }
-      }
-    }),
+    notFoundPage: const BeamPage(
+      key: ValueKey('home'),
+      title: '404',
+      child: ErrorPage(),
+    ),
+    locationBuilder: simpleBuilder,
   );
 
   @override
@@ -282,11 +312,11 @@ BeamPage beamerLoadingPage() {
 class BeamerMaterialTransitionPage extends BeamPage {
   final Color? fillColor;
 
-  BeamerMaterialTransitionPage({
+  const BeamerMaterialTransitionPage({
     LocalKey? key,
     required Widget child,
     String title = 'hello',
-    String popToNamed = '/',
+    String? popToNamed,
     this.fillColor,
   }) : super(
           key: key,
@@ -331,4 +361,33 @@ class SharedAxisPageRoute extends PageRouteBuilder<Object> {
             );
           },
         );
+}
+
+class ErrorPage extends StatelessWidget {
+  const ErrorPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              "404",
+              style: GoogleFonts.ibmPlexMono(fontSize: 44),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              child: const Text("Go to /"),
+              onPressed: () {
+                Beamer.of(context).beamToNamed('/');
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

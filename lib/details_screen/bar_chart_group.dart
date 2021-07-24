@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:beamer/beamer.dart';
 import 'package:cash_balancer/database/data.dart';
 import 'package:cash_balancer/util/row_column_spacer.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,7 @@ class BarChart extends StatelessWidget {
             [
               ...sortedItems.map((item) {
                 return RectangularPercentageWidget(
+                  id: item.id,
                   percent: item.price / maximumPrice,
                   size: 40,
                   backgroundColor: Colors.white.withOpacity(0.15),
@@ -54,6 +56,7 @@ class BarChart extends StatelessWidget {
 class RectangularPercentageWidget extends StatefulWidget {
   const RectangularPercentageWidget({
     Key? key,
+    required this.id,
     this.percent = 0.0,
     this.size = 30,
     this.direction = Axis.horizontal,
@@ -65,6 +68,7 @@ class RectangularPercentageWidget extends StatefulWidget {
     this.progressColor = const Color(0xFFFA7268),
   }) : super(key: key);
 
+  final int id;
   final double percent;
   final double size;
   final Axis direction;
@@ -150,7 +154,8 @@ class _RectangularPercentageWidgetState
           shape: const RoundedRectangleBorder(),
           primary: widget.progressColor,
         ),
-        onPressed: () {},
+        onPressed: () =>
+            Beamer.of(context).beamToNamed('editItem/${widget.id}'),
         child: Flex(
           direction: widget.direction,
           verticalDirection: widget.verticalDirection,

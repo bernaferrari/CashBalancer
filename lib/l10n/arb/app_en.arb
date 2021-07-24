@@ -1,14 +1,14 @@
 {
   "appTitle": "Cash Balancer",
-  "mainFAB": "Add Wallet",
   "mainEmptyTitle": "Add your first wallet.",
   "mainEmptySubtitle": "Tap the + to add a group, where you'll be able to add your cash.",
   "mainDialogValidator": "Please enter some text",
-  "addGroup": "Add Group",
-  "addAGroup": "Add a Group",
-  "editGroup": "Edit a Group",
-  "moveGroup": "Move \"{itemName}\"",
-  "@moveGroup": {
+  "addWallet": "Add Wallet",
+  "addAWallet": "Add a Wallet",
+  "editWallet": "Edit a Wallet",
+  "allItems": "All items",
+  "moveWallet": "Move \"{itemName}\"",
+  "@moveWallet": {
     "description": "Used on dialogs for moving items from one group into another",
     "placeholders": {
       "itemName": {
@@ -32,8 +32,5 @@
   "sortBy": "Sort by",
   "sortBy0": "Value",
   "sortBy1": "Name",
-  "pleaseEnterCurrency": "Please enter the currency ($, €, etc.)",
-  "@counterAppBarTitle": {
-    "description": "Text shown in the AppBar of the Counter Page"
-  }
+  "pleaseEnterCurrency": "Please enter the currency ($, €, etc.)"
 }

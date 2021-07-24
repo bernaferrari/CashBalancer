@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:cash_balancer/details_screen/pie_chart_items.dart';
+import 'package:cash_balancer/details_screen/bar_chart_group.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,14 +41,14 @@ class DetailsPageImpl extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         title: Text(
-          'All Items',
+          AppLocalizations.of(context).allItems,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
       ),
-      body: (data.groupsMap.isEmpty == true)
+      body: (data.walletsMap.isEmpty == true)
           ? WhenEmptyCard(
               title: AppLocalizations.of(context).mainEmptyTitle,
               subtitle: AppLocalizations.of(context).mainEmptySubtitle,
@@ -211,9 +211,9 @@ class ItemsList extends StatelessWidget {
             child: ItemCard(
               sortedItems[i],
               data.settings.relativeTarget
-                  ? data.groupsMap[sortedItems[i].groupId]!.totalValue
+                  ? data.walletsMap[sortedItems[i].walletId]!.totalValue
                   : data.totalValue,
-              data.groupsMap[sortedItems[i].groupId]!.colorName,
+              data.walletsMap[sortedItems[i].walletId]!.colorName,
               data.settings.currencySymbol,
             ),
           ),

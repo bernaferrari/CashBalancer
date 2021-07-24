@@ -9,7 +9,7 @@ void main() {
 
     // Expect everything to be null.
     expect(await db.select(db.users).getSingleOrNull(), null);
-    expect(await db.select(db.groups).getSingleOrNull(), null);
+    expect(await db.select(db.wallets).getSingleOrNull(), null);
     expect(await db.select(db.items).getSingleOrNull(), null);
 
     // Test addDefaultUser
@@ -28,8 +28,8 @@ void main() {
       //   db.items.userId.equalsExp(db.users.id),
       // ),
       leftOuterJoin(
-        db.groups,
-        db.groups.id.equalsExp(db.items.id),
+        db.wallets,
+        db.wallets.id.equalsExp(db.items.id),
       ),
     ]);
 
