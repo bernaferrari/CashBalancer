@@ -29,7 +29,7 @@ class SettingsPage extends StatelessWidget {
             SwitchListTile(
               title: Text(AppLocalizations.of(context).relativeTarget),
               subtitle: Text(
-                "Sum up to 100% in each section, instead of considering all sections.",
+                AppLocalizations.of(context).targetSettings,
                 style: Theme.of(context).textTheme.caption,
               ),
               value: state.settings.relativeTarget,

@@ -1,4 +1,5 @@
 {
+  "@@locale": "pt",
   "appTitle": "Cash Balancer",
   "mainEmptyTitle": "Adicione a sua primeira carteira",
   "mainEmptySubtitle": "Toque no + para adicionar uma carteira, onde você vai poder adicionar os seus ativos.",

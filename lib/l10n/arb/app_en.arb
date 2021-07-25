@@ -1,4 +1,5 @@
 {
+  "@@locale": "en",
   "appTitle": "Cash Balancer",
   "mainEmptyTitle": "Add your first wallet.",
   "mainEmptySubtitle": "Tap the + to add a wallet, where you'll be able to add your assets.",
