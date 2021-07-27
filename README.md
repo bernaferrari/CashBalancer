@@ -6,7 +6,7 @@ It is too hard to balance money across different assets and accounts. Spreadshee
 complex. This app should help you understand your finances without the help of an expert. It works basically as a
 finance calculator for asset allocation: you put what you have, how much you want to have (%), and check the difference.
 
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="80">](https://play.google.com/store/apps/details?id=com.bernaferrari.cash_balancer)
+[<img src="assets/google_play.png" alt="Get it on Google Play" height="60">](https://play.google.com/store/apps/details?id=com.bernaferrari.cash_balancer)
 [<img src="assets/app_store.svg" alt="Download on App Store" height="60">](https://apps.apple.com/us/app/cash-balancer-asset-allocation/id1578127532#?platform=ipad)
 
 
