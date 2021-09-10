@@ -127,31 +127,23 @@ class UsersCompanion extends UpdateCompanion<User> {
 class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   final GeneratedDatabase _db;
   final String? _alias;
-
   $UsersTable(this._db, [this._alias]);
-
   final VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
   late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
       'id', aliasedName, false,
       typeName: 'INTEGER',
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
   late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
       'name', aliasedName, false,
       typeName: 'TEXT', requiredDuringInsert: true);
-
   @override
   List<GeneratedColumn> get $columns => [id, name];
-
   @override
   String get aliasedName => _alias ?? 'users';
-
   @override
   String get actualTableName => 'users';
-
   @override
   VerificationContext validateIntegrity(Insertable<User> instance,
       {bool isInserting = false}) {
@@ -189,14 +181,12 @@ class Wallet extends DataClass implements Insertable<Wallet> {
   final String name;
   final String colorName;
   final double targetPercent;
-
   Wallet(
       {required this.id,
       required this.userId,
       required this.name,
       required this.colorName,
       required this.targetPercent});
-
   factory Wallet.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String? prefix}) {
     final effectivePrefix = prefix ?? '';
@@ -292,7 +282,7 @@ class Wallet extends DataClass implements Insertable<Wallet> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          (other is Wallet &&
+      (other is Wallet &&
           other.id == this.id &&
           other.userId == this.userId &&
           other.name == this.name &&
@@ -306,7 +296,6 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
   final Value<String> name;
   final Value<String> colorName;
   final Value<double> targetPercent;
-
   const WalletsCompanion({
     this.id = const Value.absent(),
     this.userId = const Value.absent(),
@@ -314,7 +303,6 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     this.colorName = const Value.absent(),
     this.targetPercent = const Value.absent(),
   });
-
   WalletsCompanion.insert({
     this.id = const Value.absent(),
     required int userId,
@@ -325,7 +313,6 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
         name = Value(name),
         colorName = Value(colorName),
         targetPercent = Value(targetPercent);
-
   static Insertable<Wallet> custom({
     Expression<int>? id,
     Expression<int>? userId,
@@ -394,48 +381,37 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
 class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
   final GeneratedDatabase _db;
   final String? _alias;
-
   $WalletsTable(this._db, [this._alias]);
-
   final VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
   late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
       'id', aliasedName, false,
       typeName: 'INTEGER',
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _userIdMeta = const VerificationMeta('userId');
-  @override
   late final GeneratedColumn<int?> userId = GeneratedColumn<int?>(
       'user_id', aliasedName, false,
       typeName: 'INTEGER', requiredDuringInsert: true);
   final VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
   late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
       'name', aliasedName, false,
       typeName: 'TEXT', requiredDuringInsert: true);
   final VerificationMeta _colorNameMeta = const VerificationMeta('colorName');
-  @override
   late final GeneratedColumn<String?> colorName = GeneratedColumn<String?>(
       'color_name', aliasedName, false,
       typeName: 'TEXT', requiredDuringInsert: true);
   final VerificationMeta _targetPercentMeta =
       const VerificationMeta('targetPercent');
-  @override
   late final GeneratedColumn<double?> targetPercent = GeneratedColumn<double?>(
       'target_percent', aliasedName, false,
       typeName: 'REAL', requiredDuringInsert: true);
-
   @override
   List<GeneratedColumn> get $columns =>
       [id, userId, name, colorName, targetPercent];
-
   @override
   String get aliasedName => _alias ?? 'wallets';
-
   @override
   String get actualTableName => 'wallets';
-
   @override
   VerificationContext validateIntegrity(Insertable<Wallet> instance,
       {bool isInserting = false}) {
@@ -475,7 +451,6 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
-
   @override
   Wallet map(Map<String, dynamic> data, {String? tablePrefix}) {
     return Wallet.fromData(data, _db,
@@ -496,7 +471,6 @@ class Item extends DataClass implements Insertable<Item> {
   final double quantity;
   final double price;
   final double targetPercent;
-
   Item(
       {required this.id,
       required this.walletId,
@@ -597,7 +571,7 @@ class Item extends DataClass implements Insertable<Item> {
   @override
   String toString() {
     return (StringBuffer('Item(')
-      ..write('id: $id, ')
+          ..write('id: $id, ')
           ..write('walletId: $walletId, ')
           ..write('userId: $userId, ')
           ..write('name: $name, ')
@@ -640,7 +614,6 @@ class ItemsCompanion extends UpdateCompanion<Item> {
   final Value<double> quantity;
   final Value<double> price;
   final Value<double> targetPercent;
-
   const ItemsCompanion({
     this.id = const Value.absent(),
     this.walletId = const Value.absent(),
@@ -650,7 +623,6 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     this.price = const Value.absent(),
     this.targetPercent = const Value.absent(),
   });
-
   ItemsCompanion.insert({
     this.id = const Value.absent(),
     required int walletId,
@@ -734,7 +706,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
   @override
   String toString() {
     return (StringBuffer('ItemsCompanion(')
-      ..write('id: $id, ')
+          ..write('id: $id, ')
           ..write('walletId: $walletId, ')
           ..write('userId: $userId, ')
           ..write('name: $name, ')
@@ -749,58 +721,45 @@ class ItemsCompanion extends UpdateCompanion<Item> {
 class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   final GeneratedDatabase _db;
   final String? _alias;
-
   $ItemsTable(this._db, [this._alias]);
-
   final VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
   late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
       'id', aliasedName, false,
       typeName: 'INTEGER',
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _walletIdMeta = const VerificationMeta('walletId');
-  @override
   late final GeneratedColumn<int?> walletId = GeneratedColumn<int?>(
       'wallet_id', aliasedName, false,
       typeName: 'INTEGER', requiredDuringInsert: true);
   final VerificationMeta _userIdMeta = const VerificationMeta('userId');
-  @override
   late final GeneratedColumn<int?> userId = GeneratedColumn<int?>(
       'user_id', aliasedName, false,
       typeName: 'INTEGER', requiredDuringInsert: true);
   final VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
   late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
       'name', aliasedName, false,
       typeName: 'TEXT', requiredDuringInsert: true);
   final VerificationMeta _quantityMeta = const VerificationMeta('quantity');
-  @override
   late final GeneratedColumn<double?> quantity = GeneratedColumn<double?>(
       'quantity', aliasedName, false,
       typeName: 'REAL', requiredDuringInsert: true);
   final VerificationMeta _priceMeta = const VerificationMeta('price');
-  @override
   late final GeneratedColumn<double?> price = GeneratedColumn<double?>(
       'price', aliasedName, false,
       typeName: 'REAL', requiredDuringInsert: true);
   final VerificationMeta _targetPercentMeta =
       const VerificationMeta('targetPercent');
-  @override
   late final GeneratedColumn<double?> targetPercent = GeneratedColumn<double?>(
       'target_percent', aliasedName, false,
       typeName: 'REAL', requiredDuringInsert: true);
-
   @override
   List<GeneratedColumn> get $columns =>
       [id, walletId, userId, name, quantity, price, targetPercent];
-
   @override
   String get aliasedName => _alias ?? 'items';
-
   @override
   String get actualTableName => 'items';
-
   @override
   VerificationContext validateIntegrity(Insertable<Item> instance,
       {bool isInserting = false}) {
@@ -869,7 +828,6 @@ abstract class _$Database extends GeneratedDatabase {
   late final $UsersTable users = $UsersTable(this);
   late final $WalletsTable wallets = $WalletsTable(this);
   late final $ItemsTable items = $ItemsTable(this);
-
   Selectable<int> userExists() {
     return customSelect('SELECT count(1) where exists (select * from users)',
         variables: [],
@@ -880,7 +838,6 @@ abstract class _$Database extends GeneratedDatabase {
 
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
-
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [users, wallets, items];
 }

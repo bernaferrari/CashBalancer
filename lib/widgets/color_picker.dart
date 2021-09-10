@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../util/tailwind_colors.dart';
@@ -20,23 +21,29 @@ class _ColorPickerState extends State<ColorPicker> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 56,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        child: Row(
-          children: [
-            for (String colorName in tailwindColorsNames)
-              AnimatedColorItem(
-                color: tailwindColors[colorName]![500]!,
-                isSelected: colorName == selected,
-                onSelected: () {
-                  setState(() {
-                    selected = colorName;
-                  });
-                  widget.onChanged(selected);
-                },
-              ),
-          ],
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+          PointerDeviceKind.touch,
+          PointerDeviceKind.mouse,
+        }),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            children: [
+              for (String colorName in tailwindColorsNames)
+                AnimatedColorItem(
+                  color: tailwindColors[colorName]![500]!,
+                  isSelected: colorName == selected,
+                  onSelected: () {
+                    setState(() {
+                      selected = colorName;
+                    });
+                    widget.onChanged(selected);
+                  },
+                ),
+            ],
+          ),
         ),
       ),
     );
