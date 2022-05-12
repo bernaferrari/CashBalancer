@@ -11,7 +11,7 @@ class CurrencySymbolDialog extends StatefulWidget {
       : super(key: key);
 
   @override
-  _CurrencySymbolDialogState createState() => _CurrencySymbolDialogState();
+  State<CurrencySymbolDialog> createState() => _CurrencySymbolDialogState();
 }
 
 class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {

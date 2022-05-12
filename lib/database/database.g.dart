@@ -6,7 +6,7 @@ part of 'database.dart';
 // MoorGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps, unnecessary_this
+// ignore_for_file: type=lint
 class User extends DataClass implements Insertable<User> {
   final int id;
   final String name;
@@ -67,7 +67,7 @@ class User extends DataClass implements Insertable<User> {
   }
 
   @override
-  int get hashCode => $mrjf($mrjc(id.hashCode, name.hashCode));
+  int get hashCode => Object.hash(id, name);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -125,19 +125,22 @@ class UsersCompanion extends UpdateCompanion<User> {
 }
 
 class $UsersTable extends Users with TableInfo<$UsersTable, User> {
-  final GeneratedDatabase _db;
+  @override
+  final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $UsersTable(this._db, [this._alias]);
+  $UsersTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
   late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
       'id', aliasedName, false,
-      typeName: 'INTEGER',
+      type: const IntType(),
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
   late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
       'name', aliasedName, false,
-      typeName: 'TEXT', requiredDuringInsert: true);
+      type: const StringType(), requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns => [id, name];
   @override
@@ -165,13 +168,13 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   User map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return User.fromData(data, _db,
+    return User.fromData(data, attachedDatabase,
         prefix: tablePrefix != null ? '$tablePrefix.' : null);
   }
 
   @override
   $UsersTable createAlias(String alias) {
-    return $UsersTable(_db, alias);
+    return $UsersTable(attachedDatabase, alias);
   }
 }
 
@@ -273,12 +276,7 @@ class Wallet extends DataClass implements Insertable<Wallet> {
   }
 
   @override
-  int get hashCode => $mrjf($mrjc(
-      id.hashCode,
-      $mrjc(
-          userId.hashCode,
-          $mrjc(name.hashCode,
-              $mrjc(colorName.hashCode, targetPercent.hashCode)))));
+  int get hashCode => Object.hash(id, userId, name, colorName, targetPercent);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -379,32 +377,38 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
 }
 
 class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
-  final GeneratedDatabase _db;
+  @override
+  final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $WalletsTable(this._db, [this._alias]);
+  $WalletsTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
   late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
       'id', aliasedName, false,
-      typeName: 'INTEGER',
+      type: const IntType(),
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
   late final GeneratedColumn<int?> userId = GeneratedColumn<int?>(
       'user_id', aliasedName, false,
-      typeName: 'INTEGER', requiredDuringInsert: true);
+      type: const IntType(), requiredDuringInsert: true);
   final VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
   late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
       'name', aliasedName, false,
-      typeName: 'TEXT', requiredDuringInsert: true);
+      type: const StringType(), requiredDuringInsert: true);
   final VerificationMeta _colorNameMeta = const VerificationMeta('colorName');
+  @override
   late final GeneratedColumn<String?> colorName = GeneratedColumn<String?>(
       'color_name', aliasedName, false,
-      typeName: 'TEXT', requiredDuringInsert: true);
+      type: const StringType(), requiredDuringInsert: true);
   final VerificationMeta _targetPercentMeta =
       const VerificationMeta('targetPercent');
+  @override
   late final GeneratedColumn<double?> targetPercent = GeneratedColumn<double?>(
       'target_percent', aliasedName, false,
-      typeName: 'REAL', requiredDuringInsert: true);
+      type: const RealType(), requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
       [id, userId, name, colorName, targetPercent];
@@ -453,13 +457,13 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Wallet map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return Wallet.fromData(data, _db,
+    return Wallet.fromData(data, attachedDatabase,
         prefix: tablePrefix != null ? '$tablePrefix.' : null);
   }
 
   @override
   $WalletsTable createAlias(String alias) {
-    return $WalletsTable(_db, alias);
+    return $WalletsTable(attachedDatabase, alias);
   }
 }
 
@@ -583,16 +587,8 @@ class Item extends DataClass implements Insertable<Item> {
   }
 
   @override
-  int get hashCode => $mrjf($mrjc(
-      id.hashCode,
-      $mrjc(
-          walletId.hashCode,
-          $mrjc(
-              userId.hashCode,
-              $mrjc(
-                  name.hashCode,
-                  $mrjc(quantity.hashCode,
-                      $mrjc(price.hashCode, targetPercent.hashCode)))))));
+  int get hashCode =>
+      Object.hash(id, walletId, userId, name, quantity, price, targetPercent);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -719,40 +715,48 @@ class ItemsCompanion extends UpdateCompanion<Item> {
 }
 
 class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
-  final GeneratedDatabase _db;
+  @override
+  final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $ItemsTable(this._db, [this._alias]);
+  $ItemsTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
   late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
       'id', aliasedName, false,
-      typeName: 'INTEGER',
+      type: const IntType(),
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _walletIdMeta = const VerificationMeta('walletId');
+  @override
   late final GeneratedColumn<int?> walletId = GeneratedColumn<int?>(
       'wallet_id', aliasedName, false,
-      typeName: 'INTEGER', requiredDuringInsert: true);
+      type: const IntType(), requiredDuringInsert: true);
   final VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
   late final GeneratedColumn<int?> userId = GeneratedColumn<int?>(
       'user_id', aliasedName, false,
-      typeName: 'INTEGER', requiredDuringInsert: true);
+      type: const IntType(), requiredDuringInsert: true);
   final VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
   late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
       'name', aliasedName, false,
-      typeName: 'TEXT', requiredDuringInsert: true);
+      type: const StringType(), requiredDuringInsert: true);
   final VerificationMeta _quantityMeta = const VerificationMeta('quantity');
+  @override
   late final GeneratedColumn<double?> quantity = GeneratedColumn<double?>(
       'quantity', aliasedName, false,
-      typeName: 'REAL', requiredDuringInsert: true);
+      type: const RealType(), requiredDuringInsert: true);
   final VerificationMeta _priceMeta = const VerificationMeta('price');
+  @override
   late final GeneratedColumn<double?> price = GeneratedColumn<double?>(
       'price', aliasedName, false,
-      typeName: 'REAL', requiredDuringInsert: true);
+      type: const RealType(), requiredDuringInsert: true);
   final VerificationMeta _targetPercentMeta =
       const VerificationMeta('targetPercent');
+  @override
   late final GeneratedColumn<double?> targetPercent = GeneratedColumn<double?>(
       'target_percent', aliasedName, false,
-      typeName: 'REAL', requiredDuringInsert: true);
+      type: const RealType(), requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
       [id, walletId, userId, name, quantity, price, targetPercent];
@@ -813,13 +817,13 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Item map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return Item.fromData(data, _db,
+    return Item.fromData(data, attachedDatabase,
         prefix: tablePrefix != null ? '$tablePrefix.' : null);
   }
 
   @override
   $ItemsTable createAlias(String alias) {
-    return $ItemsTable(_db, alias);
+    return $ItemsTable(attachedDatabase, alias);
   }
 }
 

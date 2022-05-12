@@ -10,10 +10,10 @@ class StorybookApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Storybook(
-        children: [
+        stories: [
           Story(
             name: 'Animated Color Item',
-            builder: (_, k) => ColorPicker('red', (changed) {}),
+            builder: (_) => ColorPicker('red', (changed) {}),
           ),
         ],
       );

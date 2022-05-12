@@ -11,7 +11,7 @@ class ColorPicker extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ColorPickerState createState() => _ColorPickerState();
+  State<ColorPicker> createState() => _ColorPickerState();
 }
 
 class _ColorPickerState extends State<ColorPicker> {
@@ -66,7 +66,7 @@ class AnimatedColorItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _size = isSelected ? maxSize - 4 : maxSize;
+    final size = isSelected ? maxSize - 4 : maxSize;
 
     return InkWell(
       customBorder: const CircleBorder(),
@@ -79,8 +79,8 @@ class AnimatedColorItem extends StatelessWidget {
             Center(
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
-                width: _size,
-                height: _size,
+                width: size,
+                height: size,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: color,
@@ -90,8 +90,8 @@ class AnimatedColorItem extends StatelessWidget {
             Center(
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
-                width: _size - 8,
-                height: _size - 8,
+                width: size - 8,
+                height: size - 8,
                 // padding: isSelected ? EdgeInsets.all(4) : EdgeInsets.zero,
                 decoration: isSelected
                     ? BoxDecoration(

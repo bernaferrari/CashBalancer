@@ -292,9 +292,9 @@ class App extends StatelessWidget {
 }
 
 BeamPage beamerLoadingPage() {
-  final _random = Random();
+  final random = Random();
   final colorName =
-      tailwindColorsNames[_random.nextInt(tailwindColorsNames.length)];
+      tailwindColorsNames[random.nextInt(tailwindColorsNames.length)];
 
   return BeamPage(
     key: const ValueKey("Loading Screen"),
@@ -357,8 +357,8 @@ class SharedAxisPageRoute extends PageRouteBuilder<Object> {
               animation: primaryAnimation,
               secondaryAnimation: secondaryAnimation,
               transitionType: transitionType,
-              child: child,
               fillColor: fillColor,
+              child: child,
             );
           },
         );

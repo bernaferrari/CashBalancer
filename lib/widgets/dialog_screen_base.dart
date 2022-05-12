@@ -96,7 +96,6 @@ class DialogScreenBase extends StatelessWidget {
                       AppBar(
                         foregroundColor:
                             Theme.of(context).colorScheme.onSurface,
-                        backwardsCompatibility: false,
                         title: Text(appBarTitle),
                         elevation: 0,
                         backgroundColor:

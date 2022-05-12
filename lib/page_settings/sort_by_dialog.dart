@@ -10,7 +10,7 @@ class SortByDialog extends StatefulWidget {
   const SortByDialog({Key? key, required this.initialValue}) : super(key: key);
 
   @override
-  _SortByDialogState createState() => _SortByDialogState();
+  State<SortByDialog> createState() => _SortByDialogState();
 }
 
 class _SortByDialogState extends State<SortByDialog> {

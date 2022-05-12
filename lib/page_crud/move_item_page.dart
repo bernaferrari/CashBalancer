@@ -1,7 +1,5 @@
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
@@ -26,7 +24,7 @@ class MoveItemPage extends StatefulWidget {
       : super(key: key);
 
   @override
-  _MoveItemPageState createState() => _MoveItemPageState();
+  State<MoveItemPage> createState() => _MoveItemPageState();
 }
 
 class _MoveItemPageState extends State<MoveItemPage> {

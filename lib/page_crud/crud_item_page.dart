@@ -1,7 +1,6 @@
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 
@@ -31,7 +30,7 @@ class CRUDItemPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CRUDItemPageState createState() => _CRUDItemPageState();
+  State<CRUDItemPage> createState() => _CRUDItemPageState();
 }
 
 class _CRUDItemPageState extends State<CRUDItemPage> {
@@ -59,7 +58,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       onChanged();
     });
   }
@@ -364,7 +363,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
   Future<void> onSaveAddMore([String? value]) async {
     if (_formKey.currentState!.validate()) {
       context.read<DataCubit>().db.createItem(
-        walletId: widget.walletId,
+            walletId: widget.walletId,
             userId: widget.userId,
             name: nameEditingController.text,
             value: moneyEditingController.text,

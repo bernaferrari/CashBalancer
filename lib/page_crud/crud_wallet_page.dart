@@ -22,7 +22,7 @@ class CRUDWalletPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CRUDWalletPageState createState() => _CRUDWalletPageState();
+  State<CRUDWalletPage> createState() => _CRUDWalletPageState();
 }
 
 class _CRUDWalletPageState extends State<CRUDWalletPage> {
