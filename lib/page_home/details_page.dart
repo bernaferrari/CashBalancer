@@ -4,7 +4,7 @@ import 'package:beamer/beamer.dart';
 import 'package:cash_balancer/page_home/pie_chart_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_multi_formatter/formatters/money_input_formatter.dart';
+import 'package:flutter_multi_formatter/formatters/formatter_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../blocs/data_bloc.dart';
@@ -129,7 +129,7 @@ class WhenEmptyCard extends StatelessWidget {
                 subtitle,
                 style: Theme.of(context)
                     .textTheme
-                    .bodyText1!
+                    .bodyLarge!
                     .copyWith(fontSize: 14),
               ),
             ],
@@ -261,7 +261,7 @@ class VerticalProgressBar extends StatelessWidget {
                     height: spacedList[i],
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        primary: nonZeroItems[i].color,
+                        backgroundColor: nonZeroItems[i].color,
                         padding: EdgeInsets.zero,
                         minimumSize: Size.zero,
                         fixedSize: Size(100, spacedList[i]),
@@ -461,7 +461,7 @@ class AddItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        primary: color,
+        backgroundColor: color,
         padding: EdgeInsets.zero,
         minimumSize: Size.zero,
         fixedSize: const Size(64, 40),
@@ -486,7 +486,7 @@ class EditWallet extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
-        primary: color,
+        foregroundColor: color,
         minimumSize: Size.zero,
         padding: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -537,7 +537,7 @@ class CircularProgress extends StatelessWidget {
                       "${totalLocalPercent.toStringAsFixed(0)}%",
                       style: Theme.of(context)
                           .textTheme
-                          .overline!
+                          .labelSmall!
                           .copyWith(fontSize: 8),
                     ),
                   ],
@@ -572,12 +572,12 @@ class WalletCard extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: Theme.of(context).textTheme.headline5,
+                style: Theme.of(context).textTheme.headlineSmall,
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
                 subtitle,
-                style: Theme.of(context).textTheme.overline,
+                style: Theme.of(context).textTheme.labelSmall,
                 overflow: TextOverflow.ellipsis,
               ),
             ],

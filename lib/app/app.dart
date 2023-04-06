@@ -194,11 +194,11 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = TextTheme(
-      bodyText1: GoogleFonts.inter(),
-      bodyText2: GoogleFonts.ibmPlexMono(),
-      overline: GoogleFonts.ibmPlexMono(),
-      headline5: GoogleFonts.rubikMonoOne(),
-      headline6: GoogleFonts.rubik(),
+      bodyLarge: GoogleFonts.inter(),
+      bodyMedium: GoogleFonts.ibmPlexMono(),
+      labelSmall: GoogleFonts.ibmPlexMono(),
+      headlineSmall: GoogleFonts.rubikMonoOne(),
+      titleLarge: GoogleFonts.rubik(),
     );
 
     final textButtonTheme = TextButtonThemeData(

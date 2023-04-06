@@ -30,7 +30,7 @@ class SettingsPage extends StatelessWidget {
               title: Text(AppLocalizations.of(context).relativeTarget),
               subtitle: Text(
                 AppLocalizations.of(context).targetSettings,
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
               value: state.settings.relativeTarget,
               onChanged: (value) async {
@@ -53,13 +53,16 @@ class SettingsPage extends StatelessWidget {
                       children: [
                         Text(
                           AppLocalizations.of(context).currencySymbol,
-                          style: Theme.of(context).textTheme.subtitle1,
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: 4),
                         Text(
                           state.settings.currencySymbol,
-                          style: Theme.of(context).textTheme.caption?.copyWith(
-                              color: Theme.of(context).colorScheme.primary),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary),
                         ),
                       ],
                     ),
@@ -83,13 +86,16 @@ class SettingsPage extends StatelessWidget {
                       children: [
                         Text(
                           AppLocalizations.of(context).sortBy,
-                          style: Theme.of(context).textTheme.subtitle1,
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: 4),
                         Text(
                           getSortByString(context, state.settings.sortBy),
-                          style: Theme.of(context).textTheme.caption?.copyWith(
-                              color: Theme.of(context).colorScheme.primary),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary),
                         ),
                       ],
                     ),
@@ -108,13 +114,13 @@ class SettingsPage extends StatelessWidget {
             Text(
               AppLocalizations.of(context).designedDeveloped,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.subtitle2,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
             const SizedBox(height: 8),
             Text(
               "@bernaferrari",
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.subtitle2,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
           ],
         );

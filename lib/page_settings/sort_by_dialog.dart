@@ -72,8 +72,8 @@ class _SortByDialogState extends State<SortByDialog> {
             width: double.infinity,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                primary: primaryColor,
-                onPrimary: backgroundDialogColor,
+                foregroundColor: backgroundDialogColor,
+                backgroundColor: primaryColor,
               ),
               label: Text(AppLocalizations.of(context).dialogSave),
               icon: const Icon(Icons.check_rounded),

@@ -150,9 +150,9 @@ class _RectangularPercentageWidgetState
       ),
       child: TextButton(
         style: TextButton.styleFrom(
+          foregroundColor: widget.progressColor,
           padding: EdgeInsets.zero,
           shape: const RoundedRectangleBorder(),
-          primary: widget.progressColor,
         ),
         onPressed: () =>
             Beamer.of(context).beamToNamed('editItem/${widget.id}'),

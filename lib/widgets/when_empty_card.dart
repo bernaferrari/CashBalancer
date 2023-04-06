@@ -50,7 +50,7 @@ class WhenEmptyCard extends StatelessWidget {
                 subtitle,
                 style: Theme.of(context)
                     .textTheme
-                    .bodyText1!
+                    .bodyLarge!
                     .copyWith(fontSize: 14),
               ),
             ],

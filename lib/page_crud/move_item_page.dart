@@ -90,8 +90,8 @@ class _MoveItemPageState extends State<MoveItemPage> {
         const SizedBox(height: 16),
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
-            primary: primaryColor,
-            onPrimary: backgroundDialogColor,
+            foregroundColor: backgroundDialogColor,
+            backgroundColor: primaryColor,
           ),
           icon: const Icon(Icons.check_rounded),
           label: Text(AppLocalizations.of(context).dialogSave),
@@ -99,7 +99,7 @@ class _MoveItemPageState extends State<MoveItemPage> {
         ),
         const SizedBox(height: 8),
         TextButton.icon(
-          style: TextButton.styleFrom(primary: primaryColorWeaker),
+          style: TextButton.styleFrom(foregroundColor: primaryColorWeaker),
           icon: const Icon(Icons.close_rounded),
           label: Text(AppLocalizations.of(context).dialogCancel),
           onPressed: () => Navigator.of(context).pop(),

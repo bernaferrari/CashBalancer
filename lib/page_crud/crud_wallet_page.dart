@@ -113,13 +113,13 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
                         AppLocalizations.of(context).optional,
                         style: Theme.of(context)
                             .textTheme
-                            .overline!
+                            .labelSmall!
                             .copyWith(color: primaryColor),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         AppLocalizations.of(context).howMuchTarget,
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
                   ),
@@ -169,8 +169,8 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
           const SizedBox(height: 16),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              primary: primaryColor,
-              onPrimary: backgroundDialogColor,
+              foregroundColor: backgroundDialogColor,
+              backgroundColor: primaryColor,
             ),
             label: Text(AppLocalizations.of(context).dialogSave),
             icon: const Icon(Icons.check_rounded),
@@ -179,7 +179,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
           if (widget.previousWallet != null) ...[
             const SizedBox(height: 8),
             OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(primary: primaryColor),
+              style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
               label: Text(AppLocalizations.of(context).dialogDelete),
               icon: const Icon(Icons.delete_outline_outlined),
               onPressed: onDelete,
@@ -187,7 +187,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
           ],
           const SizedBox(height: 8),
           TextButton.icon(
-            style: TextButton.styleFrom(primary: primaryColor),
+            style: TextButton.styleFrom(foregroundColor: primaryColor),
             label: Text(AppLocalizations.of(context).dialogCancel),
             icon: const Icon(Icons.close_rounded),
             onPressed: () => Navigator.of(context).pop(),

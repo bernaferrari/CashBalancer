@@ -140,7 +140,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                     const SizedBox(height: 8),
                     Text(
                       AppLocalizations.of(context).theAssetsName,
-                      style: Theme.of(context).textTheme.caption,
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
                 ),
@@ -191,7 +191,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                     const SizedBox(height: 8),
                     Text(
                       AppLocalizations.of(context).totalAmount,
-                      style: Theme.of(context).textTheme.caption,
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
                 ),
@@ -219,13 +219,13 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                             AppLocalizations.of(context).optional,
                             style: Theme.of(context)
                                 .textTheme
-                                .overline!
+                                .labelSmall!
                                 .copyWith(color: primaryColor),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             AppLocalizations.of(context).howMuchTarget,
-                            style: Theme.of(context).textTheme.caption,
+                            style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
                       ),
@@ -272,7 +272,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                 const SizedBox(height: 16),
                 Text(
                   "${AppLocalizations.of(context).rightNow}, $relativePercentage",
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
             ),
@@ -280,8 +280,8 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
           const SizedBox(height: 16),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              primary: primaryColor,
-              onPrimary: backgroundDialogColor,
+              foregroundColor: backgroundDialogColor,
+              backgroundColor: primaryColor,
             ),
             icon: const Icon(Icons.check_rounded),
             label: Text(AppLocalizations.of(context).dialogSave),
@@ -290,21 +290,21 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
           const SizedBox(height: 8),
           if (widget.previousItem == null)
             OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(primary: primaryColor),
+              style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
               icon: const Icon(Icons.checklist_outlined),
               label: Text(AppLocalizations.of(context).dialogSaveAddMore),
               onPressed: onSaveAddMore,
             )
           else
             OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(primary: primaryColor),
+              style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
               icon: const Icon(Icons.delete_outline_outlined),
               label: Text(AppLocalizations.of(context).dialogDelete),
               onPressed: onDelete,
             ),
           const SizedBox(height: 8),
           TextButton.icon(
-            style: TextButton.styleFrom(primary: primaryColorWeaker),
+            style: TextButton.styleFrom(foregroundColor: primaryColorWeaker),
             icon: const Icon(Icons.close_rounded),
             label: Text(AppLocalizations.of(context).dialogCancel),
             onPressed: () => Navigator.of(context).pop(),

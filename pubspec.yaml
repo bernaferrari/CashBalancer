@@ -1,44 +1,33 @@
 name: cash_balancer
 description: Balance cash between multiple wallets.
 publish_to: 'none'
-
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 1.0.0+2
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: ">=2.19.0 <3.0.0"
 
 dependencies:
-  animations: ^2.0.2
-  equatable: ^2.0.3
+  animations: ^2.0.7
+  equatable: ^2.0.5
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  flutter_bloc: ^8.0.1
-  bloc: ^8.0.3
-  google_fonts: ^2.3.2
+  flutter_bloc: ^8.1.2
+  bloc: ^8.1.1
+  google_fonts: ^4.0.3
   intl: ^0.17.0
   moor: ^4.6.1+1
   moor_flutter: ^4.1.0
-  path_provider: ^2.0.10
-  path: ^1.8.1
-  rxdart: ^0.27.3
-  sqlite3_flutter_libs: ^0.5.6
-  storybook_flutter: ^0.10.1
-  flutter_multi_formatter: ^2.5.1
-  shared_preferences: ^2.0.15
-  rx_shared_preferences: ^2.3.0
-  fl_chart: ^0.50.1
+  path_provider: ^2.0.14
+  path: ^1.8.2
+  rxdart: ^0.27.7
+  sqlite3_flutter_libs: ^0.5.13
+  storybook_flutter: ^0.12.0
+  flutter_multi_formatter: ^2.10.2
+  shared_preferences: ^2.1.0
+  rx_shared_preferences: ^3.0.0
+  fl_chart: ^0.61.0
   beamer:
     git:
       url: https://github.com/slovnicki/beamer.git
@@ -47,7 +36,7 @@ dependencies:
 
 dev_dependencies:
   moor_generator: ^4.6.0+1
-  build_runner: ^2.1.10
+  build_runner: ^2.3.3
   flutter_lints: ^2.0.1
   flutter_test:
     sdk: flutter
