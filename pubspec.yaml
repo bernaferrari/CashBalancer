@@ -1,43 +1,38 @@
 name: cash_balancer
 description: Balance cash between multiple wallets.
 publish_to: 'none'
-version: 1.0.0+2
+version: 1.0.0+3
 
 environment:
-  sdk: ">=2.19.0 <3.0.0"
+  sdk: '>=3.3.0 <4.0.0'
 
 dependencies:
-  animations: ^2.0.7
+  animations: ^2.0.11
   equatable: ^2.0.5
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  flutter_bloc: ^8.1.2
-  bloc: ^8.1.1
-  google_fonts: ^4.0.3
-  intl: ^0.17.0
-  moor: ^4.6.1+1
-  moor_flutter: ^4.1.0
-  path_provider: ^2.0.14
-  path: ^1.8.2
+  flutter_bloc: ^8.1.5
+  bloc: ^8.1.4
+  google_fonts: ^6.2.1
+  intl: any
+  drift: ^2.17.0
+  path_provider: ^2.1.3
+  path: ^1.9.0
   rxdart: ^0.27.7
-  sqlite3_flutter_libs: ^0.5.13
-  storybook_flutter: ^0.12.0
-  flutter_multi_formatter: ^2.10.2
-  shared_preferences: ^2.1.0
-  rx_shared_preferences: ^3.0.0
-  fl_chart: ^0.61.0
-  beamer:
-    git:
-      url: https://github.com/slovnicki/beamer.git
-      ref: 42f29467b3e24b2c703b542d9889f83fc6f41da2
-      path: package
+  sqlite3_flutter_libs: ^0.5.21
+  storybook_flutter: ^0.14.0
+  flutter_multi_formatter: ^2.12.8
+  shared_preferences: ^2.2.3
+  rx_shared_preferences: ^3.1.0
+  fl_chart: ^0.67.0
+  beamer: ^1.6.1
 
 dev_dependencies:
-  moor_generator: ^4.6.0+1
-  build_runner: ^2.3.3
-  flutter_lints: ^2.0.1
+  drift_dev: ^2.17.0
+  build_runner: ^2.4.9
+  flutter_lints: ^3.0.2
   flutter_test:
     sdk: flutter
 

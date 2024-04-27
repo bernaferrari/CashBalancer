@@ -2,8 +2,7 @@
 import 'dart:collection';
 import 'dart:ui';
 
-import 'package:moor/moor.dart';
-import 'package:moor_flutter/moor_flutter.dart';
+import 'package:drift/drift.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -48,7 +47,7 @@ class Items extends Table {
   RealColumn get targetPercent => real()();
 }
 
-@UseMoor(
+@DriftDatabase(
   tables: [Users, Wallets, Items],
   queries: {
     // '_resetCategory': 'UPDATE todos SET category = NULL WHERE category = ?',
@@ -56,7 +55,7 @@ class Items extends Table {
   },
 )
 class Database extends _$Database {
-  Database(QueryExecutor e) : super(e);
+  Database(super.e);
 
   @override
   int get schemaVersion => 1;

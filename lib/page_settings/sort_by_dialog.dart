@@ -7,7 +7,7 @@ import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 class SortByDialog extends StatefulWidget {
   final int initialValue;
 
-  const SortByDialog({Key? key, required this.initialValue}) : super(key: key);
+  const SortByDialog({super.key, required this.initialValue});
 
   @override
   State<SortByDialog> createState() => _SortByDialogState();

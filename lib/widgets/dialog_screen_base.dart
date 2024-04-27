@@ -50,13 +50,13 @@ class DialogScreenBase extends StatelessWidget {
   final Color? backgroundDialogColor;
 
   const DialogScreenBase({
-    Key? key,
+    super.key,
     required this.children,
     required this.colorName,
     required this.appBarTitle,
     this.backgroundDialogColor,
     this.appBarActions,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

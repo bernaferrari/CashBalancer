@@ -10,9 +10,6 @@ void main() {
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
   };
-
-  BlocOverrides.runZoned(
-    blocObserver: AppBlocObserver(),
-    () => runApp(App()),
-  );
+  Bloc.observer = AppBlocObserver();
+  runApp(App());
 }

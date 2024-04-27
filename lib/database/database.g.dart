@@ -2,25 +2,73 @@
 
 part of 'database.dart';
 
-// **************************************************************************
-// MoorGenerator
-// **************************************************************************
-
 // ignore_for_file: type=lint
+class $UsersTable extends Users with TableInfo<$UsersTable, User> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UsersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [id, name];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'users';
+  @override
+  VerificationContext validateIntegrity(Insertable<User> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  User map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return User(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+    );
+  }
+
+  @override
+  $UsersTable createAlias(String alias) {
+    return $UsersTable(attachedDatabase, alias);
+  }
+}
+
 class User extends DataClass implements Insertable<User> {
   final int id;
   final String name;
-  User({required this.id, required this.name});
-  factory User.fromData(Map<String, dynamic> data, GeneratedDatabase db,
-      {String? prefix}) {
-    final effectivePrefix = prefix ?? '';
-    return User(
-      id: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      name: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
-    );
-  }
+  const User({required this.id, required this.name});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -38,7 +86,7 @@ class User extends DataClass implements Insertable<User> {
 
   factory User.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
-    serializer ??= moorRuntimeOptions.defaultSerializer;
+    serializer ??= driftRuntimeOptions.defaultSerializer;
     return User(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
@@ -46,7 +94,7 @@ class User extends DataClass implements Insertable<User> {
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= moorRuntimeOptions.defaultSerializer;
+    serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
@@ -124,36 +172,63 @@ class UsersCompanion extends UpdateCompanion<User> {
   }
 }
 
-class $UsersTable extends Users with TableInfo<$UsersTable, User> {
+class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $UsersTable(this.attachedDatabase, [this._alias]);
-  final VerificationMeta _idMeta = const VerificationMeta('id');
+  $WalletsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      type: const IntType(),
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
       requiredDuringInsert: false,
-      defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
-  final VerificationMeta _nameMeta = const VerificationMeta('name');
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
-  late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
-      type: const StringType(), requiredDuringInsert: true);
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _colorNameMeta =
+      const VerificationMeta('colorName');
   @override
-  List<GeneratedColumn> get $columns => [id, name];
+  late final GeneratedColumn<String> colorName = GeneratedColumn<String>(
+      'color_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _targetPercentMeta =
+      const VerificationMeta('targetPercent');
   @override
-  String get aliasedName => _alias ?? 'users';
+  late final GeneratedColumn<double> targetPercent = GeneratedColumn<double>(
+      'target_percent', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
   @override
-  String get actualTableName => 'users';
+  List<GeneratedColumn> get $columns =>
+      [id, userId, name, colorName, targetPercent];
   @override
-  VerificationContext validateIntegrity(Insertable<User> instance,
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'wallets';
+  @override
+  VerificationContext validateIntegrity(Insertable<Wallet> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -161,20 +236,45 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('color_name')) {
+      context.handle(_colorNameMeta,
+          colorName.isAcceptableOrUnknown(data['color_name']!, _colorNameMeta));
+    } else if (isInserting) {
+      context.missing(_colorNameMeta);
+    }
+    if (data.containsKey('target_percent')) {
+      context.handle(
+          _targetPercentMeta,
+          targetPercent.isAcceptableOrUnknown(
+              data['target_percent']!, _targetPercentMeta));
+    } else if (isInserting) {
+      context.missing(_targetPercentMeta);
+    }
     return context;
   }
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  User map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return User.fromData(data, attachedDatabase,
-        prefix: tablePrefix != null ? '$tablePrefix.' : null);
+  Wallet map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Wallet(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}user_id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      colorName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}color_name'])!,
+      targetPercent: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}target_percent'])!,
+    );
   }
 
   @override
-  $UsersTable createAlias(String alias) {
-    return $UsersTable(attachedDatabase, alias);
+  $WalletsTable createAlias(String alias) {
+    return $WalletsTable(attachedDatabase, alias);
   }
 }
 
@@ -184,28 +284,12 @@ class Wallet extends DataClass implements Insertable<Wallet> {
   final String name;
   final String colorName;
   final double targetPercent;
-  Wallet(
+  const Wallet(
       {required this.id,
       required this.userId,
       required this.name,
       required this.colorName,
       required this.targetPercent});
-  factory Wallet.fromData(Map<String, dynamic> data, GeneratedDatabase db,
-      {String? prefix}) {
-    final effectivePrefix = prefix ?? '';
-    return Wallet(
-      id: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      userId: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}user_id'])!,
-      name: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
-      colorName: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}color_name'])!,
-      targetPercent: const RealType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}target_percent'])!,
-    );
-  }
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -229,7 +313,7 @@ class Wallet extends DataClass implements Insertable<Wallet> {
 
   factory Wallet.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
-    serializer ??= moorRuntimeOptions.defaultSerializer;
+    serializer ??= driftRuntimeOptions.defaultSerializer;
     return Wallet(
       id: serializer.fromJson<int>(json['id']),
       userId: serializer.fromJson<int>(json['userId']),
@@ -240,7 +324,7 @@ class Wallet extends DataClass implements Insertable<Wallet> {
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= moorRuntimeOptions.defaultSerializer;
+    serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'userId': serializer.toJson<int>(userId),
@@ -376,53 +460,74 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
   }
 }
 
-class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
+class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $WalletsTable(this.attachedDatabase, [this._alias]);
-  final VerificationMeta _idMeta = const VerificationMeta('id');
+  $ItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      type: const IntType(),
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
       requiredDuringInsert: false,
-      defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
-  final VerificationMeta _userIdMeta = const VerificationMeta('userId');
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _walletIdMeta =
+      const VerificationMeta('walletId');
   @override
-  late final GeneratedColumn<int?> userId = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> walletId = GeneratedColumn<int>(
+      'wallet_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
       'user_id', aliasedName, false,
-      type: const IntType(), requiredDuringInsert: true);
-  final VerificationMeta _nameMeta = const VerificationMeta('name');
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
-  late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
-      type: const StringType(), requiredDuringInsert: true);
-  final VerificationMeta _colorNameMeta = const VerificationMeta('colorName');
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _quantityMeta =
+      const VerificationMeta('quantity');
   @override
-  late final GeneratedColumn<String?> colorName = GeneratedColumn<String?>(
-      'color_name', aliasedName, false,
-      type: const StringType(), requiredDuringInsert: true);
-  final VerificationMeta _targetPercentMeta =
+  late final GeneratedColumn<double> quantity = GeneratedColumn<double>(
+      'quantity', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _priceMeta = const VerificationMeta('price');
+  @override
+  late final GeneratedColumn<double> price = GeneratedColumn<double>(
+      'price', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _targetPercentMeta =
       const VerificationMeta('targetPercent');
   @override
-  late final GeneratedColumn<double?> targetPercent = GeneratedColumn<double?>(
+  late final GeneratedColumn<double> targetPercent = GeneratedColumn<double>(
       'target_percent', aliasedName, false,
-      type: const RealType(), requiredDuringInsert: true);
+      type: DriftSqlType.double, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, userId, name, colorName, targetPercent];
+      [id, walletId, userId, name, quantity, price, targetPercent];
   @override
-  String get aliasedName => _alias ?? 'wallets';
+  String get aliasedName => _alias ?? actualTableName;
   @override
-  String get actualTableName => 'wallets';
+  String get actualTableName => $name;
+  static const String $name = 'items';
   @override
-  VerificationContext validateIntegrity(Insertable<Wallet> instance,
+  VerificationContext validateIntegrity(Insertable<Item> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('wallet_id')) {
+      context.handle(_walletIdMeta,
+          walletId.isAcceptableOrUnknown(data['wallet_id']!, _walletIdMeta));
+    } else if (isInserting) {
+      context.missing(_walletIdMeta);
     }
     if (data.containsKey('user_id')) {
       context.handle(_userIdMeta,
@@ -436,11 +541,17 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
-    if (data.containsKey('color_name')) {
-      context.handle(_colorNameMeta,
-          colorName.isAcceptableOrUnknown(data['color_name']!, _colorNameMeta));
+    if (data.containsKey('quantity')) {
+      context.handle(_quantityMeta,
+          quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta));
     } else if (isInserting) {
-      context.missing(_colorNameMeta);
+      context.missing(_quantityMeta);
+    }
+    if (data.containsKey('price')) {
+      context.handle(
+          _priceMeta, price.isAcceptableOrUnknown(data['price']!, _priceMeta));
+    } else if (isInserting) {
+      context.missing(_priceMeta);
     }
     if (data.containsKey('target_percent')) {
       context.handle(
@@ -456,14 +567,29 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Wallet map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return Wallet.fromData(data, attachedDatabase,
-        prefix: tablePrefix != null ? '$tablePrefix.' : null);
+  Item map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Item(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      walletId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}wallet_id'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}user_id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      quantity: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}quantity'])!,
+      price: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}price'])!,
+      targetPercent: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}target_percent'])!,
+    );
   }
 
   @override
-  $WalletsTable createAlias(String alias) {
-    return $WalletsTable(attachedDatabase, alias);
+  $ItemsTable createAlias(String alias) {
+    return $ItemsTable(attachedDatabase, alias);
   }
 }
 
@@ -475,7 +601,7 @@ class Item extends DataClass implements Insertable<Item> {
   final double quantity;
   final double price;
   final double targetPercent;
-  Item(
+  const Item(
       {required this.id,
       required this.walletId,
       required this.userId,
@@ -483,26 +609,6 @@ class Item extends DataClass implements Insertable<Item> {
       required this.quantity,
       required this.price,
       required this.targetPercent});
-  factory Item.fromData(Map<String, dynamic> data, GeneratedDatabase db,
-      {String? prefix}) {
-    final effectivePrefix = prefix ?? '';
-    return Item(
-      id: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      walletId: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}wallet_id'])!,
-      userId: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}user_id'])!,
-      name: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
-      quantity: const RealType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}quantity'])!,
-      price: const RealType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}price'])!,
-      targetPercent: const RealType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}target_percent'])!,
-    );
-  }
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -530,7 +636,7 @@ class Item extends DataClass implements Insertable<Item> {
 
   factory Item.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
-    serializer ??= moorRuntimeOptions.defaultSerializer;
+    serializer ??= driftRuntimeOptions.defaultSerializer;
     return Item(
       id: serializer.fromJson<int>(json['id']),
       walletId: serializer.fromJson<int>(json['walletId']),
@@ -543,7 +649,7 @@ class Item extends DataClass implements Insertable<Item> {
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= moorRuntimeOptions.defaultSerializer;
+    serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'walletId': serializer.toJson<int>(walletId),
@@ -714,134 +820,23 @@ class ItemsCompanion extends UpdateCompanion<Item> {
   }
 }
 
-class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $ItemsTable(this.attachedDatabase, [this._alias]);
-  final VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
-      'id', aliasedName, false,
-      type: const IntType(),
-      requiredDuringInsert: false,
-      defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
-  final VerificationMeta _walletIdMeta = const VerificationMeta('walletId');
-  @override
-  late final GeneratedColumn<int?> walletId = GeneratedColumn<int?>(
-      'wallet_id', aliasedName, false,
-      type: const IntType(), requiredDuringInsert: true);
-  final VerificationMeta _userIdMeta = const VerificationMeta('userId');
-  @override
-  late final GeneratedColumn<int?> userId = GeneratedColumn<int?>(
-      'user_id', aliasedName, false,
-      type: const IntType(), requiredDuringInsert: true);
-  final VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
-  late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
-      'name', aliasedName, false,
-      type: const StringType(), requiredDuringInsert: true);
-  final VerificationMeta _quantityMeta = const VerificationMeta('quantity');
-  @override
-  late final GeneratedColumn<double?> quantity = GeneratedColumn<double?>(
-      'quantity', aliasedName, false,
-      type: const RealType(), requiredDuringInsert: true);
-  final VerificationMeta _priceMeta = const VerificationMeta('price');
-  @override
-  late final GeneratedColumn<double?> price = GeneratedColumn<double?>(
-      'price', aliasedName, false,
-      type: const RealType(), requiredDuringInsert: true);
-  final VerificationMeta _targetPercentMeta =
-      const VerificationMeta('targetPercent');
-  @override
-  late final GeneratedColumn<double?> targetPercent = GeneratedColumn<double?>(
-      'target_percent', aliasedName, false,
-      type: const RealType(), requiredDuringInsert: true);
-  @override
-  List<GeneratedColumn> get $columns =>
-      [id, walletId, userId, name, quantity, price, targetPercent];
-  @override
-  String get aliasedName => _alias ?? 'items';
-  @override
-  String get actualTableName => 'items';
-  @override
-  VerificationContext validateIntegrity(Insertable<Item> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('wallet_id')) {
-      context.handle(_walletIdMeta,
-          walletId.isAcceptableOrUnknown(data['wallet_id']!, _walletIdMeta));
-    } else if (isInserting) {
-      context.missing(_walletIdMeta);
-    }
-    if (data.containsKey('user_id')) {
-      context.handle(_userIdMeta,
-          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
-    } else if (isInserting) {
-      context.missing(_userIdMeta);
-    }
-    if (data.containsKey('name')) {
-      context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
-    } else if (isInserting) {
-      context.missing(_nameMeta);
-    }
-    if (data.containsKey('quantity')) {
-      context.handle(_quantityMeta,
-          quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta));
-    } else if (isInserting) {
-      context.missing(_quantityMeta);
-    }
-    if (data.containsKey('price')) {
-      context.handle(
-          _priceMeta, price.isAcceptableOrUnknown(data['price']!, _priceMeta));
-    } else if (isInserting) {
-      context.missing(_priceMeta);
-    }
-    if (data.containsKey('target_percent')) {
-      context.handle(
-          _targetPercentMeta,
-          targetPercent.isAcceptableOrUnknown(
-              data['target_percent']!, _targetPercentMeta));
-    } else if (isInserting) {
-      context.missing(_targetPercentMeta);
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  Item map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return Item.fromData(data, attachedDatabase,
-        prefix: tablePrefix != null ? '$tablePrefix.' : null);
-  }
-
-  @override
-  $ItemsTable createAlias(String alias) {
-    return $ItemsTable(attachedDatabase, alias);
-  }
-}
-
 abstract class _$Database extends GeneratedDatabase {
-  _$Database(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
+  _$Database(QueryExecutor e) : super(e);
   late final $UsersTable users = $UsersTable(this);
   late final $WalletsTable wallets = $WalletsTable(this);
   late final $ItemsTable items = $ItemsTable(this);
   Selectable<int> userExists() {
-    return customSelect('SELECT count(1) where exists (select * from users)',
+    return customSelect(
+        'SELECT count(1) AS _c0 WHERE EXISTS (SELECT * FROM users)',
         variables: [],
         readsFrom: {
           users,
-        }).map((QueryRow row) => row.read<int>('count(1)'));
+        }).map((QueryRow row) => row.read<int>('_c0'));
   }
 
   @override
-  Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
+  Iterable<TableInfo<Table, Object?>> get allTables =>
+      allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [users, wallets, items];
 }

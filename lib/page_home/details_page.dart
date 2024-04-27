@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:beamer/beamer.dart';
 import 'package:cash_balancer/page_home/pie_chart_section.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +14,7 @@ import '../util/tailwind_colors.dart';
 import '../widgets/circle_percentage_painter.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +31,7 @@ class HomePage extends StatelessWidget {
 class HomePageImpl extends StatelessWidget {
   final FullData data;
 
-  const HomePageImpl(this.data, {Key? key}) : super(key: key);
+  const HomePageImpl(this.data, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -85,8 +83,8 @@ class WhenEmptyCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.icon,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final String title;
   final String subtitle;
@@ -144,9 +142,9 @@ class MainList extends StatelessWidget {
   final FullData data;
 
   const MainList({
-    Key? key,
+    super.key,
     required this.data,
-  }) : super(key: key);
+  });
 
   static const double margin = 20.0;
 
@@ -236,8 +234,8 @@ class VerticalProgressBar extends StatelessWidget {
   const VerticalProgressBar({
     required this.data,
     required this.totalValue,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -290,13 +288,13 @@ class GroupCard extends StatelessWidget {
   final SettingsData settings;
 
   const GroupCard({
-    Key? key,
+    super.key,
     required this.itemsList,
     required this.group,
     required this.userId,
     required this.allTotalValue,
     required this.settings,
-  }) : super(key: key);
+  });
 
   // Make it reusable.
   Widget customContainer({
@@ -451,11 +449,11 @@ class AddItem extends StatelessWidget {
   final int groupId;
 
   const AddItem({
-    Key? key,
+    super.key,
     required this.color,
     required this.userId,
     required this.groupId,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -477,10 +475,10 @@ class EditWallet extends StatelessWidget {
   final int groupId;
 
   const EditWallet({
-    Key? key,
+    super.key,
     required this.color,
     required this.groupId,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -505,12 +503,12 @@ class CircularProgress extends StatelessWidget {
   final bool hasText;
 
   const CircularProgress({
-    Key? key,
+    super.key,
     required this.totalLocalPercent,
     required this.color,
     this.size = 40,
     this.hasText = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -555,11 +553,11 @@ class WalletCard extends StatelessWidget {
   final Widget? widget;
 
   const WalletCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     this.widget,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -601,8 +599,7 @@ class ItemCard extends StatelessWidget {
 
   const ItemCard(
       this.item, this.totalValue, this.nameColor, this.currencySymbol,
-      {Key? key})
-      : super(key: key);
+      {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -697,8 +694,8 @@ class PercentArrow extends StatelessWidget {
     required this.itemValue,
     required this.totalValue,
     required this.targetPercent,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -749,8 +746,8 @@ class UpDownDiffText extends StatelessWidget {
     required this.targetPercent,
     required this.totalValue,
     this.leftWidget,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

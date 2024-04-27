@@ -15,33 +15,33 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/database.dart';
-import '../l10n/l10n.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/dialog_screen_base.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-final simpleBuilder = SimpleLocationBuilder(routes: {
-  '/': (context, state) {
+final simpleBuilder = RoutesLocationBuilder(routes: {
+  '/': (context, state, obj) {
     return const BeamPage(
       key: ValueKey('home'),
       title: 'Cash Balancer',
       child: HomePage(),
     );
   },
-  '/settings': (context, state) => BeamerMaterialTransitionPage(
+  '/settings': (context, state, obj) => BeamerMaterialTransitionPage(
         key: const ValueKey('settings'),
         title: 'Settings',
         child: const SettingsPage(),
         popToNamed: '/',
         fillColor: getScaffoldDialogBackgroundColor(context, 'warmGray'),
       ),
-  '/analysis': (context, state) => BeamerMaterialTransitionPage(
+  '/analysis': (context, state, obj) => BeamerMaterialTransitionPage(
         key: const ValueKey('analysis'),
         title: 'Analysis',
         child: const AnalysisPage(),
         popToNamed: '/',
         fillColor: getScaffoldDialogBackgroundColor(context, 'warmGray'),
       ),
-  '/addWallet/:userId': (context, state) {
+  '/addWallet/:userId': (context, state, obj) {
     final beamState = context.currentBeamLocation.state as BeamState;
 
     final userId = int.tryParse(beamState.pathParameters['userId'] ?? '');
@@ -61,7 +61,7 @@ final simpleBuilder = SimpleLocationBuilder(routes: {
       return beamerLoadingPage();
     }
   },
-  '/editWallet/:walletId': (context, state) {
+  '/editWallet/:walletId': (context, state, obj) {
     final beamState = context.currentBeamLocation.state as BeamState;
     final walletId = int.tryParse(beamState.pathParameters['walletId'] ?? '');
 
@@ -86,7 +86,7 @@ final simpleBuilder = SimpleLocationBuilder(routes: {
       return beamerLoadingPage();
     }
   },
-  '/addItem/:walletId': (context, state) {
+  '/addItem/:walletId': (context, state, obj) {
     final beamState = context.currentBeamLocation.state as BeamState;
     final walletId = int.tryParse(beamState.pathParameters['walletId'] ?? '');
 
@@ -116,7 +116,7 @@ final simpleBuilder = SimpleLocationBuilder(routes: {
       return beamerLoadingPage();
     }
   },
-  '/editItem/:itemId': (context, state) {
+  '/editItem/:itemId': (context, state, obj) {
     final beamState = context.currentBeamLocation.state as BeamState;
     final itemId = int.tryParse(beamState.pathParameters['itemId'] ?? '');
 
@@ -147,7 +147,7 @@ final simpleBuilder = SimpleLocationBuilder(routes: {
       return beamerLoadingPage();
     }
   },
-  '/moveItem/:itemId': (context, state) {
+  '/moveItem/:itemId': (context, state, obj) {
     final beamState = context.currentBeamLocation.state as BeamState;
     final itemId = int.tryParse(beamState.pathParameters['itemId'] ?? '');
 
@@ -180,7 +180,7 @@ final simpleBuilder = SimpleLocationBuilder(routes: {
 });
 
 class App extends StatelessWidget {
-  App({Key? key}) : super(key: key);
+  App({super.key});
 
   final _routerDelegate = BeamerDelegate(
     notFoundPage: const BeamPage(
@@ -188,7 +188,7 @@ class App extends StatelessWidget {
       title: '404',
       child: ErrorPage(),
     ),
-    locationBuilder: simpleBuilder,
+    locationBuilder: simpleBuilder.call,
   );
 
   @override
@@ -278,6 +278,8 @@ class App extends StatelessWidget {
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: AppLocalizations.supportedLocales,
           title: 'Cash Balancer',
@@ -314,18 +316,12 @@ class BeamerMaterialTransitionPage extends BeamPage {
   final Color? fillColor;
 
   const BeamerMaterialTransitionPage({
-    LocalKey? key,
-    required Widget child,
-    String title = '',
-    String? popToNamed,
+    super.key,
+    required super.child,
+    String super.title = '',
+    super.popToNamed,
     this.fillColor,
-  }) : super(
-          key: key,
-          child: child,
-          title: title,
-          popToNamed: popToNamed,
-          // + all other you might need
-        );
+  });
 
   @override
   Route createRoute(BuildContext context) {
@@ -342,11 +338,10 @@ class SharedAxisPageRoute extends PageRouteBuilder<Object> {
   SharedAxisPageRoute({
     required Widget page,
     required SharedAxisTransitionType transitionType,
-    required RouteSettings? settings,
+    required super.settings,
     Color? fillColor,
   }) : super(
           pageBuilder: (context, primaryAnimation, secondaryAnimation) => page,
-          settings: settings,
           transitionsBuilder: (
             context,
             primaryAnimation,
@@ -365,7 +360,7 @@ class SharedAxisPageRoute extends PageRouteBuilder<Object> {
 }
 
 class ErrorPage extends StatelessWidget {
-  const ErrorPage({Key? key}) : super(key: key);
+  const ErrorPage({super.key});
 
   @override
   Widget build(BuildContext context) {

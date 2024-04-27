@@ -1,6 +1,6 @@
 import 'package:cash_balancer/database/database.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:moor/moor.dart';
+import 'package:drift/drift.dart';
 
 void main() {
   test('Test Moor', () async {

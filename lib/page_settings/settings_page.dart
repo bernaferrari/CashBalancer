@@ -1,16 +1,16 @@
 import 'package:cash_balancer/blocs/data_bloc.dart';
 import 'package:cash_balancer/database/data.dart';
-import 'package:cash_balancer/l10n/l10n.dart';
 import 'package:cash_balancer/page_settings/sort_by_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 
+import '../l10n/l10n.dart';
 import '../widgets/dialog_screen_base.dart';
 import 'currency_symbol_dialog.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {

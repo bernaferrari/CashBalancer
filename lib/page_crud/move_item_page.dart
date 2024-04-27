@@ -1,9 +1,9 @@
 import 'package:beamer/beamer.dart';
+import 'package:cash_balancer/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
-import '../l10n/l10n.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/dialog_screen_base.dart';
 
@@ -20,8 +20,7 @@ class MoveItemPage extends StatefulWidget {
       required this.userId,
       required this.item,
       required this.wallets,
-      Key? key})
-      : super(key: key);
+      super.key});
 
   @override
   State<MoveItemPage> createState() => _MoveItemPageState();

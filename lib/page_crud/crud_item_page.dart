@@ -26,8 +26,8 @@ class CRUDItemPage extends StatefulWidget {
     required this.userId,
     required this.currency,
     this.previousItem,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<CRUDItemPage> createState() => _CRUDItemPageState();

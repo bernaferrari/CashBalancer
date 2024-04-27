@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class PieChartSection extends StatelessWidget {
   final FullData data;
 
-  const PieChartSection(this.data, {Key? key}) : super(key: key);
+  const PieChartSection(this.data, {super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -9,7 +9,7 @@ import '../page_home/details_page.dart';
 import 'bar_chart_section.dart';
 
 class AnalysisPage extends StatelessWidget {
-  const AnalysisPage({Key? key}) : super(key: key);
+  const AnalysisPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class AnalysisPage extends StatelessWidget {
 class DetailsPageImpl extends StatelessWidget {
   final FullData data;
 
-  const DetailsPageImpl(this.data, {Key? key}) : super(key: key);
+  const DetailsPageImpl(this.data, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -62,9 +62,9 @@ class MainList extends StatelessWidget {
   final FullData data;
 
   const MainList({
-    Key? key,
+    super.key,
     required this.data,
-  }) : super(key: key);
+  });
 
   static const double margin = 20.0;
 
@@ -129,7 +129,7 @@ class MainList extends StatelessWidget {
 class ItemsList extends StatelessWidget {
   final FullData data;
 
-  const ItemsList(this.data, {Key? key}) : super(key: key);
+  const ItemsList(this.data, {super.key});
 
   @override
   Widget build(BuildContext context) {

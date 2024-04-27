@@ -7,8 +7,7 @@ class ColorPicker extends StatefulWidget {
   final String initialSelection;
   final ValueChanged<String> onChanged;
 
-  const ColorPicker(this.initialSelection, this.onChanged, {Key? key})
-      : super(key: key);
+  const ColorPicker(this.initialSelection, this.onChanged, {super.key});
 
   @override
   State<ColorPicker> createState() => _ColorPickerState();
@@ -59,8 +58,8 @@ class AnimatedColorItem extends StatelessWidget {
     required this.color,
     required this.isSelected,
     this.onSelected,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final maxSize = 36.0;
 

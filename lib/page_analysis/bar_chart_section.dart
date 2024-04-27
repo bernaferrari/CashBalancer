@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 class BarChartSection extends StatelessWidget {
   final FullData data;
 
-  const BarChartSection(this.data, {Key? key}) : super(key: key);
+  const BarChartSection(this.data, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class BarChartSection extends StatelessWidget {
 
 class RectangularPercentageWidget extends StatefulWidget {
   const RectangularPercentageWidget({
-    Key? key,
+    super.key,
     required this.id,
     this.percent = 0.0,
     this.size = 30,
@@ -66,7 +66,7 @@ class RectangularPercentageWidget extends StatefulWidget {
     this.borderWidth = 0.2,
     this.backgroundColor = const Color(0x00FFFFFF),
     this.progressColor = const Color(0xFFFA7268),
-  }) : super(key: key);
+  });
 
   final int id;
   final double percent;

@@ -1,12 +1,12 @@
 import 'dart:math';
 
+import 'package:cash_balancer/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
-import '../l10n/l10n.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/color_picker.dart';
 import '../widgets/dialog_screen_base.dart';
@@ -18,8 +18,8 @@ class CRUDWalletPage extends StatefulWidget {
   const CRUDWalletPage({
     required this.userId,
     this.previousWallet,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<CRUDWalletPage> createState() => _CRUDWalletPageState();
