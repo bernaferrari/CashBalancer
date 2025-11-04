@@ -6,11 +6,11 @@ import '../util/tailwind_colors.dart';
 Color getScaffoldDialogBackgroundColor(BuildContext context, String colorName) {
   return Theme.of(context).brightness == Brightness.dark
       ? Color.alphaBlend(
-          Colors.black.withOpacity(0.40),
+          Colors.black.withValues(alpha: 0.40),
           tailwindColors[colorName]![900]!,
         )
       : Color.alphaBlend(
-          Colors.white.withOpacity(0.40),
+          Colors.white.withValues(alpha: 0.40),
           tailwindColors[colorName]![100]!,
         );
 }
@@ -30,7 +30,7 @@ Color getPrimaryColorWeaker(BuildContext context, String colorName) {
 Color getBackgroundDialogColor(BuildContext context, String colorName) {
   return Theme.of(context).brightness == Brightness.dark
       ? Color.alphaBlend(
-          Colors.black.withOpacity(0.60),
+          Colors.black.withValues(alpha: 0.60),
           tailwindColors[colorName]![900]!,
         )
       : tailwindColors[colorName]![100]!;
@@ -85,7 +85,7 @@ class DialogScreenBase extends StatelessWidget {
                     color: backgroundDialogColor ??
                         (Theme.of(context).brightness == Brightness.dark
                             ? Color.alphaBlend(
-                                Colors.black.withOpacity(0.60),
+                                Colors.black.withValues(alpha: 0.60),
                                 tailwindColors[colorName]![900]!,
                               )
                             : tailwindColors[colorName]![100]!),

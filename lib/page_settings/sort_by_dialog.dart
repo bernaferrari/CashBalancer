@@ -23,7 +23,7 @@ class _SortByDialogState extends State<SortByDialog> {
     final primaryColor = (Theme.of(context).brightness == Brightness.dark)
         ? tailwindColors[colorName]![300]!
         : tailwindColors[colorName]![800]!;
-    final backgroundDialogColor = Theme.of(context).colorScheme.background;
+    final backgroundDialogColor = Theme.of(context).colorScheme.surface;
 
     return AlertDialog(
       title: Text(AppLocalizations.of(context).sortBy),
@@ -54,7 +54,7 @@ class _SortByDialogState extends State<SortByDialog> {
                       child: Text(
                         getSortByString(context, sortId),
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onBackground,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                       onPressed: () {

@@ -44,5 +44,8 @@
   "sortBy0": "Valor",
   "sortBy1": "Nome",
   "pleaseEnterCurrency": "Por favor digite uma moeda ($, €, etc.)",
+  "invalidValue": "Formato de número inválido",
+  "valueMustBePositive": "O valor deve ser positivo",
+  "targetMustBeBetween": "O alvo deve estar entre 0 e 100",
   "designedDeveloped": "Desenhado e desenvolvido por Bernardo Ferrari."
 }

@@ -7,6 +7,7 @@ import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import '../blocs/data_bloc.dart';
 import '../database/database.dart';
 import '../l10n/l10n.dart';
+import '../utils/error_handler.dart';
 import '../widgets/dialog_screen_base.dart';
 
 class CRUDItemPage extends StatefulWidget {
@@ -163,10 +164,17 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                           return AppLocalizations.of(context)
                               .mainDialogValidator;
                         }
+                        final num = double.tryParse(value);
+                        if (num == null) {
+                          return AppLocalizations.of(context).invalidValue;
+                        }
+                        if (num < 0) {
+                          return AppLocalizations.of(context).valueMustBePositive;
+                        }
                         return null;
                       },
                       inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(RegExp(r'^-?[0-9]*')),
+                        FilteringTextInputFormatter.allow(RegExp(r'^[0-9.]*')),
                       ],
                       textAlign: TextAlign.right,
                       keyboardType: TextInputType.number,
@@ -201,7 +209,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
           const SizedBox(height: 16),
           Container(
             decoration: BoxDecoration(
-              color: primaryColorWeaker.withOpacity(0.10),
+              color: primaryColorWeaker.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(16.0),
             ),
             padding: const EdgeInsets.all(20),
@@ -241,14 +249,25 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                             controller: targetEditingController,
                             onFieldSubmitted: onSubmit,
                             validator: (value) {
-                              // No validator for target.
+                              // Target is optional, so allow empty
+                              if (value == null || value.isEmpty) {
+                                return null;
+                              }
+                              final num = double.tryParse(value);
+                              if (num == null) {
+                                return AppLocalizations.of(context).invalidValue;
+                              }
+                              if (num < 0 || num > 100) {
+                                return AppLocalizations.of(context)
+                                    .targetMustBeBetween;
+                              }
                               return null;
                             },
                             textAlign: TextAlign.right,
                             keyboardType: TextInputType.number,
                             inputFormatters: <TextInputFormatter>[
                               FilteringTextInputFormatter.allow(
-                                  RegExp(r'^-?[0-9]*')),
+                                  RegExp(r'^[0-9.]*')),
                             ],
                             decoration: InputDecoration(
                               labelText: AppLocalizations.of(context)
@@ -314,26 +333,45 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
     );
   }
 
-  void onSubmit([String? value]) {
+  void onSubmit([String? value]) async {
     if (_formKey.currentState!.validate()) {
-      if (widget.previousItem == null) {
-        context.read<DataCubit>().db.createItem(
-              walletId: widget.walletId,
-              userId: widget.userId,
-              name: nameEditingController.text,
-              value: moneyEditingController.text,
-              target: targetEditingController.text,
-            );
-      } else {
-        context.read<DataCubit>().db.updateItem(
-              item: widget.previousItem!,
-              name: nameEditingController.text,
-              price: moneyEditingController.text,
-              target: targetEditingController.text,
-            );
-      }
+      final isCreating = widget.previousItem == null;
 
-      Navigator.of(context).pop();
+      final result = isCreating
+          ? await safeDbOperation(
+              () => context.read<DataCubit>().db.createItem(
+                    walletId: widget.walletId,
+                    userId: widget.userId,
+                    name: nameEditingController.text,
+                    value: moneyEditingController.text,
+                    target: targetEditingController.text,
+                  ),
+              errorMessage: 'Failed to create item',
+            )
+          : await safeDbOperation(
+              () => context.read<DataCubit>().db.updateItem(
+                    item: widget.previousItem!,
+                    name: nameEditingController.text,
+                    price: moneyEditingController.text,
+                    target: targetEditingController.text,
+                  ),
+              errorMessage: 'Failed to update item',
+            );
+
+      if (mounted) {
+        result.when(
+          success: (_) {
+            showSuccessSnackbar(
+              context,
+              isCreating ? 'Item created successfully' : 'Item updated successfully',
+            );
+            Navigator.of(context).pop();
+          },
+          error: (error) {
+            showErrorSnackbar(context, error);
+          },
+        );
+      }
     }
   }
 
@@ -362,24 +400,51 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
 
   Future<void> onSaveAddMore([String? value]) async {
     if (_formKey.currentState!.validate()) {
-      context.read<DataCubit>().db.createItem(
-            walletId: widget.walletId,
-            userId: widget.userId,
-            name: nameEditingController.text,
-            value: moneyEditingController.text,
-            target: targetEditingController.text,
-          );
+      final result = await safeDbOperation(
+        () => context.read<DataCubit>().db.createItem(
+              walletId: widget.walletId,
+              userId: widget.userId,
+              name: nameEditingController.text,
+              value: moneyEditingController.text,
+              target: targetEditingController.text,
+            ),
+        errorMessage: 'Failed to create item',
+      );
 
-      nameFocusNode.requestFocus();
-      _formKey.currentState?.reset();
-      nameEditingController.text = '';
-      moneyEditingController.text = '';
-      targetEditingController.text = '';
+      if (mounted) {
+        result.when(
+          success: (_) {
+            showSuccessSnackbar(context, 'Item created successfully');
+            nameFocusNode.requestFocus();
+            _formKey.currentState?.reset();
+            nameEditingController.text = '';
+            moneyEditingController.text = '';
+            targetEditingController.text = '';
+          },
+          error: (error) {
+            showErrorSnackbar(context, error);
+          },
+        );
+      }
     }
   }
 
-  void onDelete() {
-    context.read<DataCubit>().db.deleteItem(widget.previousItem!);
-    Navigator.of(context).pop();
+  void onDelete() async {
+    final result = await safeDbOperation(
+      () => context.read<DataCubit>().db.deleteItem(widget.previousItem!),
+      errorMessage: 'Failed to delete item',
+    );
+
+    if (mounted) {
+      result.when(
+        success: (_) {
+          showSuccessSnackbar(context, 'Item deleted successfully');
+          Navigator.of(context).pop();
+        },
+        error: (error) {
+          showErrorSnackbar(context, error);
+        },
+      );
+    }
   }
 }

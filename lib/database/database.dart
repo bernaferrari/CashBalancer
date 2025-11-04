@@ -130,10 +130,11 @@ class Database extends _$Database {
           getColorByQuantile(groupedItems, walletsMap, sortedItems);
 
       final allItemData = sortedItems
+          .where((d) => walletsMap.containsKey(d.walletId))
           .map((d) => ItemData(
                 item: d,
-                colorName: walletsMap[d.walletId]!.colorName,
-                color: colors[d.id]!,
+                colorName: walletsMap[d.walletId]?.colorName ?? 'gray',
+                color: colors[d.id] ?? const Color(0xFF9E9E9E),
               ))
           .toList();
 

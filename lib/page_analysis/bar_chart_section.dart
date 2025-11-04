@@ -37,7 +37,7 @@ class BarChartSection extends StatelessWidget {
                   id: item.id,
                   percent: item.price / maximumPrice,
                   size: 40,
-                  backgroundColor: Colors.white.withOpacity(0.15),
+                  backgroundColor: Colors.white.withValues(alpha: 0.15),
                   borderWidth: 0,
                   progressColor: item.color,
                   direction: Axis.vertical,

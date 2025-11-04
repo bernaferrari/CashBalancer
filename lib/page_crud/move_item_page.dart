@@ -45,7 +45,7 @@ class _MoveItemPageState extends State<MoveItemPage> {
     final backgroundDialogColor =
         Theme.of(context).brightness == Brightness.dark
             ? Color.alphaBlend(
-                Colors.black.withOpacity(0.60),
+                Colors.black.withValues(alpha: 0.60),
                 tailwindColors[colorName]![900]!,
               )
             : tailwindColors[colorName]![100]!;
@@ -76,7 +76,7 @@ class _MoveItemPageState extends State<MoveItemPage> {
               child: Text(
                 group.name,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onBackground,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               onPressed: () {

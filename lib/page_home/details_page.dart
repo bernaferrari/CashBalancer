@@ -36,7 +36,6 @@ class HomePageImpl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         title: Text(
           AppLocalizations.of(context).appTitle,
@@ -50,7 +49,7 @@ class HomePageImpl extends StatelessWidget {
             onPressed: () => Beamer.of(context).beamToNamed('/settings'),
             icon: Icon(
               Icons.settings_outlined,
-              color: Theme.of(context).colorScheme.onBackground,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -170,7 +169,7 @@ class MainList extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.10),
+                    Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
               ),
               child: VerticalProgressBar(data: data, totalValue: totalValue),
             ),
@@ -197,7 +196,7 @@ class MainList extends StatelessWidget {
                             "Total: ${data.settings.currencySymbol} ${toCurrency(data.totalValue)}",
                             style: TextStyle(
                               fontSize: 12,
-                              color: Theme.of(context).colorScheme.onBackground,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -306,10 +305,10 @@ class GroupCard extends StatelessWidget {
         padding: const EdgeInsets.all(10.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.0),
-          border: Border.all(color: color.withOpacity(0.20)),
+          border: Border.all(color: color.withValues(alpha: 0.20)),
           color: Theme.of(context).brightness == Brightness.dark
-              ? color.withOpacity(0.10)
-              : color.withOpacity(0.05),
+              ? color.withValues(alpha: 0.10)
+              : color.withValues(alpha: 0.05),
         ),
         child: child,
       );
@@ -374,7 +373,7 @@ class GroupCard extends StatelessWidget {
                   height: 1,
                   margin: const EdgeInsets.symmetric(horizontal: 8),
                   color:
-                      Theme.of(context).colorScheme.onPrimary.withOpacity(0.10),
+                      Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.10),
                 ),
             ],
             const SizedBox(height: 8),
@@ -524,7 +523,7 @@ class CircularProgress extends StatelessWidget {
           color: color,
           circleColor: Colors.transparent,
           backgroundColor:
-              Theme.of(context).colorScheme.onSurface.withOpacity(0.15),
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15),
         ),
         child: hasText
             ? Center(
@@ -607,8 +606,8 @@ class ItemCard extends StatelessWidget {
       style: TextButton.styleFrom(
         padding: const EdgeInsets.all(10.0),
         backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? item.color.withOpacity(0.05)
-            : item.color.withOpacity(0.25),
+            ? item.color.withValues(alpha: 0.05)
+            : item.color.withValues(alpha: 0.25),
         elevation: 0,
       ),
       onPressed: () {
@@ -668,7 +667,7 @@ class ItemCard extends StatelessWidget {
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withOpacity(0.75),
+                            .withValues(alpha: 0.75),
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -704,7 +703,7 @@ class PercentArrow extends StatelessWidget {
         Text(
           "${(itemValue / totalValue).toPercent()}%",
           style: GoogleFonts.firaSans(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.50),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.50),
             fontSize: 18,
             fontWeight: FontWeight.w400,
           ),
@@ -714,7 +713,7 @@ class PercentArrow extends StatelessWidget {
           child: Icon(
             Icons.arrow_forward_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.50),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.50),
           ),
         ),
         Text(

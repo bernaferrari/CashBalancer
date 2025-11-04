@@ -17,7 +17,7 @@ import '../blocs/data_bloc.dart';
 import '../database/database.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/dialog_screen_base.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../gen_l10n/app_localizations.dart';
 
 final simpleBuilder = RoutesLocationBuilder(routes: {
   '/': (context, state, obj) {
@@ -71,17 +71,20 @@ final simpleBuilder = RoutesLocationBuilder(routes: {
 
     final state = context.read<DataCubit>().state;
     if (state != null) {
-      final String colorName = state.walletsMap[walletId]!.colorName;
-
-      return BeamerMaterialTransitionPage(
-        key: ValueKey('editWallet-$walletId'),
-        title: AppLocalizations.of(context).editWallet,
-        child: CRUDWalletPage(
-          userId: state.userId,
-          previousWallet: state.walletsMap[walletId]!,
-        ),
-        fillColor: getScaffoldDialogBackgroundColor(context, colorName),
-      );
+      final wallet = state.walletsMap[walletId];
+      if (wallet != null) {
+        return BeamerMaterialTransitionPage(
+          key: ValueKey('editWallet-$walletId'),
+          title: AppLocalizations.of(context).editWallet,
+          child: CRUDWalletPage(
+            userId: state.userId,
+            previousWallet: wallet,
+          ),
+          fillColor: getScaffoldDialogBackgroundColor(context, wallet.colorName),
+        );
+      } else {
+        return const ErrorPage();
+      }
     } else {
       return beamerLoadingPage();
     }
@@ -96,22 +99,25 @@ final simpleBuilder = RoutesLocationBuilder(routes: {
 
     final state = context.read<DataCubit>().state;
     if (state != null) {
-      final String colorName = state.walletsMap[walletId]!.colorName;
-
-      // Widgets and BeamPages can be mixed!
-      return BeamerMaterialTransitionPage(
-        key: ValueKey('addItem-$walletId'),
-        title: 'Add Item',
-        child: CRUDItemPage(
-          userId: state.userId,
-          previousItem: null,
-          colorName: colorName,
-          walletId: walletId,
-          totalValue: state.totalValue,
-          currency: state.settings.currencySymbol,
-        ),
-        fillColor: getScaffoldDialogBackgroundColor(context, colorName),
-      );
+      final wallet = state.walletsMap[walletId];
+      if (wallet != null) {
+        // Widgets and BeamPages can be mixed!
+        return BeamerMaterialTransitionPage(
+          key: ValueKey('addItem-$walletId'),
+          title: 'Add Item',
+          child: CRUDItemPage(
+            userId: state.userId,
+            previousItem: null,
+            colorName: wallet.colorName,
+            walletId: walletId,
+            totalValue: state.totalValue,
+            currency: state.settings.currencySymbol,
+          ),
+          fillColor: getScaffoldDialogBackgroundColor(context, wallet.colorName),
+        );
+      } else {
+        return const ErrorPage();
+      }
     } else {
       return beamerLoadingPage();
     }
@@ -239,14 +245,14 @@ class App extends StatelessWidget {
               // background: Color(0xff18170f),
               // surface: Color(0xff201f15),
             ),
-            dialogTheme: DialogTheme(
+            dialogTheme: DialogThemeData(
               backgroundColor: const Color(0xff18170f),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
             ),
-            appBarTheme: const AppBarTheme(color: Color(0xFF13B9FF)),
-            typography: Typography.material2018(),
+            appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF13B9FF)),
+            typography: Typography.material2021(),
             visualDensity: VisualDensity.standard,
             applyElevationOverlayColor: false,
             elevatedButtonTheme: elevatedButtonTheme,
@@ -259,15 +265,14 @@ class App extends StatelessWidget {
             colorScheme: const ColorScheme.dark(
               primary: Color(0xffe4d75a),
               secondary: Color(0xff5ae492),
-              background: Color(0xff121212),
               surface: Color(0xff201f15),
             ),
-            dialogTheme: DialogTheme(
+            dialogTheme: DialogThemeData(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
             ),
-            typography: Typography.material2018(),
+            typography: Typography.material2021(),
             visualDensity: VisualDensity.standard,
             applyElevationOverlayColor: false,
             elevatedButtonTheme: elevatedButtonTheme,

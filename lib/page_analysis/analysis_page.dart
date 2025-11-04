@@ -31,14 +31,13 @@ class DetailsPageImpl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         title: Text(
           AppLocalizations.of(context).allItems,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         leading: BackButton(
-          color: Theme.of(context).colorScheme.onBackground,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
           onPressed: () {
             Beamer.of(context).popToNamed('/');
           },
@@ -90,7 +89,7 @@ class MainList extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.10),
+                    Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
               ),
               child: VerticalProgressBar(data: data, totalValue: totalValue),
             ),
@@ -110,7 +109,7 @@ class MainList extends StatelessWidget {
                       "Total: ${data.settings.currencySymbol} ${toCurrency(data.totalValue)}",
                       style: TextStyle(
                         fontSize: 12,
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -145,22 +144,23 @@ class ItemsList extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         for (int i = 0; i < sortedItems.length; i++) ...[
-          SizedBox(
-            width: double.infinity,
-            child: ItemCard(
-              sortedItems[i],
-              data.settings.relativeTarget
-                  ? data.walletsMap[sortedItems[i].walletId]!.totalValue
-                  : data.totalValue,
-              data.walletsMap[sortedItems[i].walletId]!.colorName,
-              data.settings.currencySymbol,
+          if (data.walletsMap.containsKey(sortedItems[i].walletId))
+            SizedBox(
+              width: double.infinity,
+              child: ItemCard(
+                sortedItems[i],
+                data.settings.relativeTarget
+                    ? data.walletsMap[sortedItems[i].walletId]?.totalValue ?? 0
+                    : data.totalValue,
+                data.walletsMap[sortedItems[i].walletId]?.colorName ?? 'gray',
+                data.settings.currencySymbol,
+              ),
             ),
-          ),
           if (i < sortedItems.length - 1)
             Container(
               height: 1,
               margin: const EdgeInsets.symmetric(horizontal: 8),
-              color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.10),
+              color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.10),
             ),
         ],
       ],

@@ -32,7 +32,7 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
     final primaryColor = (Theme.of(context).brightness == Brightness.dark)
         ? tailwindColors['gray']![300]!
         : tailwindColors['gray']![800]!;
-    final backgroundDialogColor = Theme.of(context).colorScheme.background;
+    final backgroundDialogColor = Theme.of(context).colorScheme.surface;
 
     return AlertDialog(
       title: Text(AppLocalizations.of(context).currencySymbol),

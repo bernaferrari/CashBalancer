@@ -105,6 +105,13 @@ class User extends DataClass implements Insertable<User> {
         id: id ?? this.id,
         name: name ?? this.name,
       );
+  User copyWithCompanion(UsersCompanion data) {
+    return User(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('User(')
@@ -347,6 +354,18 @@ class Wallet extends DataClass implements Insertable<Wallet> {
         colorName: colorName ?? this.colorName,
         targetPercent: targetPercent ?? this.targetPercent,
       );
+  Wallet copyWithCompanion(WalletsCompanion data) {
+    return Wallet(
+      id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      name: data.name.present ? data.name.value : this.name,
+      colorName: data.colorName.present ? data.colorName.value : this.colorName,
+      targetPercent: data.targetPercent.present
+          ? data.targetPercent.value
+          : this.targetPercent,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Wallet(')
@@ -678,6 +697,20 @@ class Item extends DataClass implements Insertable<Item> {
         price: price ?? this.price,
         targetPercent: targetPercent ?? this.targetPercent,
       );
+  Item copyWithCompanion(ItemsCompanion data) {
+    return Item(
+      id: data.id.present ? data.id.value : this.id,
+      walletId: data.walletId.present ? data.walletId.value : this.walletId,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      name: data.name.present ? data.name.value : this.name,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
+      price: data.price.present ? data.price.value : this.price,
+      targetPercent: data.targetPercent.present
+          ? data.targetPercent.value
+          : this.targetPercent,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Item(')
@@ -822,6 +855,7 @@ class ItemsCompanion extends UpdateCompanion<Item> {
 
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(e);
+  $DatabaseManager get managers => $DatabaseManager(this);
   late final $UsersTable users = $UsersTable(this);
   late final $WalletsTable wallets = $WalletsTable(this);
   late final $ItemsTable items = $ItemsTable(this);
@@ -839,4 +873,473 @@ abstract class _$Database extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [users, wallets, items];
+}
+
+typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
+  Value<int> id,
+  required String name,
+});
+typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
+  Value<int> id,
+  Value<String> name,
+});
+
+class $$UsersTableFilterComposer extends Composer<_$Database, $UsersTable> {
+  $$UsersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+}
+
+class $$UsersTableOrderingComposer extends Composer<_$Database, $UsersTable> {
+  $$UsersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+}
+
+class $$UsersTableAnnotationComposer extends Composer<_$Database, $UsersTable> {
+  $$UsersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+}
+
+class $$UsersTableTableManager extends RootTableManager<
+    _$Database,
+    $UsersTable,
+    User,
+    $$UsersTableFilterComposer,
+    $$UsersTableOrderingComposer,
+    $$UsersTableAnnotationComposer,
+    $$UsersTableCreateCompanionBuilder,
+    $$UsersTableUpdateCompanionBuilder,
+    (User, BaseReferences<_$Database, $UsersTable, User>),
+    User,
+    PrefetchHooks Function()> {
+  $$UsersTableTableManager(_$Database db, $UsersTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$UsersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$UsersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$UsersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+          }) =>
+              UsersCompanion(
+            id: id,
+            name: name,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String name,
+          }) =>
+              UsersCompanion.insert(
+            id: id,
+            name: name,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$UsersTableProcessedTableManager = ProcessedTableManager<
+    _$Database,
+    $UsersTable,
+    User,
+    $$UsersTableFilterComposer,
+    $$UsersTableOrderingComposer,
+    $$UsersTableAnnotationComposer,
+    $$UsersTableCreateCompanionBuilder,
+    $$UsersTableUpdateCompanionBuilder,
+    (User, BaseReferences<_$Database, $UsersTable, User>),
+    User,
+    PrefetchHooks Function()>;
+typedef $$WalletsTableCreateCompanionBuilder = WalletsCompanion Function({
+  Value<int> id,
+  required int userId,
+  required String name,
+  required String colorName,
+  required double targetPercent,
+});
+typedef $$WalletsTableUpdateCompanionBuilder = WalletsCompanion Function({
+  Value<int> id,
+  Value<int> userId,
+  Value<String> name,
+  Value<String> colorName,
+  Value<double> targetPercent,
+});
+
+class $$WalletsTableFilterComposer extends Composer<_$Database, $WalletsTable> {
+  $$WalletsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get colorName => $composableBuilder(
+      column: $table.colorName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get targetPercent => $composableBuilder(
+      column: $table.targetPercent, builder: (column) => ColumnFilters(column));
+}
+
+class $$WalletsTableOrderingComposer
+    extends Composer<_$Database, $WalletsTable> {
+  $$WalletsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get colorName => $composableBuilder(
+      column: $table.colorName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get targetPercent => $composableBuilder(
+      column: $table.targetPercent,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$WalletsTableAnnotationComposer
+    extends Composer<_$Database, $WalletsTable> {
+  $$WalletsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get colorName =>
+      $composableBuilder(column: $table.colorName, builder: (column) => column);
+
+  GeneratedColumn<double> get targetPercent => $composableBuilder(
+      column: $table.targetPercent, builder: (column) => column);
+}
+
+class $$WalletsTableTableManager extends RootTableManager<
+    _$Database,
+    $WalletsTable,
+    Wallet,
+    $$WalletsTableFilterComposer,
+    $$WalletsTableOrderingComposer,
+    $$WalletsTableAnnotationComposer,
+    $$WalletsTableCreateCompanionBuilder,
+    $$WalletsTableUpdateCompanionBuilder,
+    (Wallet, BaseReferences<_$Database, $WalletsTable, Wallet>),
+    Wallet,
+    PrefetchHooks Function()> {
+  $$WalletsTableTableManager(_$Database db, $WalletsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WalletsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WalletsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WalletsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> userId = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String> colorName = const Value.absent(),
+            Value<double> targetPercent = const Value.absent(),
+          }) =>
+              WalletsCompanion(
+            id: id,
+            userId: userId,
+            name: name,
+            colorName: colorName,
+            targetPercent: targetPercent,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int userId,
+            required String name,
+            required String colorName,
+            required double targetPercent,
+          }) =>
+              WalletsCompanion.insert(
+            id: id,
+            userId: userId,
+            name: name,
+            colorName: colorName,
+            targetPercent: targetPercent,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$WalletsTableProcessedTableManager = ProcessedTableManager<
+    _$Database,
+    $WalletsTable,
+    Wallet,
+    $$WalletsTableFilterComposer,
+    $$WalletsTableOrderingComposer,
+    $$WalletsTableAnnotationComposer,
+    $$WalletsTableCreateCompanionBuilder,
+    $$WalletsTableUpdateCompanionBuilder,
+    (Wallet, BaseReferences<_$Database, $WalletsTable, Wallet>),
+    Wallet,
+    PrefetchHooks Function()>;
+typedef $$ItemsTableCreateCompanionBuilder = ItemsCompanion Function({
+  Value<int> id,
+  required int walletId,
+  required int userId,
+  required String name,
+  required double quantity,
+  required double price,
+  required double targetPercent,
+});
+typedef $$ItemsTableUpdateCompanionBuilder = ItemsCompanion Function({
+  Value<int> id,
+  Value<int> walletId,
+  Value<int> userId,
+  Value<String> name,
+  Value<double> quantity,
+  Value<double> price,
+  Value<double> targetPercent,
+});
+
+class $$ItemsTableFilterComposer extends Composer<_$Database, $ItemsTable> {
+  $$ItemsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get walletId => $composableBuilder(
+      column: $table.walletId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get quantity => $composableBuilder(
+      column: $table.quantity, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get price => $composableBuilder(
+      column: $table.price, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get targetPercent => $composableBuilder(
+      column: $table.targetPercent, builder: (column) => ColumnFilters(column));
+}
+
+class $$ItemsTableOrderingComposer extends Composer<_$Database, $ItemsTable> {
+  $$ItemsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get walletId => $composableBuilder(
+      column: $table.walletId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get quantity => $composableBuilder(
+      column: $table.quantity, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get price => $composableBuilder(
+      column: $table.price, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get targetPercent => $composableBuilder(
+      column: $table.targetPercent,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$ItemsTableAnnotationComposer extends Composer<_$Database, $ItemsTable> {
+  $$ItemsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get walletId =>
+      $composableBuilder(column: $table.walletId, builder: (column) => column);
+
+  GeneratedColumn<int> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<double> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
+
+  GeneratedColumn<double> get price =>
+      $composableBuilder(column: $table.price, builder: (column) => column);
+
+  GeneratedColumn<double> get targetPercent => $composableBuilder(
+      column: $table.targetPercent, builder: (column) => column);
+}
+
+class $$ItemsTableTableManager extends RootTableManager<
+    _$Database,
+    $ItemsTable,
+    Item,
+    $$ItemsTableFilterComposer,
+    $$ItemsTableOrderingComposer,
+    $$ItemsTableAnnotationComposer,
+    $$ItemsTableCreateCompanionBuilder,
+    $$ItemsTableUpdateCompanionBuilder,
+    (Item, BaseReferences<_$Database, $ItemsTable, Item>),
+    Item,
+    PrefetchHooks Function()> {
+  $$ItemsTableTableManager(_$Database db, $ItemsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ItemsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ItemsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ItemsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> walletId = const Value.absent(),
+            Value<int> userId = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<double> quantity = const Value.absent(),
+            Value<double> price = const Value.absent(),
+            Value<double> targetPercent = const Value.absent(),
+          }) =>
+              ItemsCompanion(
+            id: id,
+            walletId: walletId,
+            userId: userId,
+            name: name,
+            quantity: quantity,
+            price: price,
+            targetPercent: targetPercent,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int walletId,
+            required int userId,
+            required String name,
+            required double quantity,
+            required double price,
+            required double targetPercent,
+          }) =>
+              ItemsCompanion.insert(
+            id: id,
+            walletId: walletId,
+            userId: userId,
+            name: name,
+            quantity: quantity,
+            price: price,
+            targetPercent: targetPercent,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$ItemsTableProcessedTableManager = ProcessedTableManager<
+    _$Database,
+    $ItemsTable,
+    Item,
+    $$ItemsTableFilterComposer,
+    $$ItemsTableOrderingComposer,
+    $$ItemsTableAnnotationComposer,
+    $$ItemsTableCreateCompanionBuilder,
+    $$ItemsTableUpdateCompanionBuilder,
+    (Item, BaseReferences<_$Database, $ItemsTable, Item>),
+    Item,
+    PrefetchHooks Function()>;
+
+class $DatabaseManager {
+  final _$Database _db;
+  $DatabaseManager(this._db);
+  $$UsersTableTableManager get users =>
+      $$UsersTableTableManager(_db, _db.users);
+  $$WalletsTableTableManager get wallets =>
+      $$WalletsTableTableManager(_db, _db.wallets);
+  $$ItemsTableTableManager get items =>
+      $$ItemsTableTableManager(_db, _db.items);
 }

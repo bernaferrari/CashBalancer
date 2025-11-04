@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
+import '../utils/error_handler.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/color_picker.dart';
 import '../widgets/dialog_screen_base.dart';
@@ -97,7 +98,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
           const SizedBox(height: 16),
           Container(
             decoration: BoxDecoration(
-              color: primaryColorWeaker.withOpacity(0.10),
+              color: primaryColorWeaker.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(16.0),
             ),
             padding: const EdgeInsets.all(20),
@@ -135,14 +136,25 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
                         controller: targetEditingController,
                         onFieldSubmitted: onSubmit,
                         validator: (value) {
-                          // No validator for target.
+                          // Target is optional, so allow empty
+                          if (value == null || value.isEmpty) {
+                            return null;
+                          }
+                          final num = double.tryParse(value);
+                          if (num == null) {
+                            return AppLocalizations.of(context).invalidValue;
+                          }
+                          if (num < 0 || num > 100) {
+                            return AppLocalizations.of(context)
+                                .targetMustBeBetween;
+                          }
                           return null;
                         },
                         textAlign: TextAlign.right,
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[
                           FilteringTextInputFormatter.allow(
-                              RegExp(r'^-?[0-9]*')),
+                              RegExp(r'^[0-9.]*')),
                         ],
                         decoration: InputDecoration(
                           labelText:
@@ -197,35 +209,68 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
     );
   }
 
-  void onSubmit([String? value]) {
+  void onSubmit([String? value]) async {
     if (_formKey.currentState!.validate()) {
-      context.read<DataCubit>().db;
+      final isCreating = widget.previousWallet == null;
 
-      if (widget.previousWallet == null) {
-        BlocProvider.of<DataCubit>(context).db.createGroup(
-              id: widget.userId,
-              name: nameEditingController.text,
-              colorName: colorName,
-              targetPercent:
-                  double.tryParse(targetEditingController.text) ?? -1,
+      final result = isCreating
+          ? await safeDbOperation(
+              () => context.read<DataCubit>().db.createGroup(
+                    id: widget.userId,
+                    name: nameEditingController.text,
+                    colorName: colorName,
+                    targetPercent:
+                        double.tryParse(targetEditingController.text) ?? -1,
+                  ),
+              errorMessage: 'Failed to create wallet',
+            )
+          : await safeDbOperation(
+              () => context.read<DataCubit>().db.editWallet(
+                    widget.previousWallet!.copyWith(
+                      name: nameEditingController.text,
+                      colorName: colorName,
+                      targetPercent:
+                          double.tryParse(targetEditingController.text) ?? -1,
+                    ),
+                  ),
+              errorMessage: 'Failed to update wallet',
             );
-      } else {
-        context.read<DataCubit>().db.editWallet(
-              widget.previousWallet!.copyWith(
-                name: nameEditingController.text,
-                colorName: colorName,
-                targetPercent:
-                    double.tryParse(targetEditingController.text) ?? -1,
-              ),
+
+      if (mounted) {
+        result.when(
+          success: (_) {
+            showSuccessSnackbar(
+              context,
+              isCreating
+                  ? 'Wallet created successfully'
+                  : 'Wallet updated successfully',
             );
+            Navigator.of(context).pop();
+          },
+          error: (error) {
+            showErrorSnackbar(context, error);
+          },
+        );
       }
-
-      Navigator.of(context).pop();
     }
   }
 
-  void onDelete() {
-    context.read<DataCubit>().db.deleteWallet(widget.previousWallet!.id);
-    Navigator.of(context).pop();
+  void onDelete() async {
+    final result = await safeDbOperation(
+      () => context.read<DataCubit>().db.deleteWallet(widget.previousWallet!.id),
+      errorMessage: 'Failed to delete wallet',
+    );
+
+    if (mounted) {
+      result.when(
+        success: (_) {
+          showSuccessSnackbar(context, 'Wallet deleted successfully');
+          Navigator.of(context).pop();
+        },
+        error: (error) {
+          showErrorSnackbar(context, error);
+        },
+      );
+    }
   }
 }
