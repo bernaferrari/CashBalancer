@@ -11,17 +11,25 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   @override
   List<GeneratedColumn> get $columns => [id, name];
   @override
@@ -30,8 +38,10 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   String get actualTableName => $name;
   static const String $name = 'users';
   @override
-  VerificationContext validateIntegrity(Insertable<User> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<User> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -39,7 +49,9 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     }
     if (data.containsKey('name')) {
       context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
@@ -52,10 +64,14 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   User map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return User(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      name: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
     );
   }
 
@@ -78,14 +94,13 @@ class User extends DataClass implements Insertable<User> {
   }
 
   UsersCompanion toCompanion(bool nullToAbsent) {
-    return UsersCompanion(
-      id: Value(id),
-      name: Value(name),
-    );
+    return UsersCompanion(id: Value(id), name: Value(name));
   }
 
-  factory User.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory User.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return User(
       id: serializer.fromJson<int>(json['id']),
@@ -101,10 +116,8 @@ class User extends DataClass implements Insertable<User> {
     };
   }
 
-  User copyWith({int? id, String? name}) => User(
-        id: id ?? this.id,
-        name: name ?? this.name,
-      );
+  User copyWith({int? id, String? name}) =>
+      User(id: id ?? this.id, name: name ?? this.name);
   User copyWithCompanion(UsersCompanion data) {
     return User(
       id: data.id.present ? data.id.value : this.id,
@@ -136,10 +149,8 @@ class UsersCompanion extends UpdateCompanion<User> {
     this.id = const Value.absent(),
     this.name = const Value.absent(),
   });
-  UsersCompanion.insert({
-    this.id = const Value.absent(),
-    required String name,
-  }) : name = Value(name);
+  UsersCompanion.insert({this.id = const Value.absent(), required String name})
+    : name = Value(name);
   static Insertable<User> custom({
     Expression<int>? id,
     Expression<String>? name,
@@ -151,10 +162,7 @@ class UsersCompanion extends UpdateCompanion<User> {
   }
 
   UsersCompanion copyWith({Value<int>? id, Value<String>? name}) {
-    return UsersCompanion(
-      id: id ?? this.id,
-      name: name ?? this.name,
-    );
+    return UsersCompanion(id: id ?? this.id, name: name ?? this.name);
   }
 
   @override
@@ -187,73 +195,111 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
   late final GeneratedColumn<int> userId = GeneratedColumn<int>(
-      'user_id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _colorNameMeta =
-      const VerificationMeta('colorName');
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _colorNameMeta = const VerificationMeta(
+    'colorName',
+  );
   @override
   late final GeneratedColumn<String> colorName = GeneratedColumn<String>(
-      'color_name', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _targetPercentMeta =
-      const VerificationMeta('targetPercent');
+    'color_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _targetPercentMeta = const VerificationMeta(
+    'targetPercent',
+  );
   @override
   late final GeneratedColumn<double> targetPercent = GeneratedColumn<double>(
-      'target_percent', aliasedName, false,
-      type: DriftSqlType.double, requiredDuringInsert: true);
+    'target_percent',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, userId, name, colorName, targetPercent];
+  List<GeneratedColumn> get $columns => [
+    id,
+    userId,
+    name,
+    colorName,
+    targetPercent,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'wallets';
   @override
-  VerificationContext validateIntegrity(Insertable<Wallet> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<Wallet> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('user_id')) {
-      context.handle(_userIdMeta,
-          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_userIdMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
     if (data.containsKey('color_name')) {
-      context.handle(_colorNameMeta,
-          colorName.isAcceptableOrUnknown(data['color_name']!, _colorNameMeta));
+      context.handle(
+        _colorNameMeta,
+        colorName.isAcceptableOrUnknown(data['color_name']!, _colorNameMeta),
+      );
     } else if (isInserting) {
       context.missing(_colorNameMeta);
     }
     if (data.containsKey('target_percent')) {
       context.handle(
+        _targetPercentMeta,
+        targetPercent.isAcceptableOrUnknown(
+          data['target_percent']!,
           _targetPercentMeta,
-          targetPercent.isAcceptableOrUnknown(
-              data['target_percent']!, _targetPercentMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_targetPercentMeta);
     }
@@ -266,16 +312,26 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
   Wallet map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Wallet(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      userId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}user_id'])!,
-      name: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-      colorName: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}color_name'])!,
-      targetPercent: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}target_percent'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}user_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      colorName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}color_name'],
+      )!,
+      targetPercent: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}target_percent'],
+      )!,
     );
   }
 
@@ -291,12 +347,13 @@ class Wallet extends DataClass implements Insertable<Wallet> {
   final String name;
   final String colorName;
   final double targetPercent;
-  const Wallet(
-      {required this.id,
-      required this.userId,
-      required this.name,
-      required this.colorName,
-      required this.targetPercent});
+  const Wallet({
+    required this.id,
+    required this.userId,
+    required this.name,
+    required this.colorName,
+    required this.targetPercent,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -318,8 +375,10 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     );
   }
 
-  factory Wallet.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory Wallet.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Wallet(
       id: serializer.fromJson<int>(json['id']),
@@ -341,19 +400,19 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     };
   }
 
-  Wallet copyWith(
-          {int? id,
-          int? userId,
-          String? name,
-          String? colorName,
-          double? targetPercent}) =>
-      Wallet(
-        id: id ?? this.id,
-        userId: userId ?? this.userId,
-        name: name ?? this.name,
-        colorName: colorName ?? this.colorName,
-        targetPercent: targetPercent ?? this.targetPercent,
-      );
+  Wallet copyWith({
+    int? id,
+    int? userId,
+    String? name,
+    String? colorName,
+    double? targetPercent,
+  }) => Wallet(
+    id: id ?? this.id,
+    userId: userId ?? this.userId,
+    name: name ?? this.name,
+    colorName: colorName ?? this.colorName,
+    targetPercent: targetPercent ?? this.targetPercent,
+  );
   Wallet copyWithCompanion(WalletsCompanion data) {
     return Wallet(
       id: data.id.present ? data.id.value : this.id,
@@ -410,10 +469,10 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     required String name,
     required String colorName,
     required double targetPercent,
-  })  : userId = Value(userId),
-        name = Value(name),
-        colorName = Value(colorName),
-        targetPercent = Value(targetPercent);
+  }) : userId = Value(userId),
+       name = Value(name),
+       colorName = Value(colorName),
+       targetPercent = Value(targetPercent);
   static Insertable<Wallet> custom({
     Expression<int>? id,
     Expression<int>? userId,
@@ -430,12 +489,13 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     });
   }
 
-  WalletsCompanion copyWith(
-      {Value<int>? id,
-      Value<int>? userId,
-      Value<String>? name,
-      Value<String>? colorName,
-      Value<double>? targetPercent}) {
+  WalletsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? userId,
+    Value<String>? name,
+    Value<String>? colorName,
+    Value<double>? targetPercent,
+  }) {
     return WalletsCompanion(
       id: id ?? this.id,
       userId: userId ?? this.userId,
@@ -487,96 +547,149 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _walletIdMeta =
-      const VerificationMeta('walletId');
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _walletIdMeta = const VerificationMeta(
+    'walletId',
+  );
   @override
   late final GeneratedColumn<int> walletId = GeneratedColumn<int>(
-      'wallet_id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+    'wallet_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
   late final GeneratedColumn<int> userId = GeneratedColumn<int>(
-      'user_id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _quantityMeta =
-      const VerificationMeta('quantity');
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _quantityMeta = const VerificationMeta(
+    'quantity',
+  );
   @override
   late final GeneratedColumn<double> quantity = GeneratedColumn<double>(
-      'quantity', aliasedName, false,
-      type: DriftSqlType.double, requiredDuringInsert: true);
+    'quantity',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _priceMeta = const VerificationMeta('price');
   @override
   late final GeneratedColumn<double> price = GeneratedColumn<double>(
-      'price', aliasedName, false,
-      type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _targetPercentMeta =
-      const VerificationMeta('targetPercent');
+    'price',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _targetPercentMeta = const VerificationMeta(
+    'targetPercent',
+  );
   @override
   late final GeneratedColumn<double> targetPercent = GeneratedColumn<double>(
-      'target_percent', aliasedName, false,
-      type: DriftSqlType.double, requiredDuringInsert: true);
+    'target_percent',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, walletId, userId, name, quantity, price, targetPercent];
+  List<GeneratedColumn> get $columns => [
+    id,
+    walletId,
+    userId,
+    name,
+    quantity,
+    price,
+    targetPercent,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'items';
   @override
-  VerificationContext validateIntegrity(Insertable<Item> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<Item> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('wallet_id')) {
-      context.handle(_walletIdMeta,
-          walletId.isAcceptableOrUnknown(data['wallet_id']!, _walletIdMeta));
+      context.handle(
+        _walletIdMeta,
+        walletId.isAcceptableOrUnknown(data['wallet_id']!, _walletIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_walletIdMeta);
     }
     if (data.containsKey('user_id')) {
-      context.handle(_userIdMeta,
-          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_userIdMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
     if (data.containsKey('quantity')) {
-      context.handle(_quantityMeta,
-          quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta));
+      context.handle(
+        _quantityMeta,
+        quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
+      );
     } else if (isInserting) {
       context.missing(_quantityMeta);
     }
     if (data.containsKey('price')) {
       context.handle(
-          _priceMeta, price.isAcceptableOrUnknown(data['price']!, _priceMeta));
+        _priceMeta,
+        price.isAcceptableOrUnknown(data['price']!, _priceMeta),
+      );
     } else if (isInserting) {
       context.missing(_priceMeta);
     }
     if (data.containsKey('target_percent')) {
       context.handle(
+        _targetPercentMeta,
+        targetPercent.isAcceptableOrUnknown(
+          data['target_percent']!,
           _targetPercentMeta,
-          targetPercent.isAcceptableOrUnknown(
-              data['target_percent']!, _targetPercentMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_targetPercentMeta);
     }
@@ -589,20 +702,34 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   Item map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Item(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      walletId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}wallet_id'])!,
-      userId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}user_id'])!,
-      name: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-      quantity: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}quantity'])!,
-      price: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}price'])!,
-      targetPercent: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}target_percent'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      walletId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}wallet_id'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}user_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      quantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}quantity'],
+      )!,
+      price: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}price'],
+      )!,
+      targetPercent: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}target_percent'],
+      )!,
     );
   }
 
@@ -620,14 +747,15 @@ class Item extends DataClass implements Insertable<Item> {
   final double quantity;
   final double price;
   final double targetPercent;
-  const Item(
-      {required this.id,
-      required this.walletId,
-      required this.userId,
-      required this.name,
-      required this.quantity,
-      required this.price,
-      required this.targetPercent});
+  const Item({
+    required this.id,
+    required this.walletId,
+    required this.userId,
+    required this.name,
+    required this.quantity,
+    required this.price,
+    required this.targetPercent,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -653,8 +781,10 @@ class Item extends DataClass implements Insertable<Item> {
     );
   }
 
-  factory Item.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory Item.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Item(
       id: serializer.fromJson<int>(json['id']),
@@ -680,23 +810,23 @@ class Item extends DataClass implements Insertable<Item> {
     };
   }
 
-  Item copyWith(
-          {int? id,
-          int? walletId,
-          int? userId,
-          String? name,
-          double? quantity,
-          double? price,
-          double? targetPercent}) =>
-      Item(
-        id: id ?? this.id,
-        walletId: walletId ?? this.walletId,
-        userId: userId ?? this.userId,
-        name: name ?? this.name,
-        quantity: quantity ?? this.quantity,
-        price: price ?? this.price,
-        targetPercent: targetPercent ?? this.targetPercent,
-      );
+  Item copyWith({
+    int? id,
+    int? walletId,
+    int? userId,
+    String? name,
+    double? quantity,
+    double? price,
+    double? targetPercent,
+  }) => Item(
+    id: id ?? this.id,
+    walletId: walletId ?? this.walletId,
+    userId: userId ?? this.userId,
+    name: name ?? this.name,
+    quantity: quantity ?? this.quantity,
+    price: price ?? this.price,
+    targetPercent: targetPercent ?? this.targetPercent,
+  );
   Item copyWithCompanion(ItemsCompanion data) {
     return Item(
       id: data.id.present ? data.id.value : this.id,
@@ -766,12 +896,12 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     required double quantity,
     required double price,
     required double targetPercent,
-  })  : walletId = Value(walletId),
-        userId = Value(userId),
-        name = Value(name),
-        quantity = Value(quantity),
-        price = Value(price),
-        targetPercent = Value(targetPercent);
+  }) : walletId = Value(walletId),
+       userId = Value(userId),
+       name = Value(name),
+       quantity = Value(quantity),
+       price = Value(price),
+       targetPercent = Value(targetPercent);
   static Insertable<Item> custom({
     Expression<int>? id,
     Expression<int>? walletId,
@@ -792,14 +922,15 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     });
   }
 
-  ItemsCompanion copyWith(
-      {Value<int>? id,
-      Value<int>? walletId,
-      Value<int>? userId,
-      Value<String>? name,
-      Value<double>? quantity,
-      Value<double>? price,
-      Value<double>? targetPercent}) {
+  ItemsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? walletId,
+    Value<int>? userId,
+    Value<String>? name,
+    Value<double>? quantity,
+    Value<double>? price,
+    Value<double>? targetPercent,
+  }) {
     return ItemsCompanion(
       id: id ?? this.id,
       walletId: walletId ?? this.walletId,
@@ -861,11 +992,10 @@ abstract class _$Database extends GeneratedDatabase {
   late final $ItemsTable items = $ItemsTable(this);
   Selectable<int> userExists() {
     return customSelect(
-        'SELECT count(1) AS _c0 WHERE EXISTS (SELECT * FROM users)',
-        variables: [],
-        readsFrom: {
-          users,
-        }).map((QueryRow row) => row.read<int>('_c0'));
+      'SELECT count(1) AS _c0 WHERE EXISTS (SELECT * FROM users)',
+      variables: [],
+      readsFrom: {users},
+    ).map((QueryRow row) => row.read<int>('_c0'));
   }
 
   @override
@@ -875,14 +1005,10 @@ abstract class _$Database extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [users, wallets, items];
 }
 
-typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
-  Value<int> id,
-  required String name,
-});
-typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
-  Value<int> id,
-  Value<String> name,
-});
+typedef $$UsersTableCreateCompanionBuilder =
+    UsersCompanion Function({Value<int> id, required String name});
+typedef $$UsersTableUpdateCompanionBuilder =
+    UsersCompanion Function({Value<int> id, Value<String> name});
 
 class $$UsersTableFilterComposer extends Composer<_$Database, $UsersTable> {
   $$UsersTableFilterComposer({
@@ -893,10 +1019,14 @@ class $$UsersTableFilterComposer extends Composer<_$Database, $UsersTable> {
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => ColumnFilters(column));
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$UsersTableOrderingComposer extends Composer<_$Database, $UsersTable> {
@@ -908,10 +1038,14 @@ class $$UsersTableOrderingComposer extends Composer<_$Database, $UsersTable> {
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => ColumnOrderings(column));
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$UsersTableAnnotationComposer extends Composer<_$Database, $UsersTable> {
@@ -929,20 +1063,24 @@ class $$UsersTableAnnotationComposer extends Composer<_$Database, $UsersTable> {
       $composableBuilder(column: $table.name, builder: (column) => column);
 }
 
-class $$UsersTableTableManager extends RootTableManager<
-    _$Database,
-    $UsersTable,
-    User,
-    $$UsersTableFilterComposer,
-    $$UsersTableOrderingComposer,
-    $$UsersTableAnnotationComposer,
-    $$UsersTableCreateCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder,
-    (User, BaseReferences<_$Database, $UsersTable, User>),
-    User,
-    PrefetchHooks Function()> {
+class $$UsersTableTableManager
+    extends
+        RootTableManager<
+          _$Database,
+          $UsersTable,
+          User,
+          $$UsersTableFilterComposer,
+          $$UsersTableOrderingComposer,
+          $$UsersTableAnnotationComposer,
+          $$UsersTableCreateCompanionBuilder,
+          $$UsersTableUpdateCompanionBuilder,
+          (User, BaseReferences<_$Database, $UsersTable, User>),
+          User,
+          PrefetchHooks Function()
+        > {
   $$UsersTableTableManager(_$Database db, $UsersTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -951,55 +1089,52 @@ class $$UsersTableTableManager extends RootTableManager<
               $$UsersTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$UsersTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> name = const Value.absent(),
-          }) =>
-              UsersCompanion(
-            id: id,
-            name: name,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required String name,
-          }) =>
-              UsersCompanion.insert(
-            id: id,
-            name: name,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+              }) => UsersCompanion(id: id, name: name),
+          createCompanionCallback:
+              ({Value<int> id = const Value.absent(), required String name}) =>
+                  UsersCompanion.insert(id: id, name: name),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$UsersTableProcessedTableManager = ProcessedTableManager<
-    _$Database,
-    $UsersTable,
-    User,
-    $$UsersTableFilterComposer,
-    $$UsersTableOrderingComposer,
-    $$UsersTableAnnotationComposer,
-    $$UsersTableCreateCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder,
-    (User, BaseReferences<_$Database, $UsersTable, User>),
-    User,
-    PrefetchHooks Function()>;
-typedef $$WalletsTableCreateCompanionBuilder = WalletsCompanion Function({
-  Value<int> id,
-  required int userId,
-  required String name,
-  required String colorName,
-  required double targetPercent,
-});
-typedef $$WalletsTableUpdateCompanionBuilder = WalletsCompanion Function({
-  Value<int> id,
-  Value<int> userId,
-  Value<String> name,
-  Value<String> colorName,
-  Value<double> targetPercent,
-});
+typedef $$UsersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$Database,
+      $UsersTable,
+      User,
+      $$UsersTableFilterComposer,
+      $$UsersTableOrderingComposer,
+      $$UsersTableAnnotationComposer,
+      $$UsersTableCreateCompanionBuilder,
+      $$UsersTableUpdateCompanionBuilder,
+      (User, BaseReferences<_$Database, $UsersTable, User>),
+      User,
+      PrefetchHooks Function()
+    >;
+typedef $$WalletsTableCreateCompanionBuilder =
+    WalletsCompanion Function({
+      Value<int> id,
+      required int userId,
+      required String name,
+      required String colorName,
+      required double targetPercent,
+    });
+typedef $$WalletsTableUpdateCompanionBuilder =
+    WalletsCompanion Function({
+      Value<int> id,
+      Value<int> userId,
+      Value<String> name,
+      Value<String> colorName,
+      Value<double> targetPercent,
+    });
 
 class $$WalletsTableFilterComposer extends Composer<_$Database, $WalletsTable> {
   $$WalletsTableFilterComposer({
@@ -1010,19 +1145,29 @@ class $$WalletsTableFilterComposer extends Composer<_$Database, $WalletsTable> {
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get userId => $composableBuilder(
-      column: $table.userId, builder: (column) => ColumnFilters(column));
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => ColumnFilters(column));
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get colorName => $composableBuilder(
-      column: $table.colorName, builder: (column) => ColumnFilters(column));
+    column: $table.colorName,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<double> get targetPercent => $composableBuilder(
-      column: $table.targetPercent, builder: (column) => ColumnFilters(column));
+    column: $table.targetPercent,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$WalletsTableOrderingComposer
@@ -1035,20 +1180,29 @@ class $$WalletsTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get userId => $composableBuilder(
-      column: $table.userId, builder: (column) => ColumnOrderings(column));
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => ColumnOrderings(column));
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get colorName => $composableBuilder(
-      column: $table.colorName, builder: (column) => ColumnOrderings(column));
+    column: $table.colorName,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<double> get targetPercent => $composableBuilder(
-      column: $table.targetPercent,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.targetPercent,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$WalletsTableAnnotationComposer
@@ -1073,23 +1227,29 @@ class $$WalletsTableAnnotationComposer
       $composableBuilder(column: $table.colorName, builder: (column) => column);
 
   GeneratedColumn<double> get targetPercent => $composableBuilder(
-      column: $table.targetPercent, builder: (column) => column);
+    column: $table.targetPercent,
+    builder: (column) => column,
+  );
 }
 
-class $$WalletsTableTableManager extends RootTableManager<
-    _$Database,
-    $WalletsTable,
-    Wallet,
-    $$WalletsTableFilterComposer,
-    $$WalletsTableOrderingComposer,
-    $$WalletsTableAnnotationComposer,
-    $$WalletsTableCreateCompanionBuilder,
-    $$WalletsTableUpdateCompanionBuilder,
-    (Wallet, BaseReferences<_$Database, $WalletsTable, Wallet>),
-    Wallet,
-    PrefetchHooks Function()> {
+class $$WalletsTableTableManager
+    extends
+        RootTableManager<
+          _$Database,
+          $WalletsTable,
+          Wallet,
+          $$WalletsTableFilterComposer,
+          $$WalletsTableOrderingComposer,
+          $$WalletsTableAnnotationComposer,
+          $$WalletsTableCreateCompanionBuilder,
+          $$WalletsTableUpdateCompanionBuilder,
+          (Wallet, BaseReferences<_$Database, $WalletsTable, Wallet>),
+          Wallet,
+          PrefetchHooks Function()
+        > {
   $$WalletsTableTableManager(_$Database db, $WalletsTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -1098,71 +1258,76 @@ class $$WalletsTableTableManager extends RootTableManager<
               $$WalletsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$WalletsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<int> userId = const Value.absent(),
-            Value<String> name = const Value.absent(),
-            Value<String> colorName = const Value.absent(),
-            Value<double> targetPercent = const Value.absent(),
-          }) =>
-              WalletsCompanion(
-            id: id,
-            userId: userId,
-            name: name,
-            colorName: colorName,
-            targetPercent: targetPercent,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required int userId,
-            required String name,
-            required String colorName,
-            required double targetPercent,
-          }) =>
-              WalletsCompanion.insert(
-            id: id,
-            userId: userId,
-            name: name,
-            colorName: colorName,
-            targetPercent: targetPercent,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> userId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> colorName = const Value.absent(),
+                Value<double> targetPercent = const Value.absent(),
+              }) => WalletsCompanion(
+                id: id,
+                userId: userId,
+                name: name,
+                colorName: colorName,
+                targetPercent: targetPercent,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int userId,
+                required String name,
+                required String colorName,
+                required double targetPercent,
+              }) => WalletsCompanion.insert(
+                id: id,
+                userId: userId,
+                name: name,
+                colorName: colorName,
+                targetPercent: targetPercent,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$WalletsTableProcessedTableManager = ProcessedTableManager<
-    _$Database,
-    $WalletsTable,
-    Wallet,
-    $$WalletsTableFilterComposer,
-    $$WalletsTableOrderingComposer,
-    $$WalletsTableAnnotationComposer,
-    $$WalletsTableCreateCompanionBuilder,
-    $$WalletsTableUpdateCompanionBuilder,
-    (Wallet, BaseReferences<_$Database, $WalletsTable, Wallet>),
-    Wallet,
-    PrefetchHooks Function()>;
-typedef $$ItemsTableCreateCompanionBuilder = ItemsCompanion Function({
-  Value<int> id,
-  required int walletId,
-  required int userId,
-  required String name,
-  required double quantity,
-  required double price,
-  required double targetPercent,
-});
-typedef $$ItemsTableUpdateCompanionBuilder = ItemsCompanion Function({
-  Value<int> id,
-  Value<int> walletId,
-  Value<int> userId,
-  Value<String> name,
-  Value<double> quantity,
-  Value<double> price,
-  Value<double> targetPercent,
-});
+typedef $$WalletsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$Database,
+      $WalletsTable,
+      Wallet,
+      $$WalletsTableFilterComposer,
+      $$WalletsTableOrderingComposer,
+      $$WalletsTableAnnotationComposer,
+      $$WalletsTableCreateCompanionBuilder,
+      $$WalletsTableUpdateCompanionBuilder,
+      (Wallet, BaseReferences<_$Database, $WalletsTable, Wallet>),
+      Wallet,
+      PrefetchHooks Function()
+    >;
+typedef $$ItemsTableCreateCompanionBuilder =
+    ItemsCompanion Function({
+      Value<int> id,
+      required int walletId,
+      required int userId,
+      required String name,
+      required double quantity,
+      required double price,
+      required double targetPercent,
+    });
+typedef $$ItemsTableUpdateCompanionBuilder =
+    ItemsCompanion Function({
+      Value<int> id,
+      Value<int> walletId,
+      Value<int> userId,
+      Value<String> name,
+      Value<double> quantity,
+      Value<double> price,
+      Value<double> targetPercent,
+    });
 
 class $$ItemsTableFilterComposer extends Composer<_$Database, $ItemsTable> {
   $$ItemsTableFilterComposer({
@@ -1173,25 +1338,39 @@ class $$ItemsTableFilterComposer extends Composer<_$Database, $ItemsTable> {
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get walletId => $composableBuilder(
-      column: $table.walletId, builder: (column) => ColumnFilters(column));
+    column: $table.walletId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get userId => $composableBuilder(
-      column: $table.userId, builder: (column) => ColumnFilters(column));
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => ColumnFilters(column));
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<double> get quantity => $composableBuilder(
-      column: $table.quantity, builder: (column) => ColumnFilters(column));
+    column: $table.quantity,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<double> get price => $composableBuilder(
-      column: $table.price, builder: (column) => ColumnFilters(column));
+    column: $table.price,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<double> get targetPercent => $composableBuilder(
-      column: $table.targetPercent, builder: (column) => ColumnFilters(column));
+    column: $table.targetPercent,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$ItemsTableOrderingComposer extends Composer<_$Database, $ItemsTable> {
@@ -1203,26 +1382,39 @@ class $$ItemsTableOrderingComposer extends Composer<_$Database, $ItemsTable> {
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get walletId => $composableBuilder(
-      column: $table.walletId, builder: (column) => ColumnOrderings(column));
+    column: $table.walletId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get userId => $composableBuilder(
-      column: $table.userId, builder: (column) => ColumnOrderings(column));
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => ColumnOrderings(column));
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<double> get quantity => $composableBuilder(
-      column: $table.quantity, builder: (column) => ColumnOrderings(column));
+    column: $table.quantity,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<double> get price => $composableBuilder(
-      column: $table.price, builder: (column) => ColumnOrderings(column));
+    column: $table.price,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<double> get targetPercent => $composableBuilder(
-      column: $table.targetPercent,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.targetPercent,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ItemsTableAnnotationComposer extends Composer<_$Database, $ItemsTable> {
@@ -1252,23 +1444,29 @@ class $$ItemsTableAnnotationComposer extends Composer<_$Database, $ItemsTable> {
       $composableBuilder(column: $table.price, builder: (column) => column);
 
   GeneratedColumn<double> get targetPercent => $composableBuilder(
-      column: $table.targetPercent, builder: (column) => column);
+    column: $table.targetPercent,
+    builder: (column) => column,
+  );
 }
 
-class $$ItemsTableTableManager extends RootTableManager<
-    _$Database,
-    $ItemsTable,
-    Item,
-    $$ItemsTableFilterComposer,
-    $$ItemsTableOrderingComposer,
-    $$ItemsTableAnnotationComposer,
-    $$ItemsTableCreateCompanionBuilder,
-    $$ItemsTableUpdateCompanionBuilder,
-    (Item, BaseReferences<_$Database, $ItemsTable, Item>),
-    Item,
-    PrefetchHooks Function()> {
+class $$ItemsTableTableManager
+    extends
+        RootTableManager<
+          _$Database,
+          $ItemsTable,
+          Item,
+          $$ItemsTableFilterComposer,
+          $$ItemsTableOrderingComposer,
+          $$ItemsTableAnnotationComposer,
+          $$ItemsTableCreateCompanionBuilder,
+          $$ItemsTableUpdateCompanionBuilder,
+          (Item, BaseReferences<_$Database, $ItemsTable, Item>),
+          Item,
+          PrefetchHooks Function()
+        > {
   $$ItemsTableTableManager(_$Database db, $ItemsTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -1277,61 +1475,64 @@ class $$ItemsTableTableManager extends RootTableManager<
               $$ItemsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ItemsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<int> walletId = const Value.absent(),
-            Value<int> userId = const Value.absent(),
-            Value<String> name = const Value.absent(),
-            Value<double> quantity = const Value.absent(),
-            Value<double> price = const Value.absent(),
-            Value<double> targetPercent = const Value.absent(),
-          }) =>
-              ItemsCompanion(
-            id: id,
-            walletId: walletId,
-            userId: userId,
-            name: name,
-            quantity: quantity,
-            price: price,
-            targetPercent: targetPercent,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required int walletId,
-            required int userId,
-            required String name,
-            required double quantity,
-            required double price,
-            required double targetPercent,
-          }) =>
-              ItemsCompanion.insert(
-            id: id,
-            walletId: walletId,
-            userId: userId,
-            name: name,
-            quantity: quantity,
-            price: price,
-            targetPercent: targetPercent,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> walletId = const Value.absent(),
+                Value<int> userId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<double> quantity = const Value.absent(),
+                Value<double> price = const Value.absent(),
+                Value<double> targetPercent = const Value.absent(),
+              }) => ItemsCompanion(
+                id: id,
+                walletId: walletId,
+                userId: userId,
+                name: name,
+                quantity: quantity,
+                price: price,
+                targetPercent: targetPercent,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int walletId,
+                required int userId,
+                required String name,
+                required double quantity,
+                required double price,
+                required double targetPercent,
+              }) => ItemsCompanion.insert(
+                id: id,
+                walletId: walletId,
+                userId: userId,
+                name: name,
+                quantity: quantity,
+                price: price,
+                targetPercent: targetPercent,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$ItemsTableProcessedTableManager = ProcessedTableManager<
-    _$Database,
-    $ItemsTable,
-    Item,
-    $$ItemsTableFilterComposer,
-    $$ItemsTableOrderingComposer,
-    $$ItemsTableAnnotationComposer,
-    $$ItemsTableCreateCompanionBuilder,
-    $$ItemsTableUpdateCompanionBuilder,
-    (Item, BaseReferences<_$Database, $ItemsTable, Item>),
-    Item,
-    PrefetchHooks Function()>;
+typedef $$ItemsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$Database,
+      $ItemsTable,
+      Item,
+      $$ItemsTableFilterComposer,
+      $$ItemsTableOrderingComposer,
+      $$ItemsTableAnnotationComposer,
+      $$ItemsTableCreateCompanionBuilder,
+      $$ItemsTableUpdateCompanionBuilder,
+      (Item, BaseReferences<_$Database, $ItemsTable, Item>),
+      Item,
+      PrefetchHooks Function()
+    >;
 
 class $DatabaseManager {
   final _$Database _db;

@@ -87,6 +87,7 @@ class _SortByDialogState extends State<SortByDialog> {
 
   Future<void> onSubmit() async {
     await RxSharedPreferences.getInstance().setInt('sortBy', selectedSortId);
+    if (!mounted) return;
     Navigator.of(context).pop();
   }
 }

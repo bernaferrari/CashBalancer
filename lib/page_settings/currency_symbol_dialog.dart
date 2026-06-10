@@ -88,6 +88,7 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
     if (_formKey.currentState!.validate()) {
       await RxSharedPreferences.getInstance()
           .setString('currencySymbol', currencyEditingController.text);
+      if (!mounted) return;
       Navigator.of(context).pop();
     }
   }

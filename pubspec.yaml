@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 1.0.1
 
 environment:
-  sdk: '>=3.9.4 <4.0.0'
+  sdk: '>=3.12.0 <4.0.0'
 
 dependencies:
   animations: ^2.0.11
@@ -13,26 +13,26 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  flutter_bloc: ^8.1.6
-  bloc: ^8.1.4
-  google_fonts: ^6.2.1
+  flutter_bloc: ^9.1.1
+  bloc: ^9.2.1
+  google_fonts: ^8.1.0
   intl: ^0.20.0
-  drift: ^2.18.0
+  drift: ^2.33.0
   path_provider: ^2.1.3
   path: ^1.9.0
-  rxdart: ^0.27.7
-  sqlite3_flutter_libs: ^0.5.21
+  rxdart: ^0.28.0
+  sqlite3_flutter_libs: ^0.6.0+eol
   storybook_flutter: ^0.14.0
   flutter_multi_formatter: ^2.12.8
   shared_preferences: ^2.2.3
-  rx_shared_preferences: ^3.1.0
-  fl_chart: ^0.68.0
+  rx_shared_preferences: ^4.0.0
+  fl_chart: ^1.2.0
   beamer: ^1.6.2
 
 dev_dependencies:
-  drift_dev: ^2.18.0
-  build_runner: ^2.4.9
-  flutter_lints: ^3.0.2
+  drift_dev: ^2.33.0
+  build_runner: ^2.15.0
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
 

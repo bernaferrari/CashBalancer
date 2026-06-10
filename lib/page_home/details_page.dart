@@ -580,7 +580,7 @@ class WalletCard extends StatelessWidget {
             ],
           ),
         ),
-        if (widget != null) widget!,
+        ?widget,
       ],
     );
   }
@@ -761,7 +761,7 @@ class UpDownDiffText extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        if (leftWidget != null) leftWidget!,
+        ?leftWidget,
         if (targetPercent != -1)
           Text(
             "${targetPercent / 100 > itemValue / totalValue ? "↑" : "↓"} $currencySymbol ${toCurrency(totalValue * targetPercent / 100 - itemValue)} (${(targetPercent / 100 - itemValue / totalValue).toPercent()}%)",

@@ -32,6 +32,8 @@
 /build/
 
 # Web related
+web/drift_worker.js
+web/sqlite3.wasm
 
 # Symbolication related
 app.*.symbols
@@ -43,3 +45,5 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+# Widget Preview related
+.widget_preview/
