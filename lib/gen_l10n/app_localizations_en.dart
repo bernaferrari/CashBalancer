@@ -164,4 +164,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get portfolioName => 'Portfolio name';
+
+  @override
+  String get themeAuto => 'Auto';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
 }

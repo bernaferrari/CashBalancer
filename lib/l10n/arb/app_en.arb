@@ -58,5 +58,8 @@
   "hold": "Hold",
   "portfolios": "Portfolios & Goals",
   "newPortfolio": "New Portfolio / Goal",
-  "portfolioName": "Portfolio name"
+  "portfolioName": "Portfolio name",
+  "themeAuto": "Auto",
+  "themeLight": "Light",
+  "themeDark": "Dark"
 }

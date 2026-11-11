@@ -58,5 +58,8 @@
   "hold": "Manter",
   "portfolios": "Portfólios e Objetivos",
   "newPortfolio": "Novo Portfólio / Objetivo",
-  "portfolioName": "Nome do objetivo"
+  "portfolioName": "Nome do objetivo",
+  "themeAuto": "Auto",
+  "themeLight": "Claro",
+  "themeDark": "Escuro"
 }

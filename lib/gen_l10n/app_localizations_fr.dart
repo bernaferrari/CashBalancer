@@ -1,0 +1,177 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for French (`fr`).
+class AppLocalizationsFr extends AppLocalizations {
+  AppLocalizationsFr([String locale = 'fr']) : super(locale);
+
+  @override
+  String get appTitle => 'Cash Balancer';
+
+  @override
+  String get mainEmptyTitle => 'Ajoutez votre premier portefeuille.';
+
+  @override
+  String get mainEmptySubtitle =>
+      'Appuyez sur + pour ajouter un portefeuille où vous pourrez enregistrer vos actifs.';
+
+  @override
+  String get mainDialogValidator => 'Veuillez saisir du texte';
+
+  @override
+  String get addWallet => 'Ajouter Portefeuille';
+
+  @override
+  String get addAWallet => 'Ajouter un Portefeuille';
+
+  @override
+  String get editWallet => 'Modifier le Portefeuille';
+
+  @override
+  String get allItems => 'Tous les actifs';
+
+  @override
+  String get targetSettings =>
+      'Totaliser 100 % dans chaque portefeuille, au lieu de considérer la somme de tous les portefeuilles.';
+
+  @override
+  String get theAssetsName => 'Le nom de l\'actif, comme épargne ou bitcoin.';
+
+  @override
+  String get pressToAdd => 'Appuyez sur + pour ajouter.';
+
+  @override
+  String get rightNow => 'Actuellement';
+
+  @override
+  String get isGoingToBe => 'sera';
+
+  @override
+  String get howMuchTarget => 'Le pourcentage cible souhaité.';
+
+  @override
+  String get optional => 'OPTIONNEL';
+
+  @override
+  String get totalAmount => 'Le montant total que vous possédez.';
+
+  @override
+  String get value => 'Valeur';
+
+  @override
+  String get move => 'Déplacer';
+
+  @override
+  String moveWallet(String itemName) {
+    return 'Déplacer \"$itemName\"';
+  }
+
+  @override
+  String get addAsset => 'Ajouter un Actif';
+
+  @override
+  String get editAsset => 'Modifier l\'Actif';
+
+  @override
+  String get dialogAssetName => 'Nom';
+
+  @override
+  String get dialogAssetValue => 'Valeur';
+
+  @override
+  String get dialogAssetTarget => 'Cible';
+
+  @override
+  String get dialogSave => 'ENREGISTRER';
+
+  @override
+  String get dialogSaveAddMore => 'ENREGISTRER ET AJOUTER PLUS';
+
+  @override
+  String get dialogCancel => 'ANNULER';
+
+  @override
+  String get dialogDelete => 'SUPPRIMER';
+
+  @override
+  String get settings => 'Paramètres';
+
+  @override
+  String get currencySymbol => 'Devise';
+
+  @override
+  String get relativeTarget => 'Cible relative';
+
+  @override
+  String get sortBy => 'Trier par';
+
+  @override
+  String get sortBy0 => 'Valeur';
+
+  @override
+  String get sortBy1 => 'Nom';
+
+  @override
+  String get pleaseEnterCurrency => 'Veuillez saisir la devise (\$, €, etc.)';
+
+  @override
+  String get invalidValue => 'Format numérique invalide';
+
+  @override
+  String get valueMustBePositive => 'La valeur doit être positive';
+
+  @override
+  String get targetMustBeBetween =>
+      'La cible doit être comprise entre 0 et 100';
+
+  @override
+  String get designedDeveloped => 'Conçu et développé par Bernardo Ferrari.';
+
+  @override
+  String get buyOnlyRebalance => 'Rééquilibrage par Achat Seul';
+
+  @override
+  String get buyOnlyRebalanceSubtitle =>
+      'Rééquilibrez uniquement avec du nouvel argent, sans vendre d\'actifs.';
+
+  @override
+  String get rebalanceCalculator => 'Investir et Rééquilibrer';
+
+  @override
+  String get amountToInvest => 'Montant à investir';
+
+  @override
+  String get autoFillBuyOnly => 'Min. pour équilibrer sans vendre';
+
+  @override
+  String get applyInvestment => 'APPLIQUER AU PORTEFEUILLE';
+
+  @override
+  String get noTargetsSet =>
+      'Définissez des pourcentages cibles sur vos portefeuilles ou actifs pour calculer la répartition.';
+
+  @override
+  String get hold => 'Conserver';
+
+  @override
+  String get portfolios => 'Portefeuilles et Objectifs';
+
+  @override
+  String get newPortfolio => 'Nouveau Portefeuille / Objectif';
+
+  @override
+  String get portfolioName => 'Nom de l\'objectif';
+
+  @override
+  String get themeAuto => 'Auto';
+
+  @override
+  String get themeLight => 'Clair';
+
+  @override
+  String get themeDark => 'Sombre';
+}

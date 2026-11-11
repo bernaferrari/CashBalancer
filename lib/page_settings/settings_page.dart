@@ -10,14 +10,14 @@ import '../widgets/dialog_screen_base.dart';
 import 'currency_symbol_dialog.dart';
 
 class const SettingsPage({super.key}) extends StatelessWidget {
-  static const _themeModes = [
-    (0, Icons.brightness_auto_rounded, 'Auto'),
-    (1, Icons.light_mode_rounded, 'Light'),
-    (2, Icons.dark_mode_rounded, 'Dark'),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final themeModes = [
+      (0, Icons.brightness_auto_rounded, context.l10n.themeAuto),
+      (1, Icons.light_mode_rounded, context.l10n.themeLight),
+      (2, Icons.dark_mode_rounded, context.l10n.themeDark),
+    ];
+
     return BlocBuilder<DataCubit, FullData?>(
       builder: (context, state) {
         if (state == null) {
@@ -125,7 +125,7 @@ class const SettingsPage({super.key}) extends StatelessWidget {
             Row(
               spacing: 8,
               children: [
-                for (final (modeId, icon, label) in _themeModes)
+                for (final (modeId, icon, label) in themeModes)
                   Expanded(
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(

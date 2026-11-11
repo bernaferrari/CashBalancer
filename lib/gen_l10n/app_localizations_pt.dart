@@ -165,4 +165,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get portfolioName => 'Nome do objetivo';
+
+  @override
+  String get themeAuto => 'Auto';
+
+  @override
+  String get themeLight => 'Claro';
+
+  @override
+  String get themeDark => 'Escuro';
 }
