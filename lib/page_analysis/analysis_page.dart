@@ -29,7 +29,7 @@ class const DetailsPageImpl(final FullData data, {super.key})
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).allItems,
+          context.l10n.allItems,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         leading: BackButton(
@@ -45,74 +45,28 @@ class const DetailsPageImpl(final FullData data, {super.key})
       ),
       body: (data.walletsMap.isEmpty || data.allItems.isEmpty)
           ? WhenEmptyCard(
-              title: AppLocalizations.of(context).mainEmptyTitle,
-              subtitle: AppLocalizations.of(context).mainEmptySubtitle,
+              title: context.l10n.mainEmptyTitle,
+              subtitle: context.l10n.mainEmptySubtitle,
               icon: Icons.account_balance_sharp,
             )
-          : MainList(data: data),
-    );
-  }
-}
-
-class const MainList({
-  super.key,
-  required final FullData data,
-}) extends StatelessWidget {
-  static const double margin = 20.0;
-
-  @override
-  Widget build(BuildContext context) {
-    final bool longWidth = MediaQuery.sizeOf(context).width > 400;
-
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 550),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: double.infinity,
-              margin: const EdgeInsets.all(margin),
-              width: longWidth ? 30 : 20,
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withValues(alpha: 0.10),
-              ),
-              child: VerticalProgressBar(data: data),
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.only(
-                  right: margin,
-                  top: margin,
-                  // On Android the FAB may get on top of it.
-                  bottom: 6 * margin,
-                ),
-                children: [
-                  BarChartSection(data),
-                  const SizedBox(height: 16),
-                  Center(
-                    child: Text(
-                      "Total: ${data.settings.currencySymbol} ${toCurrency(data.totalValue)}",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+          : PortfolioSplitView(
+              data: data,
+              children: [
+                BarChartSection(data),
+                const SizedBox(height: 16),
+                Center(
+                  child: Text(
+                    "Total: ${data.settings.currencySymbol} ${toCurrency(data.totalValue)}",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  const Divider(height: 40),
-                  ItemsList(data),
-                ],
-              ),
+                ),
+                const Divider(height: 40),
+                ItemsList(data),
+              ],
             ),
-          ],
-        ),
-      ),
     );
   }
 }

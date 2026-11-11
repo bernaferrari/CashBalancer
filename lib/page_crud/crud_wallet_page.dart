@@ -103,84 +103,108 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
               borderRadius: BorderRadius.circular(16.0),
             ),
             padding: const EdgeInsets.all(20),
-            child: Row(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 12,
               children: [
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context).optional,
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelSmall!
-                            .copyWith(color: primaryColor),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        AppLocalizations.of(context).howMuchTarget,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 24),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextFormField(
-                        controller: targetEditingController,
-                        onFieldSubmitted: onSubmit,
-                        validator: (value) {
-                          // Target is optional, so allow empty
-                          if (value == null || value.isEmpty) {
-                            return null;
-                          }
-                          final num = double.tryParse(value);
-                          if (num == null) {
-                            return AppLocalizations.of(context).invalidValue;
-                          }
-                          if (num < 0 || num > 100) {
-                            return AppLocalizations.of(context)
-                                .targetMustBeBetween;
-                          }
-                          return null;
-                        },
-                        textAlign: TextAlign.right,
-                        keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true),
-                        onChanged: (_) => setState(() {}),
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\.?\d{0,2}')),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            context.l10n.optional,
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall!
+                                .copyWith(color: primaryColor),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            context.l10n.howMuchTarget,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                         ],
-                        decoration: InputDecoration(
-                          labelText:
-                              AppLocalizations.of(context).dialogAssetTarget,
-                          filled: true,
-                          fillColor: getInputFillColor(context),
-                          suffixText:
-                              targetEditingController.text.contains('.')
-                                  ? " %"
-                                  : ".00 %",
-                          labelStyle: TextStyle(color: primaryColorWeaker),
-                          // border is used when there is an error
-                          border: getInputDecorationBorder(primaryColorWeaker),
-                          // focusedBorder is used when focused
-                          focusedBorder:
-                              getInputDecorationBorder(primaryColorWeaker),
-                          // enabledBorder is the default, first shown, border.
-                          enabledBorder:
-                              getInputDecorationBorder(primaryColorWeaker),
-                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 24),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextFormField(
+                            controller: targetEditingController,
+                            onFieldSubmitted: onSubmit,
+                            validator: (value) {
+                              // Target is optional, so allow empty
+                              if (value == null || value.isEmpty) {
+                                return null;
+                              }
+                              final num = double.tryParse(value);
+                              if (num == null) {
+                                return context.l10n.invalidValue;
+                              }
+                              if (num < 0 || num > 100) {
+                                return context.l10n.targetMustBeBetween;
+                              }
+                              return null;
+                            },
+                            textAlign: TextAlign.right,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            onChanged: (_) => setState(() {}),
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d*\.?\d{0,2}')),
+                            ],
+                            decoration: InputDecoration(
+                              labelText: context.l10n.dialogAssetTarget,
+                              filled: true,
+                              fillColor: getInputFillColor(context),
+                              suffixText:
+                                  targetEditingController.text.contains('.')
+                                      ? " %"
+                                      : ".00 %",
+                              labelStyle: TextStyle(color: primaryColorWeaker),
+                              // border is used when there is an error
+                              border:
+                                  getInputDecorationBorder(primaryColorWeaker),
+                              // focusedBorder is used when focused
+                              focusedBorder:
+                                  getInputDecorationBorder(primaryColorWeaker),
+                              // enabledBorder is the default, first shown, border.
+                              enabledBorder:
+                                  getInputDecorationBorder(primaryColorWeaker),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    for (final preset in const ['10', '25', '50', '100'])
+                      ActionChip(
+                        visualDensity: VisualDensity.compact,
+                        label: Text('$preset%'),
+                        backgroundColor:
+                            targetEditingController.text.trim() == preset
+                                ? primaryColor.withValues(alpha: 0.25)
+                                : null,
+                        onPressed: () {
+                          setState(() {
+                            targetEditingController.text = preset;
+                          });
+                        },
+                      ),
+                  ],
                 ),
               ],
             ),

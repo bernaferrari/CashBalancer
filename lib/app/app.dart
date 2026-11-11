@@ -14,6 +14,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../blocs/data_bloc.dart';
+import '../database/data.dart';
 import '../database/database.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/dialog_screen_base.dart';
@@ -260,8 +261,15 @@ class _AppState extends State<App> {
           final db = RepositoryProvider.of<Database>(context);
           return DataCubit(db);
         },
-        child: MaterialApp.router(
-          theme: ThemeData(
+        child: BlocSelector<DataCubit, FullData?, ThemeMode>(
+          selector: (state) => switch (state?.settings.themeMode) {
+            1 => ThemeMode.light,
+            2 => ThemeMode.dark,
+            _ => ThemeMode.system,
+          },
+          builder: (context, themeMode) => MaterialApp.router(
+            themeMode: themeMode,
+            theme: ThemeData(
             scaffoldBackgroundColor: Colors.white,
             colorScheme: const ColorScheme.light(
               primary: Color(0xff162783),
@@ -332,6 +340,7 @@ class _AppState extends State<App> {
           routeInformationParser: BeamerParser(),
           backButtonDispatcher:
               BeamerBackButtonDispatcher(delegate: _routerDelegate),
+          ),
         ),
       ),
     );

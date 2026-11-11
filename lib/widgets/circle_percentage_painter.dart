@@ -36,6 +36,9 @@ class const CirclePercentagePainter({
 
   @override
   bool shouldRepaint(CirclePercentagePainter oldDelegate) {
-    return percent != oldDelegate.percent || color != oldDelegate.color;
+    return percent != oldDelegate.percent ||
+        color != oldDelegate.color ||
+        circleColor != oldDelegate.circleColor ||
+        backgroundColor != oldDelegate.backgroundColor;
   }
 }

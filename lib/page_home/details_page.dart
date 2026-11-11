@@ -33,7 +33,7 @@ class const HomePageImpl(final FullData data, {super.key})
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).appTitle,
+          context.l10n.appTitle,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         backgroundColor: Colors.transparent,
@@ -54,7 +54,7 @@ class const HomePageImpl(final FullData data, {super.key})
         onPressed: () =>
             Beamer.of(context).beamToNamed("/addWallet/${data.userId}"),
         label: Text(
-          AppLocalizations.of(context).addWallet,
+          context.l10n.addWallet,
           style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
         ),
         icon: Icon(
@@ -64,18 +64,58 @@ class const HomePageImpl(final FullData data, {super.key})
       ),
       body: data.walletsMap.isEmpty
           ? WhenEmptyCard(
-              title: AppLocalizations.of(context).mainEmptyTitle,
-              subtitle: AppLocalizations.of(context).mainEmptySubtitle,
+              title: context.l10n.mainEmptyTitle,
+              subtitle: context.l10n.mainEmptySubtitle,
               icon: Icons.account_balance_sharp,
             )
-          : MainList(data: data),
+          : PortfolioSplitView(
+              data: data,
+              children: [
+                if (data.allItems.isNotEmpty && data.totalValue > 0) ...[
+                  TextButton(
+                    onPressed: () {
+                      Beamer.of(context).beamToNamed("/analysis");
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 16,
+                      children: [
+                        PieChartSection(data),
+                        Text(
+                          "Total: ${data.settings.currencySymbol} ${toCurrency(data.totalValue)}",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 40),
+                ],
+                Column(
+                  spacing: 20,
+                  children: [
+                    for (final group in data.walletsMap.values)
+                      GroupCard(
+                        itemsList: data.walletsItems[group.id],
+                        group: group,
+                        allTotalValue: data.totalValue,
+                        settings: data.settings,
+                      ),
+                  ],
+                ),
+              ],
+            ),
     );
   }
 }
 
-class const MainList({
+class const PortfolioSplitView({
   super.key,
   required final FullData data,
+  required final List<Widget> children,
 }) extends StatelessWidget {
   static const double margin = 20.0;
 
@@ -112,44 +152,7 @@ class const MainList({
                   // On Android the FAB may get on top of it.
                   bottom: 6 * margin,
                 ),
-                children: [
-                  if (data.allItems.isNotEmpty && data.totalValue > 0) ...[
-                    TextButton(
-                      onPressed: () {
-                        Beamer.of(context).beamToNamed("/analysis");
-                      },
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: 16,
-                        children: [
-                          PieChartSection(data),
-                          Text(
-                            "Total: ${data.settings.currencySymbol} ${toCurrency(data.totalValue)}",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Divider(height: 40),
-                  ],
-                  Column(
-                    spacing: 20,
-                    children: [
-                      for (final group in data.walletsMap.values)
-                        GroupCard(
-                          itemsList: data.walletsItems[group.id],
-                          group: group,
-                          allTotalValue: data.totalValue,
-                          settings: data.settings,
-                        ),
-                    ],
-                  ),
-                ],
+                children: children,
               ),
             ),
           ],
@@ -178,25 +181,35 @@ class const VerticalProgressBar({
           spacing: 2,
           children: [
             for (int i = 0; i < nonZeroItems.length; i++)
-              Tooltip(
-                message: nonZeroItems[i].name,
-                child: SizedBox(
-                  height: spacedList[i],
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: nonZeroItems[i].color,
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      fixedSize: Size(100, spacedList[i]),
-                      shape: const RoundedRectangleBorder(),
-                      elevation: 0,
+              () {
+                final item = nonZeroItems[i];
+                final percent = data.totalValue > 0
+                    ? (item.price / data.totalValue * 100).toStringAsFixed(1)
+                    : '0';
+                return Tooltip(
+                  key: ValueKey(item.id),
+                  message:
+                      '${item.name} • ${data.settings.currencySymbol} ${toCurrency(item.price)} ($percent%)',
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 350),
+                    curve: Curves.easeOutCubic,
+                    height: spacedList[i],
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: item.color,
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        fixedSize: Size(100, spacedList[i]),
+                        shape: const RoundedRectangleBorder(),
+                        elevation: 0,
+                      ),
+                      onPressed: () =>
+                          Beamer.of(context).beamToNamed('/editItem/${item.id}'),
+                      child: const SizedBox.expand(),
                     ),
-                    onPressed: () => Beamer.of(context)
-                        .beamToNamed('/editItem/${nonZeroItems[i].id}'),
-                    child: const SizedBox.expand(),
                   ),
-                ),
-              ),
+                );
+              }(),
           ],
         );
       },
@@ -240,7 +253,7 @@ class const GroupCard({
         color: color,
         child: WalletCard(
           title: group.name,
-          subtitle: AppLocalizations.of(context).pressToAdd,
+          subtitle: context.l10n.pressToAdd,
           widget: Row(
             spacing: 8,
             children: [
@@ -418,31 +431,35 @@ class const CircularProgress({
       height: size,
       // StrokeWidth is 3.
       padding: const EdgeInsets.all(3),
-      child: CustomPaint(
-        isComplex: false,
-        painter: CirclePercentagePainter(
-          percent: totalLocalPercent / 100,
-          color: color,
-          circleColor: Colors.transparent,
-          backgroundColor:
-              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15),
-        ),
-        child: hasText
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      "${totalLocalPercent.toStringAsFixed(0)}%",
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 0, end: totalLocalPercent),
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeOutCubic,
+        builder: (context, animatedPercent, _) {
+          return CustomPaint(
+            isComplex: false,
+            painter: CirclePercentagePainter(
+              percent: (animatedPercent / 100).clamp(0.0, 1.0),
+              color: color,
+              circleColor: Colors.transparent,
+              backgroundColor: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.15),
+            ),
+            child: hasText
+                ? Center(
+                    child: Text(
+                      "${animatedPercent.toStringAsFixed(0)}%",
                       style: Theme.of(context)
                           .textTheme
                           .labelSmall!
                           .copyWith(fontSize: 8),
                     ),
-                  ],
-                ),
-              )
-            : null,
+                  )
+                : null,
+          );
+        },
       ),
     );
   }

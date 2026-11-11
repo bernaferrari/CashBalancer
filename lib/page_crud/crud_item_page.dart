@@ -290,9 +290,29 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    for (final preset in const ['10', '25', '50', '100'])
+                      ActionChip(
+                        visualDensity: VisualDensity.compact,
+                        label: Text('$preset%'),
+                        backgroundColor:
+                            targetEditingController.text.trim() == preset
+                                ? primaryColor.withValues(alpha: 0.25)
+                                : null,
+                        onPressed: () {
+                          setState(() {
+                            targetEditingController.text = preset;
+                          });
+                        },
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
                 Text(
-                  "${AppLocalizations.of(context).rightNow}, $relativePercentage",
+                  "${context.l10n.rightNow}, $relativePercentage",
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],

@@ -33,40 +33,71 @@ class _MoveItemPageState extends State<MoveItemPage> {
 
     return DialogScreenBase(
       backgroundDialogColor: backgroundDialogColor,
-      appBarTitle: AppLocalizations.of(context).moveWallet(widget.item.name),
+      appBarTitle: context.l10n.moveWallet(widget.item.name),
       colorName: colorName,
       children: [
-        const SizedBox(height: 24),
+        const SizedBox(height: 8),
         for (final group in widget.wallets)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                backgroundColor: selectedGroupId == group.id
-                    ? Theme.of(context).brightness == Brightness.dark
-                        ? tailwindColors[group.colorName]![900]!
-                        : tailwindColors[group.colorName]![100]!
-                    : null,
-                side: BorderSide(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? tailwindColors[group.colorName]![700]!
-                      : tailwindColors[group.colorName]![200]!,
-                  width: 1,
+          () {
+            final isSelected = selectedGroupId == group.id;
+            final groupAccent = tailwindColors[group.colorName]![500]!;
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: isSelected
+                      ? Theme.of(context).brightness == Brightness.dark
+                          ? tailwindColors[group.colorName]![900]!
+                          : tailwindColors[group.colorName]![100]!
+                      : null,
+                  side: BorderSide(
+                    color: isSelected
+                        ? groupAccent
+                        : Theme.of(context).brightness == Brightness.dark
+                            ? tailwindColors[group.colorName]![700]!
+                            : tailwindColors[group.colorName]![200]!,
+                    width: isSelected ? 1.5 : 1,
+                  ),
+                ),
+                onPressed: () {
+                  setState(() {
+                    selectedGroupId = group.id;
+                  });
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 10,
+                  children: [
+                    Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: groupAccent,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    Flexible(
+                      child: Text(
+                        group.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    if (isSelected)
+                      Icon(
+                        Icons.check_rounded,
+                        size: 18,
+                        color: groupAccent,
+                      ),
+                  ],
                 ),
               ),
-              child: Text(
-                group.name,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-              onPressed: () {
-                setState(() {
-                  selectedGroupId = group.id;
-                });
-              },
-            ),
-          ),
+            );
+          }(),
         const SizedBox(height: 16),
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
@@ -74,17 +105,17 @@ class _MoveItemPageState extends State<MoveItemPage> {
             backgroundColor: primaryColor,
           ),
           icon: const Icon(Icons.check_rounded),
-          label: Text(AppLocalizations.of(context).dialogSave),
+          label: Text(context.l10n.dialogSave),
           onPressed: onSubmit,
         ),
         const SizedBox(height: 8),
         TextButton.icon(
           style: TextButton.styleFrom(foregroundColor: primaryColorWeaker),
           icon: const Icon(Icons.close_rounded),
-          label: Text(AppLocalizations.of(context).dialogCancel),
+          label: Text(context.l10n.dialogCancel),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 8),
       ],
     );
   }

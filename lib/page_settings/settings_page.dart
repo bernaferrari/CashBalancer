@@ -10,6 +10,12 @@ import '../widgets/dialog_screen_base.dart';
 import 'currency_symbol_dialog.dart';
 
 class const SettingsPage({super.key}) extends StatelessWidget {
+  static const _themeModes = [
+    (0, Icons.brightness_auto_rounded, 'Auto'),
+    (1, Icons.light_mode_rounded, 'Light'),
+    (2, Icons.dark_mode_rounded, 'Dark'),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DataCubit, FullData?>(
@@ -22,12 +28,12 @@ class const SettingsPage({super.key}) extends StatelessWidget {
 
         return DialogScreenBase(
           colorName: 'warmGray',
-          appBarTitle: AppLocalizations.of(context).settings,
+          appBarTitle: context.l10n.settings,
           children: [
             SwitchListTile(
-              title: Text(AppLocalizations.of(context).relativeTarget),
+              title: Text(context.l10n.relativeTarget),
               subtitle: Text(
-                AppLocalizations.of(context).targetSettings,
+                context.l10n.targetSettings,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               value: state.settings.relativeTarget,
@@ -37,23 +43,20 @@ class const SettingsPage({super.key}) extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Row(
+              spacing: 16,
               children: [
                 Expanded(
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      // shape: RoundedRectangleBorder(
-                      //   borderRadius: BorderRadius.circular(5),
-                      //   side: BorderSide(color: Colors.red, width: 2),
-                      // ),
                       padding: const EdgeInsets.all(10),
                     ),
                     child: Column(
+                      spacing: 4,
                       children: [
                         Text(
-                          AppLocalizations.of(context).currencySymbol,
+                          context.l10n.currencySymbol,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        const SizedBox(height: 4),
                         Text(
                           state.settings.currencySymbol,
                           style: Theme.of(context)
@@ -74,19 +77,18 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                     },
                   ),
                 ),
-                const SizedBox(width: 16),
                 Expanded(
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.all(10),
                     ),
                     child: Column(
+                      spacing: 4,
                       children: [
                         Text(
-                          AppLocalizations.of(context).sortBy,
+                          context.l10n.sortBy,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        const SizedBox(height: 4),
                         Text(
                           getSortByString(context, state.settings.sortBy),
                           style: Theme.of(context)
@@ -108,9 +110,43 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 12),
+            Row(
+              spacing: 8,
+              children: [
+                for (final (modeId, icon, label) in _themeModes)
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 8,
+                        ),
+                        backgroundColor: state.settings.themeMode == modeId
+                            ? Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withValues(alpha: 0.14)
+                            : null,
+                        foregroundColor: state.settings.themeMode == modeId
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      icon: Icon(icon, size: 16),
+                      label: Text(
+                        label,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      onPressed: () async {
+                        await rxPrefs.setInt('themeMode', modeId);
+                      },
+                    ),
+                  ),
+              ],
+            ),
             const SizedBox(height: 16),
             Text(
-              AppLocalizations.of(context).designedDeveloped,
+              context.l10n.designedDeveloped,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleSmall,
             ),

@@ -24,6 +24,8 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
     super.dispose();
   }
 
+  static const _commonCurrencies = ['\$', '€', '£', 'R\$', '¥', '₿'];
+
   @override
   Widget build(BuildContext context) {
     final primaryColor = (Theme.of(context).brightness == Brightness.dark)
@@ -32,7 +34,7 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
     final backgroundDialogColor = Theme.of(context).colorScheme.surface;
 
     return AlertDialog(
-      title: Text(AppLocalizations.of(context).currencySymbol),
+      title: Text(context.l10n.currencySymbol),
       backgroundColor: backgroundDialogColor,
       content: Form(
         key: _formKey,
@@ -42,18 +44,19 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
             TextFormField(
               controller: currencyEditingController,
               onFieldSubmitted: onSubmit,
+              onChanged: (_) => setState(() {}),
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return AppLocalizations.of(context).pleaseEnterCurrency;
+                  return context.l10n.pleaseEnterCurrency;
                 }
                 return null;
               },
               decoration: InputDecoration(
                 filled: true,
                 fillColor: getInputFillColor(context),
-                labelText: AppLocalizations.of(context).currencySymbol,
+                labelText: context.l10n.currencySymbol,
                 labelStyle: TextStyle(color: primaryColor),
                 // border is used when there is an error
                 border: getInputDecorationBorder(primaryColor),
@@ -63,6 +66,26 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
                 enabledBorder: getInputDecorationBorder(primaryColor),
               ),
             ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final symbol in _commonCurrencies)
+                  ActionChip(
+                    label: Text(symbol),
+                    backgroundColor:
+                        currencyEditingController.text.trim() == symbol
+                            ? primaryColor.withValues(alpha: 0.20)
+                            : null,
+                    onPressed: () {
+                      setState(() {
+                        currencyEditingController.text = symbol;
+                      });
+                    },
+                  ),
+              ],
+            ),
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
@@ -71,7 +94,7 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
                   foregroundColor: backgroundDialogColor,
                   backgroundColor: primaryColor,
                 ),
-                label: Text(AppLocalizations.of(context).dialogSave),
+                label: Text(context.l10n.dialogSave),
                 icon: const Icon(Icons.check_rounded),
                 onPressed: onSubmit,
               ),

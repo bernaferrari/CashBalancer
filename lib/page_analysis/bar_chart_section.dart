@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:beamer/beamer.dart';
 import 'package:cash_balancer/database/data.dart';
+import 'package:cash_balancer/page_home/details_page.dart';
 import 'package:flutter/material.dart';
 
 class const BarChartSection(final FullData data, {super.key})
@@ -33,20 +34,30 @@ class const BarChartSection(final FullData data, {super.key})
             spacing: 16,
             children: [
               for (final item in sortedItems)
-                RectangularPercentageWidget(
-                  id: item.id,
-                  percent: maximumPrice > 0 ? item.price / maximumPrice : 0,
-                  size: 40,
-                  backgroundColor: Theme.of(context)
-                      .colorScheme
-                      .onPrimary
-                      .withValues(alpha: 0.10),
-                  borderWidth: 0,
-                  progressColor: item.color,
-                  direction: Axis.vertical,
-                  verticalDirection: VerticalDirection.up,
-                  borderRadius: 8,
-                ),
+                () {
+                  final percent = data.totalValue > 0
+                      ? (item.price / data.totalValue * 100).toStringAsFixed(1)
+                      : '0';
+                  return Tooltip(
+                    key: ValueKey(item.id),
+                    message:
+                        '${item.name} • ${data.settings.currencySymbol} ${toCurrency(item.price)} ($percent%)',
+                    child: RectangularPercentageWidget(
+                      id: item.id,
+                      percent: maximumPrice > 0 ? item.price / maximumPrice : 0,
+                      size: 40,
+                      backgroundColor: Theme.of(context)
+                          .colorScheme
+                          .onPrimary
+                          .withValues(alpha: 0.10),
+                      borderWidth: 0,
+                      progressColor: item.color,
+                      direction: Axis.vertical,
+                      verticalDirection: VerticalDirection.up,
+                      borderRadius: 8,
+                    ),
+                  );
+                }(),
             ],
           ),
         ),
@@ -75,22 +86,18 @@ class const RectangularPercentageWidget({
 class _RectangularPercentageWidgetState
     extends State<RectangularPercentageWidget>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  );
 
   @override
   void initState() {
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    );
-
-    _controller.addListener(() {
-      setState(() {});
-    });
-
-    _controller.animateTo(widget.percent.clamp(0.0, 1.0));
-
     super.initState();
+    _controller.animateTo(
+      widget.percent.clamp(0.0, 1.0),
+      curve: Curves.easeOutCubic,
+    );
   }
 
   @override
@@ -101,17 +108,17 @@ class _RectangularPercentageWidgetState
 
   @override
   void didUpdateWidget(RectangularPercentageWidget oldWidget) {
-    if (oldWidget.percent != widget.percent) {
-      _controller.animateTo(widget.percent.clamp(0.0, 1.0));
-    }
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.percent != widget.percent) {
+      _controller.animateTo(
+        widget.percent.clamp(0.0, 1.0),
+        curve: Curves.easeOutCubic,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final int filledFlex = (_controller.value.clamp(0.0, 1.0) * 100).round();
-    final int emptyFlex = 100 - filledFlex;
-
     final Widget progressWidget = Container(
       decoration: BoxDecoration(
         color: widget.progressColor,
@@ -146,21 +153,30 @@ class _RectangularPercentageWidgetState
         ),
         onPressed: () =>
             Beamer.of(context).beamToNamed('/editItem/${widget.id}'),
-        child: Flex(
-          direction: widget.direction,
-          verticalDirection: widget.verticalDirection,
-          children: <Widget>[
-            if (filledFlex > 0)
-              Expanded(
-                flex: filledFlex,
-                child: progressWidget,
-              ),
-            if (emptyFlex > 0)
-              Expanded(
-                flex: emptyFlex,
-                child: const SizedBox.expand(),
-              ),
-          ],
+        child: ListenableBuilder(
+          listenable: _controller,
+          builder: (context, _) {
+            final int filledFlex =
+                (_controller.value.clamp(0.0, 1.0) * 1000).round();
+            final int emptyFlex = 1000 - filledFlex;
+
+            return Flex(
+              direction: widget.direction,
+              verticalDirection: widget.verticalDirection,
+              children: <Widget>[
+                if (filledFlex > 0)
+                  Expanded(
+                    flex: filledFlex,
+                    child: progressWidget,
+                  ),
+                if (emptyFlex > 0)
+                  Expanded(
+                    flex: emptyFlex,
+                    child: const SizedBox.expand(),
+                  ),
+              ],
+            );
+          },
         ),
       ),
     );

@@ -84,19 +84,28 @@ class Database(super.e) extends _$Database {
     final relativeTargetStream = rxPrefs.getBoolStream('relativeTarget');
     final currencySymbolStream = rxPrefs.getStringStream('currencySymbol');
     final sortBy = rxPrefs.getIntStream('sortBy');
+    final themeMode = rxPrefs.getIntStream('themeMode');
 
-    final settingsData = Rx.combineLatest3<bool?, String?, int?, SettingsData>(
-        relativeTargetStream, currencySymbolStream, sortBy, (
-      relativeTarget,
-      currencySymbol,
+    final settingsData =
+        Rx.combineLatest4<bool?, String?, int?, int?, SettingsData>(
+      relativeTargetStream,
+      currencySymbolStream,
       sortBy,
-    ) {
-      return SettingsData(
-        relativeTarget: relativeTarget ?? false,
-        currencySymbol: currencySymbol ?? "\$",
-        sortBy: sortBy ?? 0,
-      );
-    });
+      themeMode,
+      (
+        relativeTarget,
+        currencySymbol,
+        sortBy,
+        themeMode,
+      ) {
+        return SettingsData(
+          relativeTarget: relativeTarget ?? false,
+          currencySymbol: currencySymbol ?? "\$",
+          sortBy: sortBy ?? 0,
+          themeMode: themeMode ?? 0,
+        );
+      },
+    );
 
     return Rx.combineLatest3<List<Wallet>, List<Item>, SettingsData, FullData>(
         walletsQuery.watch(), itemsQuery.watch(), settingsData,

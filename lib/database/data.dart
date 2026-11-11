@@ -46,4 +46,5 @@ class const SettingsData({
   required final bool relativeTarget,
   required final String currencySymbol,
   required final int sortBy,
+  final int themeMode = 0,
 });
