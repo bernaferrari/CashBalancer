@@ -379,33 +379,10 @@ enum TailwindColor {
 
   final TailwindPalette palette;
 
-  /// Resolves a Tailwind v3/v4 color name (and legacy v2 names like
-  /// `lightBlue`, `warmGray`, `trueGray`, `coolGray`, `blueGray`) safely.
-  static TailwindColor fromName(String name) => switch (name) {
-        'rose' => rose,
-        'pink' => pink,
-        'fuchsia' => fuchsia,
-        'purple' => purple,
-        'violet' => violet,
-        'indigo' => indigo,
-        'blue' => blue,
-        'sky' || 'lightBlue' => sky,
-        'cyan' => cyan,
-        'teal' => teal,
-        'emerald' => emerald,
-        'green' => green,
-        'lime' => lime,
-        'yellow' => yellow,
-        'amber' => amber,
-        'orange' => orange,
-        'red' => red,
-        'stone' || 'warmGray' => stone,
-        'neutral' || 'trueGray' => neutral,
-        'zinc' => zinc,
-        'gray' || 'coolGray' => gray,
-        'slate' || 'blueGray' => slate,
-        _ => zinc,
-      };
+  static final Map<String, TailwindColor> _byName = values.asNameMap();
+
+  /// Resolves a Tailwind v3/v4 color name safely, defaulting to [zinc].
+  static TailwindColor fromName(String name) => _byName[name] ?? zinc;
 
   static TailwindColor random([Random? rng]) {
     final r = rng ?? Random();
@@ -416,3 +393,11 @@ enum TailwindColor {
 /// Convenience helper returning the type-safe [TailwindPalette] for [name].
 TailwindPalette tailwindPalette(String name) =>
     TailwindColor.fromName(name).palette;
+
+extension HighContrastForegroundX on Color {
+  /// Returns a dark or white Display P3 foreground color that guarantees high
+  /// contrast against this background color.
+  Color get highContrastOnColor => computeLuminance() > 0.42
+      ? const _P3(0.059, 0.090, 0.165)
+      : const _P3(1.0, 1.0, 1.0);
+}

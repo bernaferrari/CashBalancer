@@ -118,12 +118,10 @@ void main() {
     // Wallet 1 items and Wallet 2 items use their respective wallet colors.
     expect(colors[1], isNot(equals(colors[3])));
 
-    // Legacy v2 color names resolve seamlessly to v3/v4 palettes.
-    expect(TailwindColor.fromName('lightBlue'), TailwindColor.sky);
-    expect(TailwindColor.fromName('warmGray'), TailwindColor.stone);
-    expect(TailwindColor.fromName('trueGray'), TailwindColor.neutral);
-    expect(TailwindColor.fromName('coolGray'), TailwindColor.gray);
-    expect(TailwindColor.fromName('blueGray'), TailwindColor.slate);
+    // Tailwind v3/v4 color names resolve via asNameMap.
+    expect(TailwindColor.fromName('sky'), TailwindColor.sky);
+    expect(TailwindColor.fromName('stone'), TailwindColor.stone);
+    expect(TailwindColor.fromName('slate'), TailwindColor.slate);
   });
 
   test('retrieveSpacedList handles empty, zero-total, and normal lists', () {

@@ -85,8 +85,9 @@ class const ItemsList(final FullData data, {super.key})
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
+      spacing: 8,
       children: [
-        for (int i = 0; i < sortedItems.length; i++) ...[
+        for (int i = 0; i < sortedItems.length; i++)
           if (data.walletsMap.containsKey(sortedItems[i].walletId))
             SizedBox(
               width: double.infinity,
@@ -101,16 +102,6 @@ class const ItemsList(final FullData data, {super.key})
                     : null,
               ),
             ),
-          if (i < sortedItems.length - 1)
-            Container(
-              height: 1,
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              color: Theme.of(context)
-                  .colorScheme
-                  .onPrimary
-                  .withValues(alpha: 0.10),
-            ),
-        ],
       ],
     );
   }

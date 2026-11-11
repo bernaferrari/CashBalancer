@@ -24,11 +24,11 @@ Map<int, Color> getColorByQuantile(
     for (final item in element.value) {
       final itemValue = item.totalValue;
       if (itemValue >= quartile66) {
-        colors[item.id] = palette.s500;
+        colors[item.id] = palette.s600;
       } else if (itemValue >= quartile33) {
-        colors[item.id] = palette.s300;
+        colors[item.id] = palette.s500;
       } else {
-        colors[item.id] = palette.s200;
+        colors[item.id] = palette.s400;
       }
     }
   }

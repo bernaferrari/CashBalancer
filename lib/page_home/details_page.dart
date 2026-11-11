@@ -137,27 +137,37 @@ class const HomePageImpl(final FullData data, {super.key})
               data: data,
               children: [
                 if (data.allItems.isNotEmpty && data.totalValue > 0) ...[
-                  TextButton(
-                    onPressed: () {
-                      Beamer.of(context).beamToNamed("/analysis");
-                    },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: 16,
-                      children: [
-                        PieChartSection(data),
-                        Text(
-                          "Total: ${data.settings.currencySymbol} ${toCurrency(data.totalValue)}",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: 12,
+                    children: [
+                      PieChartSection(data),
+                      Center(
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            visualDensity: VisualDensity.compact,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 8,
+                            ),
+                            shape: const StadiumBorder(),
+                          ),
+                          onPressed: () {
+                            Beamer.of(context).beamToNamed("/analysis");
+                          },
+                          icon: const Icon(
+                            Icons.bar_chart_rounded,
+                            size: 16,
+                          ),
+                          label: Text(
+                            "${context.l10n.allItems} (${data.allItems.length})",
+                            style: const TextStyle(fontSize: 12),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  const Divider(height: 40),
+                  const Divider(height: 32),
                 ],
                 Column(
                   spacing: 20,
@@ -301,37 +311,47 @@ class const GroupCard({
   // Make it reusable.
   Widget customContainer({
     required Widget child,
-    required Color color,
+    required TailwindPalette palette,
     required BuildContext context,
-  }) =>
-      Container(
-        padding: const EdgeInsets.all(10.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.0),
-          border: Border.all(color: color.withValues(alpha: 0.20)),
-          color: Theme.of(context).brightness == Brightness.dark
-              ? color.withValues(alpha: 0.10)
-              : color.withValues(alpha: 0.05),
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.all(14.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(
+          color: isDark
+              ? palette.s500.withValues(alpha: 0.28)
+              : palette.s500.withValues(alpha: 0.30),
+          width: 1.2,
         ),
-        child: child,
-      );
+        color: isDark
+            ? palette.s950.withValues(alpha: 0.45)
+            : palette.s50.withValues(alpha: 0.65),
+      ),
+      child: child,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final palette = tailwindPalette(group.colorName);
     final color = palette.s500;
+    final accentText = isDark ? palette.s300 : palette.s700;
 
     if (itemsList == null) {
       return customContainer(
         context: context,
-        color: color,
+        palette: palette,
         child: WalletCard(
           title: group.name,
           subtitle: context.l10n.pressToAdd,
+          accentColor: color,
           widget: Row(
             spacing: 8,
             children: [
-              EditWallet(color: color, groupId: group.id),
+              EditWallet(color: accentText, groupId: group.id),
               AddItem(color: color, groupId: group.id),
             ],
           ),
@@ -343,7 +363,7 @@ class const GroupCard({
 
       return customContainer(
         context: context,
-        color: color,
+        palette: palette,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -352,94 +372,86 @@ class const GroupCard({
               title: group.name,
               subtitle:
                   "Total: ${settings.currencySymbol} ${toCurrency(group.totalValue)}",
+              accentColor: color,
               widget: Row(
                 mainAxisSize: MainAxisSize.min,
                 spacing: 8,
                 children: [
-                  EditWallet(color: color, groupId: group.id),
+                  EditWallet(color: accentText, groupId: group.id),
                   AddItem(color: color, groupId: group.id),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
-            for (int i = 0; i < itemsList!.length; i++) ...[
-              SizedBox(
-                width: double.infinity,
-                child: ItemCard(
-                  itemsList![i],
-                  settings.relativeTarget ? group.totalValue : allTotalValue,
-                  settings.currencySymbol,
-                  buyOnlyTotalValue: buyOnlyItemsTotal,
-                ),
-              ),
-              if (i < itemsList!.length - 1)
-                Container(
-                  height: 1,
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onPrimary
-                      .withValues(alpha: 0.10),
-                ),
-            ],
-            const SizedBox(height: 8),
-            Row(
-              mainAxisSize: MainAxisSize.min,
+            const SizedBox(height: 12),
+            Column(
+              spacing: 6,
               children: [
-                const Expanded(child: SizedBox.shrink()),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (group.targetPercent != -1) ...[
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          PercentArrow(
-                            itemValue: group.totalValue,
-                            totalValue: allTotalValue,
-                            targetPercent: group.targetPercent,
-                          ),
-                          const SizedBox(height: 4),
-                          UpDownDiffText(
-                            currencySymbol: settings.currencySymbol,
-                            itemValue: group.totalValue,
-                            targetPercent: group.targetPercent,
-                            totalValue: allTotalValue,
-                            buyOnlyTotalValue: buyOnlyWalletTotal,
-                          ),
-                        ],
+                for (int i = 0; i < itemsList!.length; i++)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ItemCard(
+                      itemsList![i],
+                      settings.relativeTarget
+                          ? group.totalValue
+                          : allTotalValue,
+                      settings.currencySymbol,
+                      buyOnlyTotalValue: buyOnlyItemsTotal,
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (group.targetPercent != -1) ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      PercentArrow(
+                        itemValue: group.totalValue,
+                        totalValue: allTotalValue,
+                        targetPercent: group.targetPercent,
                       ),
-                      const SizedBox(width: 16),
-                      SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: Stack(
-                          children: [
-                            Center(
-                              child: CircularProgress(
-                                totalLocalPercent: totalLocalPercent,
-                                color: palette.s500,
-                                hasText: false,
-                              ),
-                            ),
-                            Center(
-                              child: CircularProgress(
-                                totalLocalPercent: group.targetPercent,
-                                color: palette.s200,
-                                size: 25,
-                                hasText: false,
-                              ),
-                            ),
-                          ],
+                      const SizedBox(height: 4),
+                      UpDownDiffText(
+                        currencySymbol: settings.currencySymbol,
+                        itemValue: group.totalValue,
+                        targetPercent: group.targetPercent,
+                        totalValue: allTotalValue,
+                        buyOnlyTotalValue: buyOnlyWalletTotal,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 14),
+                  SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Stack(
+                      children: [
+                        Center(
+                          child: CircularProgress(
+                            totalLocalPercent: totalLocalPercent,
+                            color: palette.s500,
+                            hasText: false,
+                          ),
                         ),
-                      ),
-                    ] else
-                      CircularProgress(
-                        totalLocalPercent: totalLocalPercent,
-                        color: color,
-                      ),
-                  ],
-                ),
+                        Center(
+                          child: CircularProgress(
+                            totalLocalPercent: group.targetPercent,
+                            color: isDark ? palette.s300 : palette.s700,
+                            size: 25,
+                            hasText: false,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else
+                  CircularProgress(
+                    totalLocalPercent: totalLocalPercent,
+                    color: color,
+                  ),
               ],
             ),
           ],
@@ -459,14 +471,14 @@ class const AddItem({
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        foregroundColor: color.highContrastOnColor,
         elevation: 0,
         padding: EdgeInsets.zero,
         minimumSize: Size.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        fixedSize: const Size(64, 40),
+        fixedSize: const Size(52, 38),
       ),
-      child: const Icon(Icons.add_rounded),
+      child: const Icon(Icons.add_rounded, size: 20),
       onPressed: () => Beamer.of(context).beamToNamed('/addItem/$groupId'),
     );
   }
@@ -482,12 +494,13 @@ class const EditWallet({
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
         foregroundColor: color,
+        side: BorderSide(color: color.withValues(alpha: 0.35)),
         minimumSize: Size.zero,
         padding: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        fixedSize: const Size(40, 40),
+        fixedSize: const Size(38, 38),
       ),
-      child: const Icon(Icons.edit_rounded),
+      child: const Icon(Icons.edit_rounded, size: 17),
       onPressed: () => Beamer.of(context).beamToNamed("/editWallet/$groupId"),
     );
   }
@@ -545,6 +558,7 @@ class const WalletCard({
   super.key,
   required final String title,
   required final String subtitle,
+  required final Color accentColor,
   final Widget? widget,
 }) extends StatelessWidget {
   @override
@@ -553,18 +567,37 @@ class const WalletCard({
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
+            spacing: 10,
             children: [
-              Text(
-                title,
-                style: Theme.of(context).textTheme.headlineSmall,
-                overflow: TextOverflow.ellipsis,
+              Container(
+                width: 10,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: accentColor,
+                  borderRadius: BorderRadius.circular(5),
+                ),
               ),
-              Text(
-                subtitle,
-                style: Theme.of(context).textTheme.labelSmall,
-                overflow: TextOverflow.ellipsis,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -597,6 +630,7 @@ class const ItemCard(
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final double itemValue = item.totalValue;
     final double ratio = totalValue > 0 ? itemValue / totalValue : 0;
     final String qtyPrefix =
@@ -604,10 +638,11 @@ class const ItemCard(
 
     return TextButton(
       style: TextButton.styleFrom(
-        padding: const EdgeInsets.all(10.0),
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? item.color.withValues(alpha: 0.05)
-            : item.color.withValues(alpha: 0.25),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        backgroundColor: isDark
+            ? item.color.withValues(alpha: 0.12)
+            : item.color.withValues(alpha: 0.12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 0,
       ),
       onPressed: () {
@@ -621,7 +656,7 @@ class const ItemCard(
           Container(
             width: 4,
             height: 38,
-            margin: const EdgeInsets.only(right: 8),
+            margin: const EdgeInsets.only(right: 10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(4),
               color: item.color,
@@ -638,10 +673,10 @@ class const ItemCard(
                     Expanded(
                       child: Text(
                         item.name,
-                        style: GoogleFonts.firaSans(
+                        style: GoogleFonts.inter(
                           color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -664,13 +699,10 @@ class const ItemCard(
                   leftWidget: Expanded(
                     child: Text(
                       "$qtyPrefix$currencySymbol ${toCurrency(itemValue)} (${ratio.toPercent()}%)",
-                      style: GoogleFonts.firaSans(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.75),
+                      style: GoogleFonts.ibmPlexMono(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -699,31 +731,26 @@ class const PercentArrow({
       children: [
         Text(
           "${ratio.toPercent()}%",
-          style: GoogleFonts.firaSans(
-            color:
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.50),
-            fontSize: 18,
-            fontWeight: FontWeight.w400,
+          style: GoogleFonts.ibmPlexMono(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
           child: Icon(
             Icons.arrow_forward_rounded,
-            size: 16,
-            color:
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.50),
+            size: 14,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         Text(
           "${formatPercent(targetPercent)}%",
-          style: GoogleFonts.firaSans(
+          style: GoogleFonts.ibmPlexMono(
             color: Theme.of(context).colorScheme.onSurface,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            fontFeatures: const [
-              FontFeature.enable('calc'),
-            ],
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ],

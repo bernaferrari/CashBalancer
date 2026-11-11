@@ -7,12 +7,12 @@ Color getScaffoldDialogBackgroundColor(BuildContext context, String colorName) {
   final palette = tailwindPalette(colorName);
   return Theme.of(context).brightness == Brightness.dark
       ? Color.alphaBlend(
-          Colors.black.withValues(alpha: 0.40),
-          palette.s900,
+          palette.s950.withValues(alpha: 0.55),
+          TailwindColor.zinc.palette.s950,
         )
       : Color.alphaBlend(
-          Colors.white.withValues(alpha: 0.40),
-          palette.s100,
+          palette.s100.withValues(alpha: 0.65),
+          TailwindColor.slate.palette.s50,
         );
 }
 
@@ -34,22 +34,25 @@ Color getBackgroundDialogColor(BuildContext context, String colorName) {
   final palette = tailwindPalette(colorName);
   return Theme.of(context).brightness == Brightness.dark
       ? Color.alphaBlend(
-          Colors.black.withValues(alpha: 0.25),
-          palette.s950,
+          palette.s900.withValues(alpha: 0.28),
+          TailwindColor.zinc.palette.s900,
         )
-      : palette.s100;
+      : Color.alphaBlend(
+          palette.s50.withValues(alpha: 0.85),
+          Colors.white,
+        );
 }
 
 Color getInputFillColor(BuildContext context) {
   return Theme.of(context).brightness == Brightness.dark
-      ? Colors.white.withValues(alpha: 0.05)
+      ? Colors.white.withValues(alpha: 0.06)
       : Colors.black.withValues(alpha: 0.04);
 }
 
 InputBorder getInputDecorationBorder(Color primaryColorWeaker) =>
     OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: primaryColorWeaker),
+      borderSide: BorderSide(color: primaryColorWeaker.withValues(alpha: 0.55)),
     );
 
 /// Accepts digits and a single decimal separator (`.` or `,`), normalizing `,`
@@ -89,6 +92,10 @@ class const DialogScreenBase({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final palette = tailwindPalette(colorName);
+    final primaryColor = getPrimaryColor(context, colorName);
+
     return Scaffold(
       backgroundColor: getScaffoldDialogBackgroundColor(context, colorName),
       body: SafeArea(
@@ -106,11 +113,18 @@ class const DialogScreenBase({
             },
             child: Center(
               child: SizedBox(
-                width: 400,
+                width: 416,
                 child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: isDark
+                          ? palette.s700.withValues(alpha: 0.45)
+                          : palette.s300.withValues(alpha: 0.85),
+                      width: 1.5,
+                    ),
                     color: backgroundDialogColor ??
                         getBackgroundDialogColor(context, colorName),
                   ),
@@ -118,16 +132,20 @@ class const DialogScreenBase({
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       AppBar(
-                        foregroundColor:
-                            Theme.of(context).colorScheme.onSurface,
-                        title: Text(appBarTitle),
+                        foregroundColor: primaryColor,
+                        title: Text(
+                          appBarTitle,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(color: primaryColor),
+                        ),
                         centerTitle: true,
                         elevation: 0,
                         scrolledUnderElevation: 0,
-                        backgroundColor:
-                            Theme.of(context).brightness == Brightness.dark
-                                ? tailwindPalette(colorName).s900
-                                : tailwindPalette(colorName).s200,
+                        backgroundColor: isDark
+                            ? palette.s900.withValues(alpha: 0.55)
+                            : palette.s100.withValues(alpha: 0.90),
                         actions: appBarActions,
                       ),
                       Flexible(

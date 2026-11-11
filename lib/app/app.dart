@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:animations/animations.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cash_balancer/page_analysis/analysis_page.dart';
@@ -221,13 +219,18 @@ class _AppState extends State<App> {
           GoogleFonts.ibmPlexMono(fontSize: 14, fontWeight: FontWeight.w400),
       bodySmall: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w400),
       labelSmall: GoogleFonts.ibmPlexMono(
-        fontSize: 10,
-        fontWeight: FontWeight.w400,
-        letterSpacing: 1.5,
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.6,
       ),
-      headlineSmall:
-          GoogleFonts.rubikMonoOne(fontSize: 24, fontWeight: FontWeight.w400),
-      titleLarge: GoogleFonts.rubik(fontSize: 20, fontWeight: FontWeight.w500),
+      headlineSmall: GoogleFonts.rubik(
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.3,
+      ),
+      titleLarge: GoogleFonts.rubik(fontSize: 20, fontWeight: FontWeight.w600),
+      titleMedium: GoogleFonts.rubik(fontSize: 15, fontWeight: FontWeight.w600),
+      titleSmall: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
     );
 
     final textButtonTheme = TextButtonThemeData(
@@ -286,95 +289,67 @@ class _AppState extends State<App> {
             themeMode: appPrefs.$1,
             locale: appPrefs.$2,
             theme: ThemeData(
-              scaffoldBackgroundColor: Colors.white,
-              colorScheme: const ColorScheme.light(
-                primary: Color.from(
-                  alpha: 1,
-                  red: 0.118,
-                  green: 0.161,
-                  blue: 0.506,
-                  colorSpace: ColorSpace.displayP3,
-                ),
-                secondary: Color.from(
-                  alpha: 1,
-                  red: 0.128,
-                  green: 0.578,
-                  blue: 0.412,
-                  colorSpace: ColorSpace.displayP3,
-                ),
+              scaffoldBackgroundColor: TailwindColor.slate.palette.s50,
+              colorScheme: ColorScheme.light(
+                primary: TailwindColor.emerald.palette.s700,
+                onPrimary: Colors.white,
+                secondary: TailwindColor.emerald.palette.s600,
+                onSecondary: Colors.white,
+                surface: Colors.white,
+                onSurface: TailwindColor.slate.palette.s900,
+                onSurfaceVariant: TailwindColor.slate.palette.s600,
               ),
               dialogTheme: DialogThemeData(
+                backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
-              floatingActionButtonTheme: const FloatingActionButtonThemeData(
-                backgroundColor: Color.from(
-                  alpha: 1,
-                  red: 0.128,
-                  green: 0.578,
-                  blue: 0.412,
-                  colorSpace: ColorSpace.displayP3,
-                ),
+              floatingActionButtonTheme: FloatingActionButtonThemeData(
+                backgroundColor: TailwindColor.emerald.palette.s600,
                 foregroundColor: Colors.white,
-                shape: StadiumBorder(),
+                elevation: 2,
+                shape: const StadiumBorder(),
               ),
               dividerTheme: DividerThemeData(
-                color: Colors.black.withValues(alpha: 0.08),
+                color: TailwindColor.slate.palette.s900.withValues(alpha: 0.08),
               ),
-              appBarTheme: const AppBarTheme(
-                backgroundColor: Color.from(
-                  alpha: 1,
-                  red: 0.158,
-                  green: 0.720,
-                  blue: 0.985,
-                  colorSpace: ColorSpace.displayP3,
-                ),
+              appBarTheme: AppBarTheme(
+                backgroundColor: TailwindColor.sky.palette.s500,
+                foregroundColor: TailwindColor.slate.palette.s900,
               ),
               typography: Typography.material2021(),
               visualDensity: VisualDensity.standard,
               applyElevationOverlayColor: false,
               elevatedButtonTheme: elevatedButtonTheme,
               outlinedButtonTheme: buildOutlinedButtonTheme(
-                  Colors.black.withValues(alpha: 0.12)),
+                  TailwindColor.slate.palette.s900.withValues(alpha: 0.14)),
               textButtonTheme: textButtonTheme,
               textTheme: textTheme,
             ),
             darkTheme: ThemeData(
               brightness: Brightness.dark,
-              scaffoldBackgroundColor: const Color(0xff121212),
-              colorScheme: const ColorScheme.dark(
-                primary: Color.from(
-                  alpha: 1,
-                  red: 0.888,
-                  green: 0.844,
-                  blue: 0.368,
-                  colorSpace: ColorSpace.displayP3,
-                ),
-                secondary: Color.from(
-                  alpha: 1,
-                  red: 0.422,
-                  green: 0.888,
-                  blue: 0.588,
-                  colorSpace: ColorSpace.displayP3,
-                ),
-                surface: Color(0xff201f15),
+              scaffoldBackgroundColor: TailwindColor.zinc.palette.s950,
+              colorScheme: ColorScheme.dark(
+                primary: TailwindColor.emerald.palette.s400,
+                onPrimary: TailwindColor.zinc.palette.s950,
+                secondary: TailwindColor.emerald.palette.s400,
+                onSecondary: TailwindColor.zinc.palette.s950,
+                surface: TailwindColor.zinc.palette.s900,
+                onSurface: TailwindColor.zinc.palette.s100,
+                onSurfaceVariant: TailwindColor.zinc.palette.s400,
               ),
               dialogTheme: DialogThemeData(
+                backgroundColor: TailwindColor.zinc.palette.s900,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
-              floatingActionButtonTheme: const FloatingActionButtonThemeData(
-                backgroundColor: Color.from(
-                  alpha: 1,
-                  red: 0.422,
-                  green: 0.888,
-                  blue: 0.588,
-                  colorSpace: ColorSpace.displayP3,
-                ),
-                foregroundColor: Colors.black,
-                shape: StadiumBorder(),
+              floatingActionButtonTheme: FloatingActionButtonThemeData(
+                backgroundColor: TailwindColor.emerald.palette.s400,
+                foregroundColor: TailwindColor.zinc.palette.s950,
+                elevation: 2,
+                shape: const StadiumBorder(),
               ),
               dividerTheme: DividerThemeData(
                 color: Colors.white.withValues(alpha: 0.08),
@@ -384,7 +359,7 @@ class _AppState extends State<App> {
               applyElevationOverlayColor: false,
               elevatedButtonTheme: elevatedButtonTheme,
               outlinedButtonTheme: buildOutlinedButtonTheme(
-                  Colors.white.withValues(alpha: 0.12)),
+                  Colors.white.withValues(alpha: 0.14)),
               textButtonTheme: textButtonTheme,
               textTheme: textTheme,
             ),

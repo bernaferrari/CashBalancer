@@ -24,7 +24,7 @@ class const BarChartSection(final FullData data, {super.key})
         sortedItems.map((e) => e.totalValue).reduce(max);
 
     return SizedBox(
-      height: 200,
+      height: 224,
       width: double.infinity,
       child: Center(
         child: SingleChildScrollView(
@@ -37,27 +37,61 @@ class const BarChartSection(final FullData data, {super.key})
                 () {
                   final percent = data.totalValue > 0
                       ? (item.totalValue / data.totalValue * 100)
-                          .toStringAsFixed(1)
+                          .toStringAsFixed(0)
                       : '0';
                   return Tooltip(
                     key: ValueKey(item.id),
                     message:
                         '${item.name} • ${data.settings.currencySymbol} ${toCurrency(item.totalValue)} ($percent%)',
-                    child: RectangularPercentageWidget(
-                      id: item.id,
-                      percent: maximumPrice > 0
-                          ? item.totalValue / maximumPrice
-                          : 0,
-                      size: 40,
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .onPrimary
-                          .withValues(alpha: 0.10),
-                      borderWidth: 0,
-                      progressColor: item.color,
-                      direction: Axis.vertical,
-                      verticalDirection: VerticalDirection.up,
-                      borderRadius: 8,
+                    child: SizedBox(
+                      width: 52,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: RectangularPercentageWidget(
+                              id: item.id,
+                              percent: maximumPrice > 0
+                                  ? item.totalValue / maximumPrice
+                                  : 0,
+                              size: 40,
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.08),
+                              borderWidth: 0,
+                              progressColor: item.color,
+                              direction: Axis.vertical,
+                              verticalDirection: VerticalDirection.up,
+                              borderRadius: 8,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            item.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                          Text(
+                            '$percent%',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall
+                                ?.copyWith(
+                                  fontSize: 10,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 }(),

@@ -52,10 +52,13 @@ class const SettingsPage({super.key}) extends StatelessWidget {
           appBarTitle: context.l10n.settings,
           children: [
             SwitchListTile(
+              contentPadding: EdgeInsets.zero,
               title: Text(context.l10n.relativeTarget),
               subtitle: Text(
                 context.l10n.targetSettings,
-                style: Theme.of(context).textTheme.bodySmall,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ),
               value: state.settings.relativeTarget,
               onChanged: (value) async {
@@ -63,31 +66,37 @@ class const SettingsPage({super.key}) extends StatelessWidget {
               },
             ),
             SwitchListTile(
+              contentPadding: EdgeInsets.zero,
               title: Text(context.l10n.buyOnlyRebalance),
               subtitle: Text(
                 context.l10n.buyOnlyRebalanceSubtitle,
-                style: Theme.of(context).textTheme.bodySmall,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ),
               value: state.settings.buyOnly,
               onChanged: (value) async {
                 await rxPrefs.setBool("buyOnly", value);
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Row(
-              spacing: 12,
+              spacing: 10,
               children: [
                 Expanded(
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 10,
+                      ),
                     ),
                     child: Column(
                       spacing: 4,
                       children: [
                         Text(
                           context.l10n.currencySymbol,
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: Theme.of(context).textTheme.titleSmall,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
@@ -96,7 +105,9 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                               .textTheme
                               .bodySmall
                               ?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary),
+                                fontWeight: FontWeight.w700,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
                       ],
                     ),
@@ -113,14 +124,17 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 10,
+                      ),
                     ),
                     child: Column(
                       spacing: 4,
                       children: [
                         Text(
                           context.l10n.sortBy,
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: Theme.of(context).textTheme.titleSmall,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
@@ -129,7 +143,9 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                               .textTheme
                               .bodySmall
                               ?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary),
+                                fontWeight: FontWeight.w700,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
                       ],
                     ),
@@ -145,14 +161,17 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 10,
+                      ),
                     ),
                     child: Column(
                       spacing: 4,
                       children: [
                         Text(
                           context.l10n.language,
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: Theme.of(context).textTheme.titleSmall,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
@@ -162,7 +181,9 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                               .textTheme
                               .bodySmall
                               ?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary),
+                                fontWeight: FontWeight.w700,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
                       ],
                     ),
