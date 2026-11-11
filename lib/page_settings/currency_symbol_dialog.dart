@@ -28,9 +28,10 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = TailwindColor.zinc.palette;
     final primaryColor = (Theme.of(context).brightness == Brightness.dark)
-        ? tailwindColors['gray']![300]!
-        : tailwindColors['gray']![800]!;
+        ? palette.s300
+        : palette.s800;
     final backgroundDialogColor = Theme.of(context).colorScheme.surface;
 
     return AlertDialog(

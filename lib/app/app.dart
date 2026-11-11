@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:ui';
 
 import 'package:animations/animations.dart';
 import 'package:beamer/beamer.dart';
@@ -34,14 +34,14 @@ final simpleBuilder = RoutesLocationBuilder(routes: {
         title: 'Settings',
         child: const SettingsPage(),
         popToNamed: '/',
-        fillColor: getScaffoldDialogBackgroundColor(context, 'warmGray'),
+        fillColor: getScaffoldDialogBackgroundColor(context, 'stone'),
       ),
   '/analysis': (context, state, obj) => BeamerMaterialTransitionPage(
         key: const ValueKey('analysis'),
         title: 'Analysis',
         child: const AnalysisPage(),
         popToNamed: '/',
-        fillColor: getScaffoldDialogBackgroundColor(context, 'warmGray'),
+        fillColor: getScaffoldDialogBackgroundColor(context, 'stone'),
       ),
   '/rebalance': (context, state, obj) => BeamerMaterialTransitionPage(
         key: const ValueKey('rebalance'),
@@ -286,64 +286,108 @@ class _AppState extends State<App> {
             themeMode: appPrefs.$1,
             locale: appPrefs.$2,
             theme: ThemeData(
-            scaffoldBackgroundColor: Colors.white,
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xff162783),
-              secondary: Color(0xff059669),
-            ),
-            dialogTheme: DialogThemeData(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
+              scaffoldBackgroundColor: Colors.white,
+              colorScheme: const ColorScheme.light(
+                primary: Color.from(
+                  alpha: 1,
+                  red: 0.118,
+                  green: 0.161,
+                  blue: 0.506,
+                  colorSpace: ColorSpace.displayP3,
+                ),
+                secondary: Color.from(
+                  alpha: 1,
+                  red: 0.128,
+                  green: 0.578,
+                  blue: 0.412,
+                  colorSpace: ColorSpace.displayP3,
+                ),
               ),
-            ),
-            floatingActionButtonTheme: const FloatingActionButtonThemeData(
-              backgroundColor: Color(0xff059669),
-              foregroundColor: Colors.white,
-              shape: StadiumBorder(),
-            ),
-            dividerTheme: DividerThemeData(
-              color: Colors.black.withValues(alpha: 0.08),
-            ),
-            appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF13B9FF)),
-            typography: Typography.material2021(),
-            visualDensity: VisualDensity.standard,
-            applyElevationOverlayColor: false,
-            elevatedButtonTheme: elevatedButtonTheme,
-            outlinedButtonTheme:
-                buildOutlinedButtonTheme(Colors.black.withValues(alpha: 0.12)),
-            textButtonTheme: textButtonTheme,
-            textTheme: textTheme,
-          ),
-          darkTheme: ThemeData(
-            brightness: Brightness.dark,
-            scaffoldBackgroundColor: const Color(0xff121212),
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xffe4d75a),
-              secondary: Color(0xff5ae492),
-              surface: Color(0xff201f15),
-            ),
-            dialogTheme: DialogThemeData(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
+              dialogTheme: DialogThemeData(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
               ),
+              floatingActionButtonTheme: const FloatingActionButtonThemeData(
+                backgroundColor: Color.from(
+                  alpha: 1,
+                  red: 0.128,
+                  green: 0.578,
+                  blue: 0.412,
+                  colorSpace: ColorSpace.displayP3,
+                ),
+                foregroundColor: Colors.white,
+                shape: StadiumBorder(),
+              ),
+              dividerTheme: DividerThemeData(
+                color: Colors.black.withValues(alpha: 0.08),
+              ),
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Color.from(
+                  alpha: 1,
+                  red: 0.158,
+                  green: 0.720,
+                  blue: 0.985,
+                  colorSpace: ColorSpace.displayP3,
+                ),
+              ),
+              typography: Typography.material2021(),
+              visualDensity: VisualDensity.standard,
+              applyElevationOverlayColor: false,
+              elevatedButtonTheme: elevatedButtonTheme,
+              outlinedButtonTheme: buildOutlinedButtonTheme(
+                  Colors.black.withValues(alpha: 0.12)),
+              textButtonTheme: textButtonTheme,
+              textTheme: textTheme,
             ),
-            floatingActionButtonTheme: const FloatingActionButtonThemeData(
-              backgroundColor: Color(0xff5ae492),
-              foregroundColor: Colors.black,
-              shape: StadiumBorder(),
+            darkTheme: ThemeData(
+              brightness: Brightness.dark,
+              scaffoldBackgroundColor: const Color(0xff121212),
+              colorScheme: const ColorScheme.dark(
+                primary: Color.from(
+                  alpha: 1,
+                  red: 0.888,
+                  green: 0.844,
+                  blue: 0.368,
+                  colorSpace: ColorSpace.displayP3,
+                ),
+                secondary: Color.from(
+                  alpha: 1,
+                  red: 0.422,
+                  green: 0.888,
+                  blue: 0.588,
+                  colorSpace: ColorSpace.displayP3,
+                ),
+                surface: Color(0xff201f15),
+              ),
+              dialogTheme: DialogThemeData(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+              floatingActionButtonTheme: const FloatingActionButtonThemeData(
+                backgroundColor: Color.from(
+                  alpha: 1,
+                  red: 0.422,
+                  green: 0.888,
+                  blue: 0.588,
+                  colorSpace: ColorSpace.displayP3,
+                ),
+                foregroundColor: Colors.black,
+                shape: StadiumBorder(),
+              ),
+              dividerTheme: DividerThemeData(
+                color: Colors.white.withValues(alpha: 0.08),
+              ),
+              typography: Typography.material2021(),
+              visualDensity: VisualDensity.standard,
+              applyElevationOverlayColor: false,
+              elevatedButtonTheme: elevatedButtonTheme,
+              outlinedButtonTheme: buildOutlinedButtonTheme(
+                  Colors.white.withValues(alpha: 0.12)),
+              textButtonTheme: textButtonTheme,
+              textTheme: textTheme,
             ),
-            dividerTheme: DividerThemeData(
-              color: Colors.white.withValues(alpha: 0.08),
-            ),
-            typography: Typography.material2021(),
-            visualDensity: VisualDensity.standard,
-            applyElevationOverlayColor: false,
-            elevatedButtonTheme: elevatedButtonTheme,
-            outlinedButtonTheme:
-                buildOutlinedButtonTheme(Colors.white.withValues(alpha: 0.12)),
-            textButtonTheme: textButtonTheme,
-            textTheme: textTheme,
-          ),
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -364,9 +408,7 @@ class _AppState extends State<App> {
 }
 
 BeamPage beamerLoadingPage() {
-  final random = Random();
-  final colorName =
-      tailwindColorsNames[random.nextInt(tailwindColorsNames.length)];
+  final color = TailwindColor.random().palette.s500;
 
   return BeamPage(
     key: const ValueKey("Loading Screen"),
@@ -374,9 +416,7 @@ BeamPage beamerLoadingPage() {
     type: BeamPageType.noTransition,
     child: Center(
       child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(
-          tailwindColors[colorName]![500]!,
-        ),
+        valueColor: AlwaysStoppedAnimation<Color>(color),
       ),
     ),
   );

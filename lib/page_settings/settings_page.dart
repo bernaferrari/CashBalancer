@@ -48,7 +48,7 @@ class const SettingsPage({super.key}) extends StatelessWidget {
             : context.l10n.themeAuto;
 
         return DialogScreenBase(
-          colorName: 'warmGray',
+          colorName: 'stone',
           appBarTitle: context.l10n.settings,
           children: [
             SwitchListTile(

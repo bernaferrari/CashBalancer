@@ -40,22 +40,23 @@ class _MoveItemPageState extends State<MoveItemPage> {
         for (final group in widget.wallets)
           () {
             final isSelected = selectedGroupId == group.id;
-            final groupAccent = tailwindColors[group.colorName]![500]!;
+            final palette = tailwindPalette(group.colorName);
+            final groupAccent = palette.s500;
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 4.0),
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   backgroundColor: isSelected
                       ? Theme.of(context).brightness == Brightness.dark
-                          ? tailwindColors[group.colorName]![900]!
-                          : tailwindColors[group.colorName]![100]!
+                          ? palette.s900
+                          : palette.s100
                       : null,
                   side: BorderSide(
                     color: isSelected
                         ? groupAccent
                         : Theme.of(context).brightness == Brightness.dark
-                            ? tailwindColors[group.colorName]![700]!
-                            : tailwindColors[group.colorName]![200]!,
+                            ? palette.s700
+                            : palette.s200,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),

@@ -33,8 +33,8 @@ class _PortfoliosDialogState extends State<PortfoliosDialog> {
 
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final primaryColor = isDark
-            ? tailwindColors['emerald']![300]!
-            : tailwindColors['emerald']![800]!;
+            ? TailwindColor.emerald.palette.s300
+            : TailwindColor.emerald.palette.s800;
         final cubit = context.read<DataCubit>();
 
         return AlertDialog(

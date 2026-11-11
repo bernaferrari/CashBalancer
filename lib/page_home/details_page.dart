@@ -318,8 +318,8 @@ class const GroupCard({
 
   @override
   Widget build(BuildContext context) {
-    final Map<int, Color> localTailwindColor = tailwindColors[group.colorName]!;
-    final color = localTailwindColor[500]!;
+    final palette = tailwindPalette(group.colorName);
+    final color = palette.s500;
 
     if (itemsList == null) {
       return customContainer(
@@ -418,14 +418,14 @@ class const GroupCard({
                             Center(
                               child: CircularProgress(
                                 totalLocalPercent: totalLocalPercent,
-                                color: localTailwindColor[500]!,
+                                color: palette.s500,
                                 hasText: false,
                               ),
                             ),
                             Center(
                               child: CircularProgress(
                                 totalLocalPercent: group.targetPercent,
-                                color: localTailwindColor[200]!,
+                                color: palette.s200,
                                 size: 25,
                                 hasText: false,
                               ),
@@ -742,13 +742,13 @@ class const UpDownDiffText({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final greenColor = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xff77d874)
-        : const Color(0xff2A8B27);
-
-    final redColor = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xffff5a74)
-        : const Color(0xffCC0020);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final greenColor = isDark
+        ? TailwindColor.green.palette.s400
+        : TailwindColor.green.palette.s700;
+    final redColor = isDark
+        ? TailwindColor.rose.palette.s400
+        : TailwindColor.red.palette.s600;
 
     final double currentRatio = totalValue > 0 ? itemValue / totalValue : 0;
     final double targetRatio = targetPercent / 100;

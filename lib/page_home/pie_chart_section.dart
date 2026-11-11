@@ -72,8 +72,8 @@ class _PieChartSectionState extends State<PieChartSection> {
                             style: GoogleFonts.rubik(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color:
-                                  tailwindColors[touchedWallet.colorName]![500],
+                              color: tailwindPalette(touchedWallet.colorName)
+                                  .s500,
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -113,7 +113,7 @@ class _PieChartSectionState extends State<PieChartSection> {
           final isTouched = i == _touchedIndex;
           final double percent = groupData.totalValue / totalValue * 100;
           return PieChartSectionData(
-            color: tailwindColors[groupData.colorName]![500]!,
+            color: tailwindPalette(groupData.colorName).s500,
             value: percent,
             title: '${percent.toStringAsFixed(0)}%',
             radius: isTouched ? 56 : 50,

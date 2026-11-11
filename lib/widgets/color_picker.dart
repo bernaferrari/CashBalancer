@@ -13,13 +13,13 @@ class const ColorPicker(
 }
 
 class _ColorPickerState extends State<ColorPicker> {
-  late String selected = widget.initialSelection;
+  late TailwindColor selected = TailwindColor.fromName(widget.initialSelection);
 
   @override
   void didUpdateWidget(ColorPicker oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initialSelection != widget.initialSelection) {
-      selected = widget.initialSelection;
+      selected = TailwindColor.fromName(widget.initialSelection);
     }
   }
 
@@ -37,15 +37,15 @@ class _ColorPickerState extends State<ColorPicker> {
           physics: const BouncingScrollPhysics(),
           child: Row(
             children: [
-              for (String colorName in tailwindColorsNames)
+              for (final twColor in TailwindColor.values)
                 AnimatedColorItem(
-                  color: tailwindColors[colorName]![500]!,
-                  isSelected: colorName == selected,
+                  color: twColor.palette.s500,
+                  isSelected: twColor == selected,
                   onSelected: () {
                     setState(() {
-                      selected = colorName;
+                      selected = twColor;
                     });
-                    widget.onChanged(selected);
+                    widget.onChanged(selected.name);
                   },
                 ),
             ],

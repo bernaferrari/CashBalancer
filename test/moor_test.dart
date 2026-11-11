@@ -1,7 +1,10 @@
+import 'dart:ui';
+
 import 'package:cash_balancer/database/data.dart';
 import 'package:cash_balancer/database/database.dart';
 import 'package:cash_balancer/util/get_color_by_quantile.dart';
 import 'package:cash_balancer/util/retrieve_spaced_list.dart';
+import 'package:cash_balancer/util/tailwind_colors.dart';
 import 'package:cash_balancer/widgets/dialog_screen_base.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/services.dart';
@@ -107,14 +110,20 @@ void main() {
       2: [item3],
     };
 
-    final colors =
-        getColorByQuantile(itemsMap, groupMap, [item1, item2, item3]);
+    final colors = getColorByQuantile(itemsMap, groupMap);
     expect(colors.keys, containsAll([1, 2, 3]));
-    expect(colors[1], isNotNull);
-    expect(colors[2], isNotNull);
-    expect(colors[3], isNotNull);
+    expect(colors[1]?.colorSpace, ColorSpace.displayP3);
+    expect(colors[2]?.colorSpace, ColorSpace.displayP3);
+    expect(colors[3]?.colorSpace, ColorSpace.displayP3);
     // Wallet 1 items and Wallet 2 items use their respective wallet colors.
     expect(colors[1], isNot(equals(colors[3])));
+
+    // Legacy v2 color names resolve seamlessly to v3/v4 palettes.
+    expect(TailwindColor.fromName('lightBlue'), TailwindColor.sky);
+    expect(TailwindColor.fromName('warmGray'), TailwindColor.stone);
+    expect(TailwindColor.fromName('trueGray'), TailwindColor.neutral);
+    expect(TailwindColor.fromName('coolGray'), TailwindColor.gray);
+    expect(TailwindColor.fromName('blueGray'), TailwindColor.slate);
   });
 
   test('retrieveSpacedList handles empty, zero-total, and normal lists', () {

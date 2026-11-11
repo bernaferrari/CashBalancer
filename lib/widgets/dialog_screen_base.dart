@@ -4,36 +4,40 @@ import 'package:flutter/services.dart';
 import '../util/tailwind_colors.dart';
 
 Color getScaffoldDialogBackgroundColor(BuildContext context, String colorName) {
+  final palette = tailwindPalette(colorName);
   return Theme.of(context).brightness == Brightness.dark
       ? Color.alphaBlend(
           Colors.black.withValues(alpha: 0.40),
-          tailwindColors[colorName]![900]!,
+          palette.s900,
         )
       : Color.alphaBlend(
           Colors.white.withValues(alpha: 0.40),
-          tailwindColors[colorName]![100]!,
+          palette.s100,
         );
 }
 
 Color getPrimaryColor(BuildContext context, String colorName) {
+  final palette = tailwindPalette(colorName);
   return Theme.of(context).brightness == Brightness.dark
-      ? tailwindColors[colorName]![200]!
-      : tailwindColors[colorName]![800]!;
+      ? palette.s200
+      : palette.s800;
 }
 
 Color getPrimaryColorWeaker(BuildContext context, String colorName) {
+  final palette = tailwindPalette(colorName);
   return Theme.of(context).brightness == Brightness.dark
-      ? tailwindColors[colorName]![300]!
-      : tailwindColors[colorName]![700]!;
+      ? palette.s300
+      : palette.s700;
 }
 
 Color getBackgroundDialogColor(BuildContext context, String colorName) {
+  final palette = tailwindPalette(colorName);
   return Theme.of(context).brightness == Brightness.dark
       ? Color.alphaBlend(
-          Colors.black.withValues(alpha: 0.60),
-          tailwindColors[colorName]![900]!,
+          Colors.black.withValues(alpha: 0.25),
+          palette.s950,
         )
-      : tailwindColors[colorName]![100]!;
+      : palette.s100;
 }
 
 Color getInputFillColor(BuildContext context) {
@@ -122,8 +126,8 @@ class const DialogScreenBase({
                         scrolledUnderElevation: 0,
                         backgroundColor:
                             Theme.of(context).brightness == Brightness.dark
-                                ? tailwindColors[colorName]![900]!
-                                : tailwindColors[colorName]![200],
+                                ? tailwindPalette(colorName).s900
+                                : tailwindPalette(colorName).s200,
                         actions: appBarActions,
                       ),
                       Flexible(

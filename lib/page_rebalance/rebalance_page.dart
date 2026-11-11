@@ -158,7 +158,7 @@ class _RebalancePageState extends State<RebalancePage> {
                 for (final wallet in targetedWallets)
                   _AllocationTile(
                     name: wallet.name,
-                    color: tailwindColors[wallet.colorName]![500]!,
+                    color: tailwindPalette(wallet.colorName).s500,
                     currentValue: wallet.totalValue,
                     delta: walletDeltas[wallet.id] ?? 0,
                     targetPercent: wallet.targetPercent,
@@ -348,10 +348,12 @@ class const _AllocationTile({
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final greenColor =
-        isDark ? const Color(0xff77d874) : const Color(0xff2A8B27);
-    final redColor =
-        isDark ? const Color(0xffff5a74) : const Color(0xffCC0020);
+    final greenColor = isDark
+        ? TailwindColor.green.palette.s400
+        : TailwindColor.green.palette.s700;
+    final redColor = isDark
+        ? TailwindColor.rose.palette.s400
+        : TailwindColor.red.palette.s600;
     final isHold = delta.abs() < 0.005;
     final isBuy = delta > 0;
 

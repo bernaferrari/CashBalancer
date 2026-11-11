@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cash_balancer/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,8 +22,9 @@ class const CRUDWalletPage({
 class _CRUDWalletPageState extends State<CRUDWalletPage> {
   final _formKey = GlobalKey<FormState>();
 
-  late String colorName = widget.previousWallet?.colorName ??
-      tailwindColorsNames[Random().nextInt(tailwindColorsNames.length)];
+  late String colorName = widget.previousWallet != null
+      ? TailwindColor.fromName(widget.previousWallet!.colorName).name
+      : TailwindColor.random().name;
 
   late final TextEditingController nameEditingController =
       TextEditingController(text: widget.previousWallet?.name);

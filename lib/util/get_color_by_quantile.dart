@@ -8,7 +8,6 @@ import 'tailwind_colors.dart';
 Map<int, Color> getColorByQuantile(
   Map<int, List<Item>> itemsMap,
   Map<int, WalletData> groupMap,
-  List<Item> itemsList,
 ) {
   final colors = <int, Color>{};
 
@@ -20,23 +19,19 @@ Map<int, Color> getColorByQuantile(
 
     final quartile33 = q33(arr);
     final quartile66 = q66(arr);
-    final palette = _getColor(wallet.colorName);
+    final palette = tailwindPalette(wallet.colorName);
 
     for (final item in element.value) {
       final itemValue = item.totalValue;
       if (itemValue >= quartile66) {
-        colors[item.id] = palette[500]!;
+        colors[item.id] = palette.s500;
       } else if (itemValue >= quartile33) {
-        colors[item.id] = palette[300]!;
+        colors[item.id] = palette.s300;
       } else {
-        colors[item.id] = palette[200]!;
+        colors[item.id] = palette.s200;
       }
     }
   }
 
   return colors;
-}
-
-Map<int, Color> _getColor(String colorType) {
-  return tailwindColors[colorType] ?? tailwindColors['gray']!;
 }

@@ -4,6 +4,8 @@
 // operations and displaying appropriate feedback to users.
 import 'package:flutter/material.dart';
 
+import '../util/tailwind_colors.dart';
+
 /// Result wrapper for database operations
 ///
 /// This class represents the result of a database operation that may succeed or fail.
@@ -15,30 +17,11 @@ sealed class DbResult<T> {
   R when<R>({
     required R Function(T data) success,
     required R Function(String error) error,
-  }) {
-    return switch (this) {
-      Success(data: final data) => success(data),
-      Failure(message: final message) => error(message),
-    };
-  }
-
-  /// Check if the operation was successful
-  bool get isSuccess => this is Success;
-
-  /// Check if the operation failed
-  bool get isFailure => this is Failure;
-
-  /// Get the data if successful, null otherwise
-  T? get dataOrNull => switch (this) {
-    Success(data: final data) => data,
-    Failure() => null,
-  };
-
-  /// Get the error message if failed, null otherwise
-  String? get errorOrNull => switch (this) {
-    Success() => null,
-    Failure(message: final message) => message,
-  };
+  }) =>
+      switch (this) {
+        Success(data: final data) => success(data),
+        Failure(message: final message) => error(message),
+      };
 }
 
 /// Successful database operation result
@@ -60,10 +43,10 @@ Future<DbResult<T>> safeDbOperation<T>(
     return Success(result);
   } on Exception catch (e) {
     return Failure(
-      errorMessage ?? 'An error occurred: ${e.toString()}',
+      errorMessage ?? 'An error occurred: $e',
       exception: e,
     );
-  } catch (e) {
+  } catch (_) {
     return Failure(
       errorMessage ?? 'An unexpected error occurred',
     );
@@ -75,7 +58,7 @@ void showErrorSnackbar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(message),
-      backgroundColor: Colors.red,
+      backgroundColor: TailwindColor.red.palette.s600,
       duration: const Duration(seconds: 4),
     ),
   );

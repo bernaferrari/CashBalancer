@@ -135,21 +135,15 @@ class Database(super.e) extends _$Database {
       final walletsMap = <int, WalletData>{};
       double totalValue = 0;
       for (final wallet in walletsList) {
-        final double walletValue;
-        if (groupedItems[wallet.id] != null) {
-          walletValue =
-              groupedItems[wallet.id]!.fold(0, (a, b) => a + b.totalValue);
-        } else {
-          walletValue = 0;
-        }
-
+        final walletValue = groupedItems[wallet.id]
+                ?.fold<double>(0, (a, b) => a + b.totalValue) ??
+            0;
         totalValue += walletValue;
-
         walletsMap[wallet.id] = WalletData(wallet, walletValue);
       }
 
       final Map<int, Color> colors =
-          getColorByQuantile(groupedItems, walletsMap, sortedItems);
+          getColorByQuantile(groupedItems, walletsMap);
 
       final allItemData = sortedItems
           .where((d) => walletsMap.containsKey(d.walletId))

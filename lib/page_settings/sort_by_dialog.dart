@@ -10,19 +10,18 @@ class const SortByDialog({super.key, required final int initialValue})
 }
 
 class _SortByDialogState extends State<SortByDialog> {
-  final String colorName = 'green';
   late int selectedSortId = widget.initialValue;
   static const sortByValues = [0, 1];
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = (Theme.of(context).brightness == Brightness.dark)
-        ? tailwindColors[colorName]![300]!
-        : tailwindColors[colorName]![800]!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final palette = TailwindColor.green.palette;
+    final primaryColor = isDark ? palette.s300 : palette.s800;
     final backgroundDialogColor = Theme.of(context).colorScheme.surface;
 
     return AlertDialog(
-      title: Text(AppLocalizations.of(context).sortBy),
+      title: Text(context.l10n.sortBy),
       backgroundColor: backgroundDialogColor,
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -35,14 +34,10 @@ class _SortByDialogState extends State<SortByDialog> {
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       backgroundColor: selectedSortId == sortId
-                          ? Theme.of(context).brightness == Brightness.dark
-                              ? tailwindColors[colorName]![800]!
-                              : tailwindColors[colorName]![200]!
+                          ? (isDark ? palette.s800 : palette.s200)
                           : null,
                       side: BorderSide(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? tailwindColors[colorName]![700]!
-                            : tailwindColors[colorName]![200]!,
+                        color: isDark ? palette.s700 : palette.s200,
                         width: 1,
                       ),
                     ),
@@ -69,7 +64,7 @@ class _SortByDialogState extends State<SortByDialog> {
                 foregroundColor: backgroundDialogColor,
                 backgroundColor: primaryColor,
               ),
-              label: Text(AppLocalizations.of(context).dialogSave),
+              label: Text(context.l10n.dialogSave),
               icon: const Icon(Icons.check_rounded),
               onPressed: onSubmit,
             ),
@@ -86,14 +81,8 @@ class _SortByDialogState extends State<SortByDialog> {
   }
 }
 
-String getSortByString(BuildContext context, int value) {
-  if (value == 0) {
-    // Value
-    return AppLocalizations.of(context).sortBy0;
-  } else if (value == 1) {
-    // Name
-    return AppLocalizations.of(context).sortBy1;
-  }
-
-  return '';
-}
+String getSortByString(BuildContext context, int value) => switch (value) {
+      0 => context.l10n.sortBy0,
+      1 => context.l10n.sortBy1,
+      _ => '',
+    };
