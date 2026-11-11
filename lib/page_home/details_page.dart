@@ -12,6 +12,7 @@ import '../util/retrieve_spaced_list.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/circle_percentage_painter.dart';
 import '../widgets/when_empty_card.dart';
+import 'portfolios_dialog.dart';
 
 class const HomePage({super.key}) extends StatelessWidget {
   @override
@@ -32,16 +33,70 @@ class const HomePageImpl(final FullData data, {super.key})
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          context.l10n.appTitle,
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        leading: IconButton(
+          tooltip: context.l10n.portfolios,
+          onPressed: () {
+            showDialog<Object>(
+              context: context,
+              builder: (_) => BlocProvider.value(
+                value: context.read<DataCubit>(),
+                child: const PortfoliosDialog(),
+              ),
+            );
+          },
+          icon: Icon(
+            Icons.bookmarks_outlined,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+        title: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () {
+            showDialog<Object>(
+              context: context,
+              builder: (_) => BlocProvider.value(
+                value: context.read<DataCubit>(),
+                child: const PortfoliosDialog(),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  context.l10n.appTitle,
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                ),
+                if (data.portfolios.length > 1)
+                  Text(
+                    data.userName,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                  ),
+              ],
+            ),
+          ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
         actions: [
+          if (data.allItems.isNotEmpty)
+            IconButton(
+              tooltip: context.l10n.rebalanceCalculator,
+              onPressed: () => Beamer.of(context).beamToNamed('/rebalance'),
+              icon: Icon(
+                Icons.calculate_outlined,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
           IconButton(
+            tooltip: context.l10n.settings,
             onPressed: () => Beamer.of(context).beamToNamed('/settings'),
             icon: Icon(
               Icons.settings_outlined,
@@ -102,6 +157,12 @@ class const HomePageImpl(final FullData data, {super.key})
                         itemsList: data.walletsItems[group.id],
                         group: group,
                         allTotalValue: data.totalValue,
+                        buyOnlyWalletTotal: data.settings.buyOnly
+                            ? data.buyOnlyTotalForWallets
+                            : null,
+                        buyOnlyItemsTotal: data.settings.buyOnly
+                            ? data.buyOnlyTotalForItems(group.id)
+                            : null,
                         settings: data.settings,
                       ),
                   ],
@@ -222,6 +283,8 @@ class const GroupCard({
   required final List<ItemData>? itemsList,
   required final WalletData group,
   required final double allTotalValue,
+  final double? buyOnlyWalletTotal,
+  final double? buyOnlyItemsTotal,
   required final SettingsData settings,
 }) extends StatelessWidget {
   // Make it reusable.
@@ -295,6 +358,7 @@ class const GroupCard({
                   itemsList![i],
                   settings.relativeTarget ? group.totalValue : allTotalValue,
                   settings.currencySymbol,
+                  buyOnlyTotalValue: buyOnlyItemsTotal,
                 ),
               ),
               if (i < itemsList!.length - 1)
@@ -330,6 +394,7 @@ class const GroupCard({
                             itemValue: group.totalValue,
                             targetPercent: group.targetPercent,
                             totalValue: allTotalValue,
+                            buyOnlyTotalValue: buyOnlyWalletTotal,
                           ),
                         ],
                       ),
@@ -500,13 +565,23 @@ class const WalletCard({
 }
 
 extension Percent on double {
-  String toPercent() => isFinite ? (this * 100).toStringAsFixed(0) : '0';
+  String toPercent() => isFinite ? formatPercent(this * 100) : '0';
+}
+
+String formatPercent(double percent) {
+  if (!percent.isFinite) return '0';
+  final rounded = (percent * 10).roundToDouble() / 10;
+  if (rounded == rounded.truncateToDouble()) {
+    return rounded.toInt().toString();
+  }
+  return rounded.toStringAsFixed(1);
 }
 
 class const ItemCard(
   final ItemData item,
   final double totalValue,
   final String currencySymbol, {
+  final double? buyOnlyTotalValue,
   super.key,
 }) extends StatelessWidget {
   @override
@@ -571,6 +646,7 @@ class const ItemCard(
                   itemValue: item.price,
                   targetPercent: item.targetPercent,
                   totalValue: totalValue,
+                  buyOnlyTotalValue: buyOnlyTotalValue,
                   leftWidget: Expanded(
                     child: Text(
                       "$currencySymbol ${toCurrency(item.price)} (${ratio.toPercent()}%)",
@@ -626,7 +702,7 @@ class const PercentArrow({
           ),
         ),
         Text(
-          "${targetPercent.toStringAsFixed(0)}%",
+          "${formatPercent(targetPercent)}%",
           style: GoogleFonts.firaSans(
             color: Theme.of(context).colorScheme.onSurface,
             fontSize: 18,
@@ -646,6 +722,7 @@ class const UpDownDiffText({
   required final double itemValue,
   required final double targetPercent,
   required final double totalValue,
+  final double? buyOnlyTotalValue,
   final Widget? leftWidget,
   super.key,
 }) extends StatelessWidget {
@@ -661,6 +738,37 @@ class const UpDownDiffText({
 
     final double currentRatio = totalValue > 0 ? itemValue / totalValue : 0;
     final double targetRatio = targetPercent / 100;
+
+    if (buyOnlyTotalValue != null) {
+      final double buyNeeded =
+          (buyOnlyTotalValue! * targetRatio - itemValue).clamp(0.0, double.infinity);
+      final bool isHold = buyNeeded < 0.005;
+
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          ?leftWidget,
+          if (targetPercent != -1)
+            Text(
+              isHold
+                  ? "✓ ${context.l10n.hold} ($currencySymbol 0.00)"
+                  : "↑ $currencySymbol ${toCurrency(buyNeeded)} (+${(targetRatio - currentRatio).abs().toPercent()}%)",
+              style: GoogleFonts.firaSans(
+                color: isHold
+                    ? Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.55)
+                    : greenColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+        ],
+      );
+    }
+
     final bool isUnderOrEqual = targetRatio >= currentRatio;
 
     return Row(

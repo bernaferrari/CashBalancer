@@ -168,9 +168,8 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                         }
                         return null;
                       },
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(
-                            RegExp(r'^\d*\.?\d{0,2}')),
+                      inputFormatters: const <TextInputFormatter>[
+                        DecimalTextInputFormatter(),
                       ],
                       textAlign: TextAlign.right,
                       keyboardType:
@@ -179,10 +178,8 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                         filled: true,
                         fillColor: getInputFillColor(context),
                         labelText: AppLocalizations.of(context).value,
+                        hintText: '0.00',
                         prefixText: widget.currency,
-                        suffixText: moneyEditingController.text.contains('.')
-                            ? null
-                            : ".00",
                         labelStyle: TextStyle(color: primaryColor),
                         // border is used when there is an error
                         border: getInputDecorationBorder(primaryColor),
@@ -263,19 +260,16 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                             keyboardType: const TextInputType.numberWithOptions(
                                 decimal: true),
                             onChanged: (_) => setState(() {}),
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.allow(
-                                  RegExp(r'^\d*\.?\d{0,2}')),
+                            inputFormatters: const <TextInputFormatter>[
+                              DecimalTextInputFormatter(),
                             ],
                             decoration: InputDecoration(
                               labelText: AppLocalizations.of(context)
                                   .dialogAssetTarget,
+                              hintText: '0',
                               filled: true,
                               fillColor: getInputFillColor(context),
-                              suffixText:
-                                  targetEditingController.text.contains('.')
-                                      ? " %"
-                                      : ".00 %",
+                              suffixText: " %",
                               labelStyle: TextStyle(color: primaryColorWeaker),
                               border:
                                   getInputDecorationBorder(primaryColorWeaker),

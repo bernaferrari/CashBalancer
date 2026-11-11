@@ -47,5 +47,16 @@
   "invalidValue": "Formato de número inválido",
   "valueMustBePositive": "O valor deve ser positivo",
   "targetMustBeBetween": "O alvo deve estar entre 0 e 100",
-  "designedDeveloped": "Desenhado e desenvolvido por Bernardo Ferrari."
+  "designedDeveloped": "Desenhado e desenvolvido por Bernardo Ferrari.",
+  "buyOnlyRebalance": "Apenas Comprar (Sem Vendas)",
+  "buyOnlyRebalanceSubtitle": "Rebalanceie usando apenas novos aportes, sem vender ativos acima do alvo.",
+  "rebalanceCalculator": "Investir e Rebalancear",
+  "amountToInvest": "Valor para investir",
+  "autoFillBuyOnly": "Mín. para equilibrar sem vender",
+  "applyInvestment": "APLICAR APORTE",
+  "noTargetsSet": "Defina porcentagens alvo nas suas carteiras ou ativos para calcular a distribuição do aporte.",
+  "hold": "Manter",
+  "portfolios": "Portfólios e Objetivos",
+  "newPortfolio": "Novo Portfólio / Objetivo",
+  "portfolioName": "Nome do objetivo"
 }

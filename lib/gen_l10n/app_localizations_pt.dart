@@ -130,4 +130,39 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get designedDeveloped =>
       'Desenhado e desenvolvido por Bernardo Ferrari.';
+
+  @override
+  String get buyOnlyRebalance => 'Apenas Comprar (Sem Vendas)';
+
+  @override
+  String get buyOnlyRebalanceSubtitle =>
+      'Rebalanceie usando apenas novos aportes, sem vender ativos acima do alvo.';
+
+  @override
+  String get rebalanceCalculator => 'Investir e Rebalancear';
+
+  @override
+  String get amountToInvest => 'Valor para investir';
+
+  @override
+  String get autoFillBuyOnly => 'Mín. para equilibrar sem vender';
+
+  @override
+  String get applyInvestment => 'APLICAR APORTE';
+
+  @override
+  String get noTargetsSet =>
+      'Defina porcentagens alvo nas suas carteiras ou ativos para calcular a distribuição do aporte.';
+
+  @override
+  String get hold => 'Manter';
+
+  @override
+  String get portfolios => 'Portfólios e Objetivos';
+
+  @override
+  String get newPortfolio => 'Novo Portfólio / Objetivo';
+
+  @override
+  String get portfolioName => 'Nome do objetivo';
 }

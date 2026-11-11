@@ -82,24 +82,28 @@ class Database(super.e) extends _$Database {
 
     final rxPrefs = RxSharedPreferences.getInstance();
     final relativeTargetStream = rxPrefs.getBoolStream('relativeTarget');
+    final buyOnlyStream = rxPrefs.getBoolStream('buyOnly');
     final currencySymbolStream = rxPrefs.getStringStream('currencySymbol');
     final sortBy = rxPrefs.getIntStream('sortBy');
     final themeMode = rxPrefs.getIntStream('themeMode');
 
     final settingsData =
-        Rx.combineLatest4<bool?, String?, int?, int?, SettingsData>(
+        Rx.combineLatest5<bool?, bool?, String?, int?, int?, SettingsData>(
       relativeTargetStream,
+      buyOnlyStream,
       currencySymbolStream,
       sortBy,
       themeMode,
       (
         relativeTarget,
+        buyOnly,
         currencySymbol,
         sortBy,
         themeMode,
       ) {
         return SettingsData(
           relativeTarget: relativeTarget ?? false,
+          buyOnly: buyOnly ?? false,
           currencySymbol: currencySymbol ?? "\$",
           sortBy: sortBy ?? 0,
           themeMode: themeMode ?? 0,
@@ -107,9 +111,14 @@ class Database(super.e) extends _$Database {
       },
     );
 
-    return Rx.combineLatest3<List<Wallet>, List<Item>, SettingsData, FullData>(
-        walletsQuery.watch(), itemsQuery.watch(), settingsData,
-        (walletsList, itemsList, settings) {
+    return Rx.combineLatest4<List<User>, List<Wallet>, List<Item>, SettingsData,
+            FullData>(
+        select(users).watch(),
+        walletsQuery.watch(),
+        itemsQuery.watch(),
+        settingsData, (usersList, walletsList, itemsList, settings) {
+      final currentUser =
+          usersList.where((u) => u.id == userId).firstOrNull;
       final List<Item> sortedItems = [...itemsList]..sort((a, b) {
           return (b.price * b.quantity).compareTo((a.price * a.quantity));
         });
@@ -165,6 +174,8 @@ class Database(super.e) extends _$Database {
 
       return FullData(
         userId: userId,
+        userName: currentUser?.name ?? 'Wallet #1',
+        portfolios: usersList,
         totalValue: totalValue,
         allItems: allItemData,
         walletsItems: groupedItemData,
@@ -277,6 +288,14 @@ class Database(super.e) extends _$Database {
   Future<void> deleteWallet(int walletId) async {
     await (delete(items)..where((t) => t.walletId.equals(walletId))).go();
     await (delete(wallets)..where((t) => t.id.equals(walletId))).go();
+  }
+
+  Future<int> deletePortfolio(int portfolioUserId) async {
+    await (delete(items)..where((t) => t.userId.equals(portfolioUserId))).go();
+    await (delete(wallets)..where((t) => t.userId.equals(portfolioUserId)))
+        .go();
+    await (delete(users)..where((t) => t.id.equals(portfolioUserId))).go();
+    return getDefaultUser();
   }
 
   Future<int> getDefaultUser() async {

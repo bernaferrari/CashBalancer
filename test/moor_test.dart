@@ -2,7 +2,9 @@ import 'package:cash_balancer/database/data.dart';
 import 'package:cash_balancer/database/database.dart';
 import 'package:cash_balancer/util/get_color_by_quantile.dart';
 import 'package:cash_balancer/util/retrieve_spaced_list.dart';
+import 'package:cash_balancer/widgets/dialog_screen_base.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -150,5 +152,97 @@ void main() {
     );
     final spaced = retrieveSpacedList([i1, i2], 200);
     expect(spaced, [99.0, 99.0]);
+  });
+
+  test('DecimalTextInputFormatter supports dot and comma cents', () {
+    const formatter = DecimalTextInputFormatter();
+    const empty = TextEditingValue.empty;
+
+    expect(
+      formatter
+          .formatEditUpdate(empty, const TextEditingValue(text: '1234.56'))
+          .text,
+      '1234.56',
+    );
+    expect(
+      formatter
+          .formatEditUpdate(empty, const TextEditingValue(text: '1234,56'))
+          .text,
+      '1234.56',
+    );
+    expect(
+      formatter
+          .formatEditUpdate(
+            const TextEditingValue(text: '12.34'),
+            const TextEditingValue(text: '12.345'),
+          )
+          .text,
+      '12.34',
+    );
+  });
+
+  test('Buy-only rebalancing calculates required total without selling', () {
+    const w1 = Wallet(
+      id: 1,
+      userId: 1,
+      name: 'Stocks',
+      colorName: 'emerald',
+      targetPercent: 60,
+    );
+    const w2 = Wallet(
+      id: 2,
+      userId: 1,
+      name: 'Crypto',
+      colorName: 'amber',
+      targetPercent: 40,
+    );
+    final data = FullData(
+      userId: 1,
+      totalValue: 1000,
+      allItems: [
+        ItemData(
+          item: const Item(
+            id: 1,
+            walletId: 1,
+            userId: 1,
+            name: 'BOVA11',
+            quantity: 1,
+            price: 400,
+            targetPercent: 60,
+          ),
+          colorName: 'emerald',
+          color: const Color(0xFF10B981),
+        ),
+        ItemData(
+          item: const Item(
+            id: 2,
+            walletId: 2,
+            userId: 1,
+            name: 'BTC',
+            quantity: 1,
+            price: 600,
+            targetPercent: 40,
+          ),
+          colorName: 'amber',
+          color: const Color(0xFFF59E0B),
+        ),
+      ],
+      walletsItems: const {},
+      walletsMap: {
+        1: WalletData(w1, 400),
+        2: WalletData(w2, 600),
+      },
+      settings: const SettingsData(
+        relativeTarget: false,
+        buyOnly: true,
+        currencySymbol: '\$',
+        sortBy: 0,
+      ),
+    );
+
+    // BTC is $600 with a 40% target, so total portfolio must reach $1500
+    // ($600 / 0.40) to avoid selling BTC, requiring $500 of BOVA11 ($900 total).
+    expect(data.buyOnlyTotalForWallets, closeTo(1500, 0.01));
+    expect(data.buyOnlyTotalForItems(), closeTo(1500, 0.01));
   });
 }

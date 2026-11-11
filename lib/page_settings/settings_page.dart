@@ -41,6 +41,17 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                 await rxPrefs.setBool("relativeTarget", value);
               },
             ),
+            SwitchListTile(
+              title: Text(context.l10n.buyOnlyRebalance),
+              subtitle: Text(
+                context.l10n.buyOnlyRebalanceSubtitle,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              value: state.settings.buyOnly,
+              onChanged: (value) async {
+                await rxPrefs.setBool("buyOnly", value);
+              },
+            ),
             const SizedBox(height: 16),
             Row(
               spacing: 16,

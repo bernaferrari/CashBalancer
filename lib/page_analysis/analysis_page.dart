@@ -96,6 +96,9 @@ class const ItemsList(final FullData data, {super.key})
                     ? data.walletsMap[sortedItems[i].walletId]?.totalValue ?? 0
                     : data.totalValue,
                 data.settings.currencySymbol,
+                buyOnlyTotalValue: data.settings.buyOnly
+                    ? data.buyOnlyTotalForItems(sortedItems[i].walletId)
+                    : null,
               ),
             ),
           if (i < sortedItems.length - 1)

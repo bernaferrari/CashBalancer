@@ -158,18 +158,15 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
                             keyboardType: const TextInputType.numberWithOptions(
                                 decimal: true),
                             onChanged: (_) => setState(() {}),
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.allow(
-                                  RegExp(r'^\d*\.?\d{0,2}')),
+                            inputFormatters: const <TextInputFormatter>[
+                              DecimalTextInputFormatter(),
                             ],
                             decoration: InputDecoration(
                               labelText: context.l10n.dialogAssetTarget,
+                              hintText: '0',
                               filled: true,
                               fillColor: getInputFillColor(context),
-                              suffixText:
-                                  targetEditingController.text.contains('.')
-                                      ? " %"
-                                      : ".00 %",
+                              suffixText: " %",
                               labelStyle: TextStyle(color: primaryColorWeaker),
                               // border is used when there is an error
                               border:

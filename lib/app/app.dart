@@ -7,6 +7,7 @@ import 'package:cash_balancer/page_crud/crud_item_page.dart';
 import 'package:cash_balancer/page_crud/crud_wallet_page.dart';
 import 'package:cash_balancer/page_crud/move_item_page.dart';
 import 'package:cash_balancer/page_home/details_page.dart';
+import 'package:cash_balancer/page_rebalance/rebalance_page.dart';
 import 'package:cash_balancer/page_settings/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,6 +42,13 @@ final simpleBuilder = RoutesLocationBuilder(routes: {
         child: const AnalysisPage(),
         popToNamed: '/',
         fillColor: getScaffoldDialogBackgroundColor(context, 'warmGray'),
+      ),
+  '/rebalance': (context, state, obj) => BeamerMaterialTransitionPage(
+        key: const ValueKey('rebalance'),
+        title: 'Rebalance',
+        child: const RebalancePage(),
+        popToNamed: '/',
+        fillColor: getScaffoldDialogBackgroundColor(context, 'emerald'),
       ),
   '/addWallet/:userId': (context, state, obj) {
     final beamState = context.currentBeamLocation.state as BeamState;

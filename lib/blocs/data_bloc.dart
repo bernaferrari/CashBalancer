@@ -18,9 +18,12 @@ class DataCubit(final Database db) extends Cubit<FullData?> {
     return super.close();
   }
 
-  Future<void> initData() async {
-    final int userId = await db.getDefaultUser();
+  Future<void> initData([int? targetUserId]) async {
+    final int userId = targetUserId ?? await db.getDefaultUser();
     if (isClosed) return;
+    await _currentEntries?.cancel();
     _currentEntries = db.watchWallets(userId).listen(emit);
   }
+
+  Future<void> switchPortfolio(int userId) => initData(userId);
 }

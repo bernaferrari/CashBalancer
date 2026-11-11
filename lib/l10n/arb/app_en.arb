@@ -47,5 +47,16 @@
   "invalidValue": "Invalid number format",
   "valueMustBePositive": "Value must be positive",
   "targetMustBeBetween": "Target must be between 0 and 100",
-  "designedDeveloped": "Designed & developed by Bernardo Ferrari."
+  "designedDeveloped": "Designed & developed by Bernardo Ferrari.",
+  "buyOnlyRebalance": "Buy-Only Rebalancing",
+  "buyOnlyRebalanceSubtitle": "Rebalance using only new cash without selling any overweight assets.",
+  "rebalanceCalculator": "Invest & Rebalance",
+  "amountToInvest": "Amount to invest",
+  "autoFillBuyOnly": "Min. to balance without selling",
+  "applyInvestment": "APPLY TO PORTFOLIO",
+  "noTargetsSet": "Set target percentages on your wallets or assets to calculate how to distribute your investment.",
+  "hold": "Hold",
+  "portfolios": "Portfolios & Goals",
+  "newPortfolio": "New Portfolio / Goal",
+  "portfolioName": "Portfolio name"
 }

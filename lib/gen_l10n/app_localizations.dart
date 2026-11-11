@@ -331,6 +331,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Designed & developed by Bernardo Ferrari.'**
   String get designedDeveloped;
+
+  /// No description provided for @buyOnlyRebalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy-Only Rebalancing'**
+  String get buyOnlyRebalance;
+
+  /// No description provided for @buyOnlyRebalanceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebalance using only new cash without selling any overweight assets.'**
+  String get buyOnlyRebalanceSubtitle;
+
+  /// No description provided for @rebalanceCalculator.
+  ///
+  /// In en, this message translates to:
+  /// **'Invest & Rebalance'**
+  String get rebalanceCalculator;
+
+  /// No description provided for @amountToInvest.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount to invest'**
+  String get amountToInvest;
+
+  /// No description provided for @autoFillBuyOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Min. to balance without selling'**
+  String get autoFillBuyOnly;
+
+  /// No description provided for @applyInvestment.
+  ///
+  /// In en, this message translates to:
+  /// **'APPLY TO PORTFOLIO'**
+  String get applyInvestment;
+
+  /// No description provided for @noTargetsSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Set target percentages on your wallets or assets to calculate how to distribute your investment.'**
+  String get noTargetsSet;
+
+  /// No description provided for @hold.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold'**
+  String get hold;
+
+  /// No description provided for @portfolios.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolios & Goals'**
+  String get portfolios;
+
+  /// No description provided for @newPortfolio.
+  ///
+  /// In en, this message translates to:
+  /// **'New Portfolio / Goal'**
+  String get newPortfolio;
+
+  /// No description provided for @portfolioName.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio name'**
+  String get portfolioName;
 }
 
 class _AppLocalizationsDelegate

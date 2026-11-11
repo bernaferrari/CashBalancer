@@ -48,6 +48,33 @@ InputBorder getInputDecorationBorder(Color primaryColorWeaker) =>
       borderSide: BorderSide(color: primaryColorWeaker),
     );
 
+/// Accepts digits and a single decimal separator (`.` or `,`), normalizing `,`
+/// to `.` and allowing up to [decimalRange] fractional digits.
+class const DecimalTextInputFormatter({final int decimalRange = 2})
+    extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final normalized = newValue.text.replaceAll(',', '.');
+    if (normalized.isEmpty) {
+      return newValue.copyWith(text: '');
+    }
+    final pattern = RegExp('^\\d*\\.?\\d{0,$decimalRange}\$');
+    if (!pattern.hasMatch(normalized)) {
+      return oldValue;
+    }
+    final text = normalized == '.' ? '0.' : normalized;
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(
+        offset: newValue.selection.end.clamp(0, text.length),
+      ),
+    );
+  }
+}
+
 class const DialogScreenBase({
   super.key,
   required final List<Widget> children,
