@@ -175,4 +175,19 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get themeDark => 'Dunkel';
+
+  @override
+  String get quantity => 'Menge';
+
+  @override
+  String get loadSamplePortfolio => 'Beispiel-Portfolio laden';
+
+  @override
+  String get language => 'Sprache';
+
+  @override
+  String get exportBackup => 'JSON exportieren';
+
+  @override
+  String get importBackup => 'JSON importieren';
 }

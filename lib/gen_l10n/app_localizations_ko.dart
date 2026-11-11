@@ -169,4 +169,19 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get themeDark => '다크';
+
+  @override
+  String get quantity => '수량';
+
+  @override
+  String get loadSamplePortfolio => '샘플 포트폴리오 불러오기';
+
+  @override
+  String get language => '언어';
+
+  @override
+  String get exportBackup => 'JSON 내보내기';
+
+  @override
+  String get importBackup => 'JSON 가져오기';
 }

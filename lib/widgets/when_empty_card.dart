@@ -5,6 +5,7 @@ class const WhenEmptyCard({
   required final String title,
   required final String subtitle,
   required final IconData icon,
+  final Widget? action,
   super.key,
 }) extends StatelessWidget {
   @override
@@ -47,6 +48,10 @@ class const WhenEmptyCard({
                     .bodyLarge!
                     .copyWith(fontSize: 14),
               ),
+              if (action != null) ...[
+                const SizedBox(height: 16),
+                ?action,
+              ],
             ],
           ),
         ),

@@ -52,5 +52,10 @@
   "portfolioName": "目标名称",
   "themeAuto": "自动",
   "themeLight": "浅色",
-  "themeDark": "深色"
+  "themeDark": "深色",
+  "quantity": "数量",
+  "loadSamplePortfolio": "加载示例投资组合",
+  "language": "语言",
+  "exportBackup": "导出 JSON",
+  "importBackup": "导入 JSON"
 }

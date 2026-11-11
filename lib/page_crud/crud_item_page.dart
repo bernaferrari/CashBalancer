@@ -5,10 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 
 import '../blocs/data_bloc.dart';
+import '../database/data.dart';
 import '../database/database.dart';
 import '../l10n/l10n.dart';
 import '../utils/error_handler.dart';
 import '../widgets/dialog_screen_base.dart';
+import '../widgets/target_percentage_card.dart';
 
 class const CRUDItemPage({
   required final String colorName,
@@ -36,6 +38,9 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
   late final TextEditingController moneyEditingController =
       TextEditingController(
           text: _formatInitialNumber(widget.previousItem?.price));
+  late final TextEditingController quantityEditingController =
+      TextEditingController(
+          text: _formatInitialNumber(widget.previousItem?.quantity ?? 1));
 
   late final TextEditingController targetEditingController =
       TextEditingController(
@@ -64,6 +69,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
     valueFocusNode.dispose();
     nameEditingController.dispose();
     moneyEditingController.dispose();
+    quantityEditingController.dispose();
     targetEditingController.dispose();
     super.dispose();
   }
@@ -75,14 +81,24 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
     final backgroundDialogColor =
         getBackgroundDialogColor(context, widget.colorName);
 
+    final dataState = context.watch<DataCubit>().state;
+    final siblingItems = dataState == null
+        ? const <ItemData>[]
+        : (dataState.settings.relativeTarget
+            ? (dataState.walletsItems[widget.walletId] ?? const <ItemData>[])
+            : dataState.allItems);
+    final allocatedOtherPercent = siblingItems
+        .where((i) => i.id != widget.previousItem?.id && i.targetPercent > 0)
+        .fold<double>(0, (sum, i) => sum + i.targetPercent);
+
     return Form(
       key: _formKey,
       child: DialogScreenBase(
         colorName: widget.colorName,
         backgroundDialogColor: backgroundDialogColor,
         appBarTitle: widget.previousItem == null
-            ? AppLocalizations.of(context).addAsset
-            : AppLocalizations.of(context).editAsset,
+            ? context.l10n.addAsset
+            : context.l10n.editAsset,
         appBarActions: [
           if (widget.previousItem != null)
             IconButton(
@@ -91,7 +107,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                     .beamToNamed('/moveItem/${widget.previousItem!.id}');
               },
               icon: const Icon(Icons.low_priority),
-              tooltip: AppLocalizations.of(context).move,
+              tooltip: context.l10n.move,
             ),
         ],
         children: [
@@ -109,33 +125,29 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                       onFieldSubmitted: (value) {
                         valueFocusNode.requestFocus();
                       },
-                      autofocus: widget.previousItem == null ? true : false,
+                      autofocus: widget.previousItem == null,
                       focusNode: nameFocusNode,
                       keyboardType: TextInputType.text,
                       textCapitalization: TextCapitalization.sentences,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return AppLocalizations.of(context)
-                              .mainDialogValidator;
+                          return context.l10n.mainDialogValidator;
                         }
                         return null;
                       },
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: getInputFillColor(context),
-                        labelText: AppLocalizations.of(context).dialogAssetName,
+                        labelText: context.l10n.dialogAssetName,
                         labelStyle: TextStyle(color: primaryColor),
-                        // border is used when there is an error
                         border: getInputDecorationBorder(primaryColor),
-                        // focusedBorder is used when focused
                         focusedBorder: getInputDecorationBorder(primaryColor),
-                        // enabledBorder is the default, first shown, border.
                         enabledBorder: getInputDecorationBorder(primaryColor),
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      AppLocalizations.of(context).theAssetsName,
+                      context.l10n.theAssetsName,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
@@ -156,15 +168,14 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                       focusNode: valueFocusNode,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return AppLocalizations.of(context)
-                              .mainDialogValidator;
+                          return context.l10n.mainDialogValidator;
                         }
                         final num = double.tryParse(value);
                         if (num == null) {
-                          return AppLocalizations.of(context).invalidValue;
+                          return context.l10n.invalidValue;
                         }
                         if (num < 0) {
-                          return AppLocalizations.of(context).valueMustBePositive;
+                          return context.l10n.valueMustBePositive;
                         }
                         return null;
                       },
@@ -177,21 +188,18 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: getInputFillColor(context),
-                        labelText: AppLocalizations.of(context).value,
+                        labelText: context.l10n.value,
                         hintText: '0.00',
                         prefixText: widget.currency,
                         labelStyle: TextStyle(color: primaryColor),
-                        // border is used when there is an error
                         border: getInputDecorationBorder(primaryColor),
-                        // focusedBorder is used when focused
                         focusedBorder: getInputDecorationBorder(primaryColor),
-                        // enabledBorder is the default, first shown, border.
                         enabledBorder: getInputDecorationBorder(primaryColor),
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      AppLocalizations.of(context).totalAmount,
+                      context.l10n.totalAmount,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
@@ -199,117 +207,40 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Container(
-            decoration: BoxDecoration(
-              color: primaryColorWeaker.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(16.0),
+          const SizedBox(height: 12),
+          TextFormField(
+            controller: quantityEditingController,
+            onFieldSubmitted: onSubmit,
+            onChanged: onChanged,
+            textAlign: TextAlign.right,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: const <TextInputFormatter>[
+              DecimalTextInputFormatter(decimalRange: 4),
+            ],
+            decoration: InputDecoration(
+              isDense: true,
+              filled: true,
+              fillColor: getInputFillColor(context),
+              labelText: context.l10n.quantity,
+              hintText: '1',
+              prefixText: '× ',
+              labelStyle: TextStyle(color: primaryColorWeaker),
+              border: getInputDecorationBorder(primaryColorWeaker),
+              focusedBorder: getInputDecorationBorder(primaryColorWeaker),
+              enabledBorder: getInputDecorationBorder(primaryColorWeaker),
             ),
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context).optional,
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelSmall!
-                                .copyWith(color: primaryColor),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            AppLocalizations.of(context).howMuchTarget,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextFormField(
-                            controller: targetEditingController,
-                            onFieldSubmitted: onSubmit,
-                            validator: (value) {
-                              // Target is optional, so allow empty
-                              if (value == null || value.isEmpty) {
-                                return null;
-                              }
-                              final num = double.tryParse(value);
-                              if (num == null) {
-                                return AppLocalizations.of(context).invalidValue;
-                              }
-                              if (num < 0 || num > 100) {
-                                return AppLocalizations.of(context)
-                                    .targetMustBeBetween;
-                              }
-                              return null;
-                            },
-                            textAlign: TextAlign.right,
-                            keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true),
-                            onChanged: (_) => setState(() {}),
-                            inputFormatters: const <TextInputFormatter>[
-                              DecimalTextInputFormatter(),
-                            ],
-                            decoration: InputDecoration(
-                              labelText: AppLocalizations.of(context)
-                                  .dialogAssetTarget,
-                              hintText: '0',
-                              filled: true,
-                              fillColor: getInputFillColor(context),
-                              suffixText: " %",
-                              labelStyle: TextStyle(color: primaryColorWeaker),
-                              border:
-                                  getInputDecorationBorder(primaryColorWeaker),
-                              focusedBorder:
-                                  getInputDecorationBorder(primaryColorWeaker),
-                              enabledBorder:
-                                  getInputDecorationBorder(primaryColorWeaker),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    for (final preset in const ['10', '25', '50', '100'])
-                      ActionChip(
-                        visualDensity: VisualDensity.compact,
-                        label: Text('$preset%'),
-                        backgroundColor:
-                            targetEditingController.text.trim() == preset
-                                ? primaryColor.withValues(alpha: 0.25)
-                                : null,
-                        onPressed: () {
-                          setState(() {
-                            targetEditingController.text = preset;
-                          });
-                        },
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  "${context.l10n.rightNow}, $relativePercentage",
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
+          ),
+          const SizedBox(height: 16),
+          TargetPercentageCard(
+            controller: targetEditingController,
+            primaryColor: primaryColor,
+            primaryColorWeaker: primaryColorWeaker,
+            onFieldSubmitted: onSubmit,
+            onChanged: () => setState(() {}),
+            allocatedOtherPercent: allocatedOtherPercent,
+            footer: Text(
+              "${context.l10n.rightNow}, $relativePercentage",
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
           const SizedBox(height: 16),
@@ -319,7 +250,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
               backgroundColor: primaryColor,
             ),
             icon: const Icon(Icons.check_rounded),
-            label: Text(AppLocalizations.of(context).dialogSave),
+            label: Text(context.l10n.dialogSave),
             onPressed: onSubmit,
           ),
           const SizedBox(height: 8),
@@ -327,21 +258,21 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
               icon: const Icon(Icons.checklist_outlined),
-              label: Text(AppLocalizations.of(context).dialogSaveAddMore),
+              label: Text(context.l10n.dialogSaveAddMore),
               onPressed: onSaveAddMore,
             )
           else
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
               icon: const Icon(Icons.delete_outline_outlined),
-              label: Text(AppLocalizations.of(context).dialogDelete),
+              label: Text(context.l10n.dialogDelete),
               onPressed: onDelete,
             ),
           const SizedBox(height: 8),
           TextButton.icon(
             style: TextButton.styleFrom(foregroundColor: primaryColorWeaker),
             icon: const Icon(Icons.close_rounded),
-            label: Text(AppLocalizations.of(context).dialogCancel),
+            label: Text(context.l10n.dialogCancel),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
@@ -361,6 +292,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                     userId: widget.userId,
                     name: trimmedName,
                     value: moneyEditingController.text,
+                    quantity: quantityEditingController.text,
                     target: targetEditingController.text,
                   ),
               errorMessage: 'Failed to create item',
@@ -370,6 +302,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                     item: widget.previousItem!,
                     name: trimmedName,
                     price: moneyEditingController.text,
+                    quantity: quantityEditingController.text,
                     target: targetEditingController.text,
                   ),
               errorMessage: 'Failed to update item',
@@ -385,13 +318,15 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
   }
 
   void onChanged([String? value]) {
-    final moneyValue = double.tryParse(moneyEditingController.text) ?? 0;
+    final unitPrice = double.tryParse(moneyEditingController.text) ?? 0;
+    final qty = double.tryParse(quantityEditingController.text) ?? 1;
+    final moneyValue = unitPrice * (qty > 0 ? qty : 1);
     final currentTotal =
         context.read<DataCubit>().state?.totalValue ?? widget.totalValue;
 
     final double newTotal = widget.previousItem == null
         ? currentTotal + moneyValue
-        : currentTotal + moneyValue - widget.previousItem!.price;
+        : currentTotal + moneyValue - widget.previousItem!.totalValue;
 
     final String finalPercent = newTotal <= 0
         ? '0'
@@ -399,7 +334,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
 
     setState(() {
       relativePercentage =
-          '${widget.currency}${toCurrencyString(moneyEditingController.text)} ${AppLocalizations.of(context).isGoingToBe} $finalPercent%';
+          '${widget.currency}${toCurrencyString(moneyValue.toStringAsFixed(2))} ${context.l10n.isGoingToBe} $finalPercent%';
     });
   }
 
@@ -411,6 +346,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
               userId: widget.userId,
               name: nameEditingController.text.trim(),
               value: moneyEditingController.text,
+              quantity: quantityEditingController.text,
               target: targetEditingController.text,
             ),
         errorMessage: 'Failed to create item',
@@ -423,6 +359,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
             _formKey.currentState?.reset();
             nameEditingController.text = '';
             moneyEditingController.text = '';
+            quantityEditingController.text = '1';
             targetEditingController.text = '';
             onChanged();
           },

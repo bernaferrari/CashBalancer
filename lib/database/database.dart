@@ -1,5 +1,6 @@
 // don't import moor_web.dart or moor_flutter/moor_flutter.dart in shared code
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:drift/drift.dart';
@@ -86,20 +87,23 @@ class Database(super.e) extends _$Database {
     final currencySymbolStream = rxPrefs.getStringStream('currencySymbol');
     final sortBy = rxPrefs.getIntStream('sortBy');
     final themeMode = rxPrefs.getIntStream('themeMode');
+    final languageCodeStream = rxPrefs.getStringStream('languageCode');
 
-    final settingsData =
-        Rx.combineLatest5<bool?, bool?, String?, int?, int?, SettingsData>(
+    final settingsData = Rx.combineLatest6<bool?, bool?, String?, int?, int?,
+        String?, SettingsData>(
       relativeTargetStream,
       buyOnlyStream,
       currencySymbolStream,
       sortBy,
       themeMode,
+      languageCodeStream,
       (
         relativeTarget,
         buyOnly,
         currencySymbol,
         sortBy,
         themeMode,
+        languageCode,
       ) {
         return SettingsData(
           relativeTarget: relativeTarget ?? false,
@@ -107,6 +111,10 @@ class Database(super.e) extends _$Database {
           currencySymbol: currencySymbol ?? "\$",
           sortBy: sortBy ?? 0,
           themeMode: themeMode ?? 0,
+          languageCode:
+              (languageCode != null && languageCode.isNotEmpty)
+                  ? languageCode
+                  : null,
         );
       },
     );
@@ -120,18 +128,17 @@ class Database(super.e) extends _$Database {
       final currentUser =
           usersList.where((u) => u.id == userId).firstOrNull;
       final List<Item> sortedItems = [...itemsList]..sort((a, b) {
-          return (b.price * b.quantity).compareTo((a.price * a.quantity));
+          return b.totalValue.compareTo(a.totalValue);
         });
-      final Map<int, List<Item>> groupedItems =
-          groupItemByWalletId(sortedItems);
+      final Map<int, List<Item>> groupedItems = groupByWalletId(sortedItems);
 
       final walletsMap = <int, WalletData>{};
       double totalValue = 0;
       for (final wallet in walletsList) {
         final double walletValue;
         if (groupedItems[wallet.id] != null) {
-          walletValue = groupedItems[wallet.id]!
-              .fold(0, (a, b) => a + (b.price * b.quantity));
+          walletValue =
+              groupedItems[wallet.id]!.fold(0, (a, b) => a + b.totalValue);
         } else {
           walletValue = 0;
         }
@@ -170,7 +177,7 @@ class Database(super.e) extends _$Database {
       }
 
       final Map<int, List<ItemData>> groupedItemData =
-          groupItemDataByWalletId(allItemData);
+          groupByWalletId(allItemData);
 
       return FullData(
         userId: userId,
@@ -185,36 +192,11 @@ class Database(super.e) extends _$Database {
     });
   }
 
-  Map<int, List<Item>> groupItemByWalletId(List<Item> itemList) {
-    final groupedList = <int, List<Item>>{};
-
-    for (int i = 0; i < itemList.length; i++) {
-      final walletId = itemList[i].walletId;
-
-      if (groupedList[walletId] != null) {
-        groupedList[walletId]!.add(itemList[i]);
-      } else {
-        groupedList[walletId] = [itemList[i]];
-      }
+  Map<int, List<T>> groupByWalletId<T extends Item>(List<T> itemList) {
+    final groupedList = <int, List<T>>{};
+    for (final item in itemList) {
+      (groupedList[item.walletId] ??= <T>[]).add(item);
     }
-
-    return groupedList;
-  }
-
-  Map<int, List<ItemData>> groupItemDataByWalletId(List<ItemData> itemList) {
-    final groupedList = <int, List<ItemData>>{};
-
-    for (int i = 0; i < itemList.length; i++) {
-      final walletId = itemList[i].walletId;
-
-      final groupPosition = groupedList[walletId];
-      if (groupPosition != null) {
-        groupPosition.add(itemList[i]);
-      } else {
-        groupedList[walletId] = [itemList[i]];
-      }
-    }
-
     return groupedList;
   }
 
@@ -250,12 +232,14 @@ class Database(super.e) extends _$Database {
     required String name,
     required String value,
     required String target,
+    String quantity = '1',
   }) {
+    final parsedQty = double.tryParse(quantity);
     return into(items).insert(ItemsCompanion.insert(
       walletId: walletId,
       userId: userId,
       name: name,
-      quantity: 1,
+      quantity: (parsedQty != null && parsedQty > 0) ? parsedQty : 1,
       price: double.parse(value),
       targetPercent: double.tryParse(target) ?? -1,
     ));
@@ -266,9 +250,13 @@ class Database(super.e) extends _$Database {
     required String name,
     required String price,
     required String target,
+    String? quantity,
   }) {
+    final parsedQty = quantity != null ? double.tryParse(quantity) : null;
     return update(items).replace(item.copyWith(
       name: name,
+      quantity:
+          (parsedQty != null && parsedQty > 0) ? parsedQty : item.quantity,
       price: double.parse(price),
       targetPercent: double.tryParse(target) ?? -1,
     ));
@@ -308,5 +296,127 @@ class Database(super.e) extends _$Database {
 
   Future<Item?> getItemFromId(int id) async {
     return (select(items)..where((t) => t.id.equals(id))).getSingleOrNull();
+  }
+
+  Future<void> seedSamplePortfolio(int userId) async {
+    await transaction(() async {
+      final stocksId = await createGroup(
+        id: userId,
+        name: 'Stocks',
+        colorName: 'emerald',
+        targetPercent: 60,
+      );
+      final cryptoId = await createGroup(
+        id: userId,
+        name: 'Crypto',
+        colorName: 'amber',
+        targetPercent: 25,
+      );
+      final cashId = await createGroup(
+        id: userId,
+        name: 'Cash',
+        colorName: 'indigo',
+        targetPercent: 15,
+      );
+
+      await createItem(
+        walletId: stocksId,
+        userId: userId,
+        name: 'S&P 500 ETF',
+        value: '4200',
+        target: '40',
+      );
+      await createItem(
+        walletId: stocksId,
+        userId: userId,
+        name: 'AAPL',
+        value: '220',
+        quantity: '8',
+        target: '20',
+      );
+      await createItem(
+        walletId: cryptoId,
+        userId: userId,
+        name: 'Bitcoin',
+        value: '85000',
+        quantity: '0.03',
+        target: '18',
+      );
+      await createItem(
+        walletId: cryptoId,
+        userId: userId,
+        name: 'Ethereum',
+        value: '3000',
+        quantity: '0.25',
+        target: '7',
+      );
+      await createItem(
+        walletId: cashId,
+        userId: userId,
+        name: 'High-Yield Savings',
+        value: '1200',
+        target: '15',
+      );
+    });
+  }
+
+  Future<String> exportPortfolioJson(int userId) async {
+    final userWallets =
+        await (select(wallets)..where((w) => w.userId.equals(userId))).get();
+    final userItems =
+        await (select(items)..where((i) => i.userId.equals(userId))).get();
+
+    final payload = {
+      'version': 1,
+      'wallets': [
+        for (final w in userWallets)
+          {
+            'name': w.name,
+            'colorName': w.colorName,
+            'targetPercent': w.targetPercent,
+            'items': [
+              for (final i in userItems.where((x) => x.walletId == w.id))
+                {
+                  'name': i.name,
+                  'quantity': i.quantity,
+                  'price': i.price,
+                  'targetPercent': i.targetPercent,
+                },
+            ],
+          },
+      ],
+    };
+    return const JsonEncoder.withIndent('  ').convert(payload);
+  }
+
+  Future<void> importPortfolioJson(int userId, String jsonString) async {
+    final decoded = jsonDecode(jsonString) as Map<String, dynamic>;
+    final walletsJson = decoded['wallets'] as List<dynamic>? ?? const [];
+
+    await transaction(() async {
+      for (final rawWallet in walletsJson) {
+        final wMap = rawWallet as Map<String, dynamic>;
+        final walletId = await createGroup(
+          id: userId,
+          name: (wMap['name'] as String?) ?? 'Wallet',
+          colorName: (wMap['colorName'] as String?) ?? 'emerald',
+          targetPercent: (wMap['targetPercent'] as num?)?.toDouble() ?? -1,
+        );
+        final itemsJson = wMap['items'] as List<dynamic>? ?? const [];
+        for (final rawItem in itemsJson) {
+          final iMap = rawItem as Map<String, dynamic>;
+          await into(items).insert(
+            ItemsCompanion.insert(
+              walletId: walletId,
+              userId: userId,
+              name: (iMap['name'] as String?) ?? 'Asset',
+              quantity: (iMap['quantity'] as num?)?.toDouble() ?? 1,
+              price: (iMap['price'] as num?)?.toDouble() ?? 0,
+              targetPercent: (iMap['targetPercent'] as num?)?.toDouble() ?? -1,
+            ),
+          );
+        }
+      }
+    });
   }
 }

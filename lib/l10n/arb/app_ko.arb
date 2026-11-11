@@ -52,5 +52,10 @@
   "portfolioName": "포트폴리오 이름",
   "themeAuto": "자동",
   "themeLight": "라이트",
-  "themeDark": "다크"
+  "themeDark": "다크",
+  "quantity": "수량",
+  "loadSamplePortfolio": "샘플 포트폴리오 불러오기",
+  "language": "언어",
+  "exportBackup": "JSON 내보내기",
+  "importBackup": "JSON 가져오기"
 }

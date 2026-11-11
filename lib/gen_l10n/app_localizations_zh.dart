@@ -169,4 +169,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get themeDark => '深色';
+
+  @override
+  String get quantity => '数量';
+
+  @override
+  String get loadSamplePortfolio => '加载示例投资组合';
+
+  @override
+  String get language => '语言';
+
+  @override
+  String get exportBackup => '导出 JSON';
+
+  @override
+  String get importBackup => '导入 JSON';
 }

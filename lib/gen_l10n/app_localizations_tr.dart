@@ -174,4 +174,19 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get themeDark => 'Koyu';
+
+  @override
+  String get quantity => 'Miktar';
+
+  @override
+  String get loadSamplePortfolio => 'Örnek portföy yükle';
+
+  @override
+  String get language => 'Dil';
+
+  @override
+  String get exportBackup => 'JSON Dışa Aktar';
+
+  @override
+  String get importBackup => 'JSON İçe Aktar';
 }

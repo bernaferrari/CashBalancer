@@ -52,5 +52,10 @@
   "portfolioName": "Portföy adı",
   "themeAuto": "Otomatik",
   "themeLight": "Açık",
-  "themeDark": "Koyu"
+  "themeDark": "Koyu",
+  "quantity": "Miktar",
+  "loadSamplePortfolio": "Örnek portföy yükle",
+  "language": "Dil",
+  "exportBackup": "JSON Dışa Aktar",
+  "importBackup": "JSON İçe Aktar"
 }

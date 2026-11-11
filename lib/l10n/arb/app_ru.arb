@@ -52,5 +52,10 @@
   "portfolioName": "Название портфеля",
   "themeAuto": "Авто",
   "themeLight": "Светлая",
-  "themeDark": "Тёмная"
+  "themeDark": "Тёмная",
+  "quantity": "Количество",
+  "loadSamplePortfolio": "Загрузить пример портфеля",
+  "language": "Язык",
+  "exportBackup": "Экспорт JSON",
+  "importBackup": "Импорт JSON"
 }

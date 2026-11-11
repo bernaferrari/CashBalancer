@@ -122,6 +122,16 @@ class const HomePageImpl(final FullData data, {super.key})
               title: context.l10n.mainEmptyTitle,
               subtitle: context.l10n.mainEmptySubtitle,
               icon: Icons.account_balance_sharp,
+              action: OutlinedButton.icon(
+                icon: const Icon(Icons.auto_awesome_rounded, size: 18),
+                label: Text(context.l10n.loadSamplePortfolio),
+                onPressed: () {
+                  context
+                      .read<DataCubit>()
+                      .db
+                      .seedSamplePortfolio(data.userId);
+                },
+              ),
             )
           : PortfolioSplitView(
               data: data,
@@ -232,7 +242,7 @@ class const VerticalProgressBar({
     return LayoutBuilder(
       builder: (context, constraints) {
         final List<ItemData> nonZeroItems =
-            data.allItems.where((element) => element.price > 0).toList();
+            data.allItems.where((element) => element.totalValue > 0).toList();
 
         final List<double> spacedList =
             retrieveSpacedList(nonZeroItems, constraints.maxHeight);
@@ -245,12 +255,13 @@ class const VerticalProgressBar({
               () {
                 final item = nonZeroItems[i];
                 final percent = data.totalValue > 0
-                    ? (item.price / data.totalValue * 100).toStringAsFixed(1)
+                    ? (item.totalValue / data.totalValue * 100)
+                        .toStringAsFixed(1)
                     : '0';
                 return Tooltip(
                   key: ValueKey(item.id),
                   message:
-                      '${item.name} • ${data.settings.currencySymbol} ${toCurrency(item.price)} ($percent%)',
+                      '${item.name} • ${data.settings.currencySymbol} ${toCurrency(item.totalValue)} ($percent%)',
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 350),
                     curve: Curves.easeOutCubic,
@@ -586,7 +597,10 @@ class const ItemCard(
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final double ratio = totalValue > 0 ? item.price / totalValue : 0;
+    final double itemValue = item.totalValue;
+    final double ratio = totalValue > 0 ? itemValue / totalValue : 0;
+    final String qtyPrefix =
+        item.quantity != 1 ? '${formatPercent(item.quantity)}× • ' : '';
 
     return TextButton(
       style: TextButton.styleFrom(
@@ -634,7 +648,7 @@ class const ItemCard(
                     ),
                     if (item.targetPercent != -1)
                       PercentArrow(
-                        itemValue: item.price,
+                        itemValue: itemValue,
                         totalValue: totalValue,
                         targetPercent: item.targetPercent,
                       ),
@@ -643,13 +657,13 @@ class const ItemCard(
                 const SizedBox(height: 4),
                 UpDownDiffText(
                   currencySymbol: currencySymbol,
-                  itemValue: item.price,
+                  itemValue: itemValue,
                   targetPercent: item.targetPercent,
                   totalValue: totalValue,
                   buyOnlyTotalValue: buyOnlyTotalValue,
                   leftWidget: Expanded(
                     child: Text(
-                      "$currencySymbol ${toCurrency(item.price)} (${ratio.toPercent()}%)",
+                      "$qtyPrefix$currencySymbol ${toCurrency(itemValue)} (${ratio.toPercent()}%)",
                       style: GoogleFonts.firaSans(
                         color: Theme.of(context)
                             .colorScheme

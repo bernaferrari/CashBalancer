@@ -52,5 +52,10 @@
   "portfolioName": "Name des Ziels",
   "themeAuto": "Auto",
   "themeLight": "Hell",
-  "themeDark": "Dunkel"
+  "themeDark": "Dunkel",
+  "quantity": "Menge",
+  "loadSamplePortfolio": "Beispiel-Portfolio laden",
+  "language": "Sprache",
+  "exportBackup": "JSON exportieren",
+  "importBackup": "JSON importieren"
 }

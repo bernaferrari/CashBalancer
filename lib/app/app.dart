@@ -269,14 +269,22 @@ class _AppState extends State<App> {
           final db = RepositoryProvider.of<Database>(context);
           return DataCubit(db);
         },
-        child: BlocSelector<DataCubit, FullData?, ThemeMode>(
-          selector: (state) => switch (state?.settings.themeMode) {
-            1 => ThemeMode.light,
-            2 => ThemeMode.dark,
-            _ => ThemeMode.system,
+        child: BlocSelector<DataCubit, FullData?, (ThemeMode, Locale?)>(
+          selector: (state) {
+            final themeMode = switch (state?.settings.themeMode) {
+              1 => ThemeMode.light,
+              2 => ThemeMode.dark,
+              _ => ThemeMode.system,
+            };
+            final langCode = state?.settings.languageCode;
+            final locale = (langCode != null && langCode.isNotEmpty)
+                ? Locale(langCode)
+                : null;
+            return (themeMode, locale);
           },
-          builder: (context, themeMode) => MaterialApp.router(
-            themeMode: themeMode,
+          builder: (context, appPrefs) => MaterialApp.router(
+            themeMode: appPrefs.$1,
+            locale: appPrefs.$2,
             theme: ThemeData(
             scaffoldBackgroundColor: Colors.white,
             colorScheme: const ColorScheme.light(

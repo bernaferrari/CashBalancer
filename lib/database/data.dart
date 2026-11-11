@@ -3,6 +3,10 @@ import 'dart:ui';
 
 import 'database.dart';
 
+extension ItemValueX on Item {
+  double get totalValue => price * quantity;
+}
+
 class ItemData({
   required Item item,
   required final String colorName,
@@ -68,7 +72,7 @@ class const FullData({
         if (item.targetPercent > 0) {
           requiredTotal = math.max(
             requiredTotal,
-            item.price / (item.targetPercent / 100),
+            item.totalValue / (item.targetPercent / 100),
           );
         }
       }
@@ -80,7 +84,7 @@ class const FullData({
       if (item.targetPercent > 0) {
         requiredTotal = math.max(
           requiredTotal,
-          item.price / (item.targetPercent / 100),
+          item.totalValue / (item.targetPercent / 100),
         );
       }
     }
@@ -94,4 +98,5 @@ class const SettingsData({
   required final String currencySymbol,
   required final int sortBy,
   final int themeMode = 0,
+  final String? languageCode,
 });

@@ -61,5 +61,10 @@
   "portfolioName": "Portfolio name",
   "themeAuto": "Auto",
   "themeLight": "Light",
-  "themeDark": "Dark"
+  "themeDark": "Dark",
+  "quantity": "Quantity",
+  "loadSamplePortfolio": "Load sample portfolio",
+  "language": "Language",
+  "exportBackup": "Export JSON",
+  "importBackup": "Import JSON"
 }

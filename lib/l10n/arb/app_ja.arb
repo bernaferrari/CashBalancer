@@ -52,5 +52,10 @@
   "portfolioName": "ポートフォリオ名",
   "themeAuto": "自動",
   "themeLight": "ライト",
-  "themeDark": "ダーク"
+  "themeDark": "ダーク",
+  "quantity": "数量",
+  "loadSamplePortfolio": "サンプルポートフォリオを読み込む",
+  "language": "言語",
+  "exportBackup": "JSON出力",
+  "importBackup": "JSON読込"
 }

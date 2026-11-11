@@ -77,7 +77,7 @@ class const ItemsList(final FullData data, {super.key})
   Widget build(BuildContext context) {
     final List<ItemData> sortedItems = [...data.allItems];
     if (data.settings.sortBy == 0) {
-      sortedItems.sort((a, b) => b.price.compareTo(a.price));
+      sortedItems.sort((a, b) => b.totalValue.compareTo(a.totalValue));
     } else {
       sortedItems.sort((a, b) => a.name.compareTo(b.name));
     }

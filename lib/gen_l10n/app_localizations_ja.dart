@@ -169,4 +169,19 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get themeDark => 'ダーク';
+
+  @override
+  String get quantity => '数量';
+
+  @override
+  String get loadSamplePortfolio => 'サンプルポートフォリオを読み込む';
+
+  @override
+  String get language => '言語';
+
+  @override
+  String get exportBackup => 'JSON出力';
+
+  @override
+  String get importBackup => 'JSON読込';
 }

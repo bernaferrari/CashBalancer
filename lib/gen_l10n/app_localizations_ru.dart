@@ -174,4 +174,19 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get themeDark => 'Тёмная';
+
+  @override
+  String get quantity => 'Количество';
+
+  @override
+  String get loadSamplePortfolio => 'Загрузить пример портфеля';
+
+  @override
+  String get language => 'Язык';
+
+  @override
+  String get exportBackup => 'Экспорт JSON';
+
+  @override
+  String get importBackup => 'Импорт JSON';
 }

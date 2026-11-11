@@ -171,7 +171,7 @@ class _RebalancePageState extends State<RebalancePage> {
                   _AllocationTile(
                     name: item.name,
                     color: item.color,
-                    currentValue: item.price,
+                    currentValue: item.totalValue,
                     delta: itemDeltas[item.id] ?? 0,
                     targetPercent: item.targetPercent,
                     currency: currency,
@@ -268,7 +268,7 @@ class _RebalancePageState extends State<RebalancePage> {
             final base = state.settings.relativeTarget
                 ? (state.walletsMap[item.walletId]?.totalValue ?? 0) + deposit
                 : newTotal;
-            return base * (item.targetPercent / 100) - item.price;
+            return base * (item.targetPercent / 100) - item.totalValue;
           }(),
       };
     }
@@ -278,7 +278,7 @@ class _RebalancePageState extends State<RebalancePage> {
         for (final item in targeted)
           item.id: () {
             final reqTotal = state.buyOnlyTotalForItems(item.walletId);
-            return (reqTotal * (item.targetPercent / 100) - item.price)
+            return (reqTotal * (item.targetPercent / 100) - item.totalValue)
                 .clamp(0.0, double.infinity);
           }(),
       };
@@ -291,7 +291,7 @@ class _RebalancePageState extends State<RebalancePage> {
           final base = state.settings.relativeTarget
               ? (state.walletsMap[item.walletId]?.totalValue ?? 0) + deposit
               : newTotal;
-          return (base * (item.targetPercent / 100) - item.price)
+          return (base * (item.targetPercent / 100) - item.totalValue)
               .clamp(0.0, double.infinity);
         }(),
     };
@@ -320,11 +320,15 @@ class _RebalancePageState extends State<RebalancePage> {
     for (final item in state.allItems) {
       final delta = deltas[item.id] ?? 0;
       if (delta.abs() < 0.01) continue;
-      final newPrice = (item.price + delta).clamp(0.0, double.infinity);
+      final newTotalValue =
+          (item.totalValue + delta).clamp(0.0, double.infinity);
+      final newUnitPrice =
+          item.quantity > 0 ? newTotalValue / item.quantity : newTotalValue;
       await db.updateItem(
         item: item,
         name: item.name,
-        price: newPrice.toStringAsFixed(2),
+        price: newUnitPrice.toStringAsFixed(2),
+        quantity: item.quantity.toString(),
         target: item.targetPercent >= 0 ? item.targetPercent.toString() : '',
       );
     }

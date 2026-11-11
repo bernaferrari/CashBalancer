@@ -15,13 +15,13 @@ class const BarChartSection(final FullData data, {super.key})
 
     final List<ItemData> sortedItems = [...data.allItems];
     if (data.settings.sortBy == 0) {
-      sortedItems.sort((a, b) => b.price.compareTo(a.price));
+      sortedItems.sort((a, b) => b.totalValue.compareTo(a.totalValue));
     } else {
       sortedItems.sort((a, b) => a.name.compareTo(b.name));
     }
 
     final double maximumPrice =
-        sortedItems.map((e) => e.price).reduce(max);
+        sortedItems.map((e) => e.totalValue).reduce(max);
 
     return SizedBox(
       height: 200,
@@ -36,15 +36,18 @@ class const BarChartSection(final FullData data, {super.key})
               for (final item in sortedItems)
                 () {
                   final percent = data.totalValue > 0
-                      ? (item.price / data.totalValue * 100).toStringAsFixed(1)
+                      ? (item.totalValue / data.totalValue * 100)
+                          .toStringAsFixed(1)
                       : '0';
                   return Tooltip(
                     key: ValueKey(item.id),
                     message:
-                        '${item.name} • ${data.settings.currencySymbol} ${toCurrency(item.price)} ($percent%)',
+                        '${item.name} • ${data.settings.currencySymbol} ${toCurrency(item.totalValue)} ($percent%)',
                     child: RectangularPercentageWidget(
                       id: item.id,
-                      percent: maximumPrice > 0 ? item.price / maximumPrice : 0,
+                      percent: maximumPrice > 0
+                          ? item.totalValue / maximumPrice
+                          : 0,
                       size: 40,
                       backgroundColor: Theme.of(context)
                           .colorScheme

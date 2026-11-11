@@ -52,5 +52,10 @@
   "portfolioName": "पोर्टफोलियो का नाम",
   "themeAuto": "ऑटो",
   "themeLight": "लाइट",
-  "themeDark": "डार्क"
+  "themeDark": "डार्क",
+  "quantity": "मात्रा",
+  "loadSamplePortfolio": "उदाहरण पोर्टफोलियो लोड करें",
+  "language": "भाषा",
+  "exportBackup": "JSON निर्यात",
+  "importBackup": "JSON आयात"
 }

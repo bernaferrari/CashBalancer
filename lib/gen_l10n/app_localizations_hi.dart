@@ -174,4 +174,19 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get themeDark => 'डार्क';
+
+  @override
+  String get quantity => 'मात्रा';
+
+  @override
+  String get loadSamplePortfolio => 'उदाहरण पोर्टफोलियो लोड करें';
+
+  @override
+  String get language => 'भाषा';
+
+  @override
+  String get exportBackup => 'JSON निर्यात';
+
+  @override
+  String get importBackup => 'JSON आयात';
 }

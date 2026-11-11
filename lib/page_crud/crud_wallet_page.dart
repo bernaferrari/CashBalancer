@@ -2,15 +2,15 @@ import 'dart:math';
 
 import 'package:cash_balancer/l10n/l10n.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
-import '../utils/error_handler.dart';
 import '../util/tailwind_colors.dart';
+import '../utils/error_handler.dart';
 import '../widgets/color_picker.dart';
 import '../widgets/dialog_screen_base.dart';
+import '../widgets/target_percentage_card.dart';
 
 class const CRUDWalletPage({
   required final int userId,
@@ -53,13 +53,20 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
     final primaryColor = getPrimaryColor(context, colorName);
     final primaryColorWeaker = getPrimaryColorWeaker(context, colorName);
     final backgroundDialogColor = getBackgroundDialogColor(context, colorName);
+    final dataState = context.watch<DataCubit>().state;
+    final allocatedOtherPercent = dataState == null
+        ? 0.0
+        : dataState.walletsMap.values
+            .where((w) =>
+                w.id != widget.previousWallet?.id && w.targetPercent > 0)
+            .fold<double>(0, (sum, w) => sum + w.targetPercent);
 
     return Form(
       key: _formKey,
       child: DialogScreenBase(
         appBarTitle: widget.previousWallet == null
-            ? AppLocalizations.of(context).addAWallet
-            : AppLocalizations.of(context).editWallet,
+            ? context.l10n.addAWallet
+            : context.l10n.editWallet,
         backgroundDialogColor: backgroundDialogColor,
         colorName: colorName,
         children: [
@@ -70,20 +77,17 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
             textCapitalization: TextCapitalization.sentences,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return AppLocalizations.of(context).mainDialogValidator;
+                return context.l10n.mainDialogValidator;
               }
               return null;
             },
             decoration: InputDecoration(
               filled: true,
               fillColor: getInputFillColor(context),
-              labelText: AppLocalizations.of(context).dialogAssetName,
+              labelText: context.l10n.dialogAssetName,
               labelStyle: TextStyle(color: primaryColor),
-              // border is used when there is an error
               border: getInputDecorationBorder(primaryColor),
-              // focusedBorder is used when focused
               focusedBorder: getInputDecorationBorder(primaryColor),
-              // enabledBorder is the default, first shown, border.
               enabledBorder: getInputDecorationBorder(primaryColor),
             ),
           ),
@@ -97,114 +101,13 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
             }),
           ),
           const SizedBox(height: 16),
-          Container(
-            decoration: BoxDecoration(
-              color: primaryColorWeaker.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              spacing: 12,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            context.l10n.optional,
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelSmall!
-                                .copyWith(color: primaryColor),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            context.l10n.howMuchTarget,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextFormField(
-                            controller: targetEditingController,
-                            onFieldSubmitted: onSubmit,
-                            validator: (value) {
-                              // Target is optional, so allow empty
-                              if (value == null || value.isEmpty) {
-                                return null;
-                              }
-                              final num = double.tryParse(value);
-                              if (num == null) {
-                                return context.l10n.invalidValue;
-                              }
-                              if (num < 0 || num > 100) {
-                                return context.l10n.targetMustBeBetween;
-                              }
-                              return null;
-                            },
-                            textAlign: TextAlign.right,
-                            keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true),
-                            onChanged: (_) => setState(() {}),
-                            inputFormatters: const <TextInputFormatter>[
-                              DecimalTextInputFormatter(),
-                            ],
-                            decoration: InputDecoration(
-                              labelText: context.l10n.dialogAssetTarget,
-                              hintText: '0',
-                              filled: true,
-                              fillColor: getInputFillColor(context),
-                              suffixText: " %",
-                              labelStyle: TextStyle(color: primaryColorWeaker),
-                              // border is used when there is an error
-                              border:
-                                  getInputDecorationBorder(primaryColorWeaker),
-                              // focusedBorder is used when focused
-                              focusedBorder:
-                                  getInputDecorationBorder(primaryColorWeaker),
-                              // enabledBorder is the default, first shown, border.
-                              enabledBorder:
-                                  getInputDecorationBorder(primaryColorWeaker),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    for (final preset in const ['10', '25', '50', '100'])
-                      ActionChip(
-                        visualDensity: VisualDensity.compact,
-                        label: Text('$preset%'),
-                        backgroundColor:
-                            targetEditingController.text.trim() == preset
-                                ? primaryColor.withValues(alpha: 0.25)
-                                : null,
-                        onPressed: () {
-                          setState(() {
-                            targetEditingController.text = preset;
-                          });
-                        },
-                      ),
-                  ],
-                ),
-              ],
-            ),
+          TargetPercentageCard(
+            controller: targetEditingController,
+            primaryColor: primaryColor,
+            primaryColorWeaker: primaryColorWeaker,
+            onFieldSubmitted: onSubmit,
+            onChanged: () => setState(() {}),
+            allocatedOtherPercent: allocatedOtherPercent,
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
@@ -212,7 +115,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
               foregroundColor: backgroundDialogColor,
               backgroundColor: primaryColor,
             ),
-            label: Text(AppLocalizations.of(context).dialogSave),
+            label: Text(context.l10n.dialogSave),
             icon: const Icon(Icons.check_rounded),
             onPressed: onSubmit,
           ),
@@ -220,7 +123,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
             const SizedBox(height: 8),
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
-              label: Text(AppLocalizations.of(context).dialogDelete),
+              label: Text(context.l10n.dialogDelete),
               icon: const Icon(Icons.delete_outline_outlined),
               onPressed: onDelete,
             ),
@@ -228,7 +131,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
           const SizedBox(height: 8),
           TextButton.icon(
             style: TextButton.styleFrom(foregroundColor: primaryColor),
-            label: Text(AppLocalizations.of(context).dialogCancel),
+            label: Text(context.l10n.dialogCancel),
             icon: const Icon(Icons.close_rounded),
             onPressed: () => Navigator.of(context).pop(),
           ),

@@ -52,5 +52,10 @@
   "portfolioName": "Nombre del objetivo",
   "themeAuto": "Auto",
   "themeLight": "Claro",
-  "themeDark": "Oscuro"
+  "themeDark": "Oscuro",
+  "quantity": "Cantidad",
+  "loadSamplePortfolio": "Cargar cartera de ejemplo",
+  "language": "Idioma",
+  "exportBackup": "Exportar JSON",
+  "importBackup": "Importar JSON"
 }

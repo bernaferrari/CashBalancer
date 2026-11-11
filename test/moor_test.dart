@@ -245,4 +245,29 @@ void main() {
     expect(data.buyOnlyTotalForWallets, closeTo(1500, 0.01));
     expect(data.buyOnlyTotalForItems(), closeTo(1500, 0.01));
   });
+
+  test('Sample portfolio seeding, quantity × price, and JSON export/import',
+      () async {
+    SharedPreferences.setMockInitialValues({});
+    final db = Database(NativeDatabase.memory());
+    addTearDown(db.close);
+
+    final userId = await db.getDefaultUser();
+    await db.seedSamplePortfolio(userId);
+
+    final seeded = await db.watchWallets(userId).first;
+    expect(seeded.walletsMap.length, 3);
+    expect(seeded.allItems.length, 5);
+    expect(seeded.totalValue, closeTo(10460, 0.01));
+
+    // Export and import into a second portfolio.
+    final exportedJson = await db.exportPortfolioJson(userId);
+    final secondUserId = await db.createUser('Imported');
+    await db.importPortfolioJson(secondUserId, exportedJson);
+
+    final imported = await db.watchWallets(secondUserId).first;
+    expect(imported.walletsMap.length, 3);
+    expect(imported.allItems.length, 5);
+    expect(imported.totalValue, closeTo(10460, 0.01));
+  });
 }

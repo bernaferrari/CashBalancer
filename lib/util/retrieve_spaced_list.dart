@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import '../database/data.dart';
 import '../database/database.dart';
 
 List<double> retrieveSpacedList(List<Item> data, double maxSize) {
@@ -13,7 +14,7 @@ List<double> retrieveSpacedList(List<Item> data, double maxSize) {
   final double maxWH = math.max(0.0, maxSize - (data.length - 1) * 2);
 
   final double totalValue = data
-      .map((d) => d.price * d.quantity)
+      .map((d) => d.totalValue)
       .fold(0.0, (previous, current) => previous + current.abs());
 
   if (totalValue <= 0) {
@@ -21,7 +22,6 @@ List<double> retrieveSpacedList(List<Item> data, double maxSize) {
   }
 
   return data
-      .map((d) =>
-          math.max(0.0, maxWH * (d.price * d.quantity).abs() / totalValue))
+      .map((d) => math.max(0.0, maxWH * d.totalValue.abs() / totalValue))
       .toList();
 }

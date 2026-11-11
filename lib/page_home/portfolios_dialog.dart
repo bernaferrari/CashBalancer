@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
+import '../database/database.dart';
 import '../l10n/l10n.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/dialog_screen_base.dart';
@@ -14,10 +15,13 @@ class const PortfoliosDialog({super.key}) extends StatefulWidget {
 
 class _PortfoliosDialogState extends State<PortfoliosDialog> {
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _renameController = TextEditingController();
+  int? _editingPortfolioId;
 
   @override
   void dispose() {
     _nameController.dispose();
+    _renameController.dispose();
     super.dispose();
   }
 
@@ -45,6 +49,52 @@ class _PortfoliosDialogState extends State<PortfoliosDialog> {
                 for (final portfolio in state.portfolios)
                   () {
                     final isCurrent = portfolio.id == state.userId;
+                    final isEditing = _editingPortfolioId == portfolio.id;
+
+                    if (isEditing) {
+                      return Row(
+                        spacing: 6,
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _renameController,
+                              autofocus: true,
+                              onSubmitted: (_) =>
+                                  _saveRename(cubit, portfolio),
+                              textCapitalization:
+                                  TextCapitalization.sentences,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                filled: true,
+                                fillColor: getInputFillColor(context),
+                                border:
+                                    getInputDecorationBorder(primaryColor),
+                                focusedBorder:
+                                    getInputDecorationBorder(primaryColor),
+                                enabledBorder:
+                                    getInputDecorationBorder(primaryColor),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            visualDensity: VisualDensity.compact,
+                            icon: Icon(
+                              Icons.check_rounded,
+                              size: 20,
+                              color: primaryColor,
+                            ),
+                            onPressed: () => _saveRename(cubit, portfolio),
+                          ),
+                          IconButton(
+                            visualDensity: VisualDensity.compact,
+                            icon: const Icon(Icons.close_rounded, size: 18),
+                            onPressed: () =>
+                                setState(() => _editingPortfolioId = null),
+                          ),
+                        ],
+                      );
+                    }
+
                     return OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         backgroundColor: isCurrent
@@ -90,6 +140,19 @@ class _PortfoliosDialogState extends State<PortfoliosDialog> {
                                     : FontWeight.w500,
                               ),
                             ),
+                          ),
+                          IconButton(
+                            visualDensity: VisualDensity.compact,
+                            icon: const Icon(
+                              Icons.edit_outlined,
+                              size: 18,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _editingPortfolioId = portfolio.id;
+                                _renameController.text = portfolio.name;
+                              });
+                            },
                           ),
                           if (state.portfolios.length > 1)
                             IconButton(
@@ -146,6 +209,16 @@ class _PortfoliosDialogState extends State<PortfoliosDialog> {
         );
       },
     );
+  }
+
+  Future<void> _saveRename(DataCubit cubit, User portfolio) async {
+    final newName = _renameController.text.trim();
+    if (newName.isNotEmpty) {
+      await cubit.db.editUser(portfolio.copyWith(name: newName));
+    }
+    if (mounted) {
+      setState(() => _editingPortfolioId = null);
+    }
   }
 
   Future<void> _createPortfolio(DataCubit cubit) async {

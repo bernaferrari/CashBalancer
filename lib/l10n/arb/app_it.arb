@@ -52,5 +52,10 @@
   "portfolioName": "Nome dell'obiettivo",
   "themeAuto": "Auto",
   "themeLight": "Chiaro",
-  "themeDark": "Scuro"
+  "themeDark": "Scuro",
+  "quantity": "Quantità",
+  "loadSamplePortfolio": "Carica portafoglio di esempio",
+  "language": "Lingua",
+  "exportBackup": "Esporta JSON",
+  "importBackup": "Importa JSON"
 }
