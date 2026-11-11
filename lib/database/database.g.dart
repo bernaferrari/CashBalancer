@@ -994,7 +994,7 @@ abstract class _$Database extends GeneratedDatabase {
     return customSelect(
       'SELECT count(1) AS _c0 WHERE EXISTS (SELECT * FROM users)',
       variables: [],
-      readsFrom: {users},
+      readsFrom: {this.users},
     ).map((QueryRow row) => row.read<int>('_c0'));
   }
 
@@ -1005,10 +1005,14 @@ abstract class _$Database extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [users, wallets, items];
 }
 
-typedef $$UsersTableCreateCompanionBuilder =
-    UsersCompanion Function({Value<int> id, required String name});
-typedef $$UsersTableUpdateCompanionBuilder =
-    UsersCompanion Function({Value<int> id, Value<String> name});
+typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
+  Value<int> id,
+  required String name,
+});
+typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
+  Value<int> id,
+  Value<String> name,
+});
 
 class $$UsersTableFilterComposer extends Composer<_$Database, $UsersTable> {
   $$UsersTableFilterComposer({
@@ -1089,16 +1093,21 @@ class $$UsersTableTableManager
               $$UsersTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$UsersTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<String> name = const Value.absent(),
-              }) => UsersCompanion(id: id, name: name),
-          createCompanionCallback:
-              ({Value<int> id = const Value.absent(), required String name}) =>
-                  UsersCompanion.insert(id: id, name: name),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+          }) => UsersCompanion(id: id, name: name),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String name,
+          }) => UsersCompanion.insert(id: id, name: name),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$UsersTable, User>(table),
+                  BaseReferences<_$Database, $UsersTable, User>(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -1119,22 +1128,20 @@ typedef $$UsersTableProcessedTableManager =
       User,
       PrefetchHooks Function()
     >;
-typedef $$WalletsTableCreateCompanionBuilder =
-    WalletsCompanion Function({
-      Value<int> id,
-      required int userId,
-      required String name,
-      required String colorName,
-      required double targetPercent,
-    });
-typedef $$WalletsTableUpdateCompanionBuilder =
-    WalletsCompanion Function({
-      Value<int> id,
-      Value<int> userId,
-      Value<String> name,
-      Value<String> colorName,
-      Value<double> targetPercent,
-    });
+typedef $$WalletsTableCreateCompanionBuilder = WalletsCompanion Function({
+  Value<int> id,
+  required int userId,
+  required String name,
+  required String colorName,
+  required double targetPercent,
+});
+typedef $$WalletsTableUpdateCompanionBuilder = WalletsCompanion Function({
+  Value<int> id,
+  Value<int> userId,
+  Value<String> name,
+  Value<String> colorName,
+  Value<double> targetPercent,
+});
 
 class $$WalletsTableFilterComposer extends Composer<_$Database, $WalletsTable> {
   $$WalletsTableFilterComposer({
@@ -1287,7 +1294,16 @@ class $$WalletsTableTableManager
                 targetPercent: targetPercent,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$WalletsTable, Wallet>(table),
+                  BaseReferences<_$Database, $WalletsTable, Wallet>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -1308,26 +1324,24 @@ typedef $$WalletsTableProcessedTableManager =
       Wallet,
       PrefetchHooks Function()
     >;
-typedef $$ItemsTableCreateCompanionBuilder =
-    ItemsCompanion Function({
-      Value<int> id,
-      required int walletId,
-      required int userId,
-      required String name,
-      required double quantity,
-      required double price,
-      required double targetPercent,
-    });
-typedef $$ItemsTableUpdateCompanionBuilder =
-    ItemsCompanion Function({
-      Value<int> id,
-      Value<int> walletId,
-      Value<int> userId,
-      Value<String> name,
-      Value<double> quantity,
-      Value<double> price,
-      Value<double> targetPercent,
-    });
+typedef $$ItemsTableCreateCompanionBuilder = ItemsCompanion Function({
+  Value<int> id,
+  required int walletId,
+  required int userId,
+  required String name,
+  required double quantity,
+  required double price,
+  required double targetPercent,
+});
+typedef $$ItemsTableUpdateCompanionBuilder = ItemsCompanion Function({
+  Value<int> id,
+  Value<int> walletId,
+  Value<int> userId,
+  Value<String> name,
+  Value<double> quantity,
+  Value<double> price,
+  Value<double> targetPercent,
+});
 
 class $$ItemsTableFilterComposer extends Composer<_$Database, $ItemsTable> {
   $$ItemsTableFilterComposer({
@@ -1512,7 +1526,12 @@ class $$ItemsTableTableManager
                 targetPercent: targetPercent,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$ItemsTable, Item>(table),
+                  BaseReferences<_$Database, $ItemsTable, Item>(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),

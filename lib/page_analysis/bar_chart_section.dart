@@ -5,22 +5,23 @@ import 'package:cash_balancer/database/data.dart';
 import 'package:cash_balancer/util/row_column_spacer.dart';
 import 'package:flutter/material.dart';
 
-class BarChartSection extends StatelessWidget {
-  final FullData data;
-
-  const BarChartSection(this.data, {super.key});
-
+class const BarChartSection(final FullData data, {super.key})
+    extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final List<ItemData> sortedItems;
+    if (data.allItems.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final List<ItemData> sortedItems = [...data.allItems];
     if (data.settings.sortBy == 0) {
-      sortedItems = data.allItems..sort((a, b) => b.price.compareTo(a.price));
+      sortedItems.sort((a, b) => b.price.compareTo(a.price));
     } else {
-      sortedItems = data.allItems..sort((a, b) => a.name.compareTo(b.name));
+      sortedItems.sort((a, b) => a.name.compareTo(b.name));
     }
 
     final double maximumPrice =
-        sortedItems.map((e) => e.price).toList().reduce(max);
+        sortedItems.map((e) => e.price).reduce(max);
 
     return SizedBox(
       height: 200,
@@ -35,9 +36,12 @@ class BarChartSection extends StatelessWidget {
               ...sortedItems.map((item) {
                 return RectangularPercentageWidget(
                   id: item.id,
-                  percent: item.price / maximumPrice,
+                  percent: maximumPrice > 0 ? item.price / maximumPrice : 0,
                   size: 40,
-                  backgroundColor: Colors.white.withValues(alpha: 0.15),
+                  backgroundColor: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.10),
                   borderWidth: 0,
                   progressColor: item.color,
                   direction: Axis.vertical,
@@ -53,32 +57,19 @@ class BarChartSection extends StatelessWidget {
   }
 }
 
-class RectangularPercentageWidget extends StatefulWidget {
-  const RectangularPercentageWidget({
-    super.key,
-    required this.id,
-    this.percent = 0.0,
-    this.size = 30,
-    this.direction = Axis.horizontal,
-    this.verticalDirection = VerticalDirection.down,
-    this.borderRadius = 4,
-    this.borderColor = const Color(0xFFFA7268),
-    this.borderWidth = 0.2,
-    this.backgroundColor = const Color(0x00FFFFFF),
-    this.progressColor = const Color(0xFFFA7268),
-  });
-
-  final int id;
-  final double percent;
-  final double size;
-  final Axis direction;
-  final VerticalDirection verticalDirection;
-  final double borderRadius;
-  final Color backgroundColor;
-  final Color? progressColor;
-  final Color borderColor;
-  final double borderWidth;
-
+class const RectangularPercentageWidget({
+  super.key,
+  required final int id,
+  final double percent = 0.0,
+  final double size = 30,
+  final Axis direction = Axis.horizontal,
+  final VerticalDirection verticalDirection = VerticalDirection.down,
+  final double borderRadius = 4,
+  final Color borderColor = const Color(0xFFFA7268),
+  final double borderWidth = 0.2,
+  final Color backgroundColor = const Color(0x00FFFFFF),
+  final Color? progressColor = const Color(0xFFFA7268),
+}) extends StatefulWidget {
   @override
   State createState() => _RectangularPercentageWidgetState();
 }
@@ -99,7 +90,7 @@ class _RectangularPercentageWidgetState
       setState(() {});
     });
 
-    _controller.animateTo(widget.percent);
+    _controller.animateTo(widget.percent.clamp(0.0, 1.0));
 
     super.initState();
   }
@@ -113,14 +104,15 @@ class _RectangularPercentageWidgetState
   @override
   void didUpdateWidget(RectangularPercentageWidget oldWidget) {
     if (oldWidget.percent != widget.percent) {
-      _controller.animateTo(widget.percent);
+      _controller.animateTo(widget.percent.clamp(0.0, 1.0));
     }
     super.didUpdateWidget(oldWidget);
   }
 
   @override
   Widget build(BuildContext context) {
-    final double position = _controller.value;
+    final int filledFlex = (_controller.value.clamp(0.0, 1.0) * 100).round();
+    final int emptyFlex = 100 - filledFlex;
 
     final Widget progressWidget = Container(
       decoration: BoxDecoration(
@@ -155,19 +147,21 @@ class _RectangularPercentageWidgetState
           shape: const RoundedRectangleBorder(),
         ),
         onPressed: () =>
-            Beamer.of(context).beamToNamed('editItem/${widget.id}'),
+            Beamer.of(context).beamToNamed('/editItem/${widget.id}'),
         child: Flex(
           direction: widget.direction,
           verticalDirection: widget.verticalDirection,
           children: <Widget>[
-            Expanded(
-              flex: (position * 100).toInt(),
-              child: progressWidget,
-            ),
-            Expanded(
-              flex: 100 - (position * 100).toInt(),
-              child: Container(),
-            )
+            if (filledFlex > 0)
+              Expanded(
+                flex: filledFlex,
+                child: progressWidget,
+              ),
+            if (emptyFlex > 0)
+              Expanded(
+                flex: emptyFlex,
+                child: const SizedBox.expand(),
+              ),
           ],
         ),
       ),

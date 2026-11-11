@@ -4,11 +4,8 @@ import 'package:cash_balancer/util/tailwind_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 
-class SortByDialog extends StatefulWidget {
-  final int initialValue;
-
-  const SortByDialog({super.key, required this.initialValue});
-
+class const SortByDialog({super.key, required final int initialValue})
+    extends StatefulWidget {
   @override
   State<SortByDialog> createState() => _SortByDialogState();
 }

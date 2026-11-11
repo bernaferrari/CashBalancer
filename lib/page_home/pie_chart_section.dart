@@ -3,11 +3,8 @@ import 'package:cash_balancer/util/tailwind_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class PieChartSection extends StatelessWidget {
-  final FullData data;
-
-  const PieChartSection(this.data, {super.key});
-
+class const PieChartSection(final FullData data, {super.key})
+    extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -25,12 +22,16 @@ class PieChartSection extends StatelessWidget {
   }
 
   List<PieChartSectionData> showingSections(FullData data) {
-    return data.walletsMap.values.map((groupData) {
+    if (data.totalValue <= 0) return const [];
+
+    return data.walletsMap.values
+        .where((groupData) => groupData.totalValue > 0)
+        .map((groupData) {
+      final double percent = groupData.totalValue / data.totalValue * 100;
       return PieChartSectionData(
         color: tailwindColors[groupData.colorName]![500]!,
-        value: groupData.totalValue / data.totalValue * 100,
-        title:
-            '${(groupData.totalValue / data.totalValue * 100).toStringAsFixed(0)}%',
+        value: percent,
+        title: '${percent.toStringAsFixed(0)}%',
         radius: 50,
         titleStyle: const TextStyle(
           fontSize: 16,

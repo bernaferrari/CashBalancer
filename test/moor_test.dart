@@ -1,22 +1,154 @@
+import 'package:cash_balancer/database/data.dart';
 import 'package:cash_balancer/database/database.dart';
+import 'package:cash_balancer/util/get_color_by_quantile.dart';
+import 'package:cash_balancer/util/retrieve_spaced_list.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  test('Test Moor', () async {
+  test('Database initialization and CRUD operations', () async {
+    SharedPreferences.setMockInitialValues({});
     final db = Database(NativeDatabase.memory());
     addTearDown(db.close);
 
     // beforeOpen creates a default user on first open.
     expect((await db.userExists().getSingle()), 1);
-    final id = await db.getDefaultUser();
-    expect(id, greaterThan(0));
+    final userId = await db.getDefaultUser();
+    expect(userId, greaterThan(0));
 
+    // Create a wallet and items.
+    await db.createGroup(
+      id: userId,
+      name: 'Stocks',
+      colorName: 'emerald',
+      targetPercent: 60,
+    );
+    final fullDataAfterWallet = await db.watchWallets(userId).first;
+    expect(fullDataAfterWallet.walletsMap.length, 1);
+    final wallet = fullDataAfterWallet.walletsMap.values.first;
+    expect(wallet.name, 'Stocks');
+
+    await db.createItem(
+      walletId: wallet.id,
+      userId: userId,
+      name: 'AAPL',
+      value: '1500',
+      target: '50',
+    );
+    final fullDataAfterItem = await db.watchWallets(userId).first;
+    expect(fullDataAfterItem.allItems.length, 1);
+    expect(fullDataAfterItem.allItems.first.name, 'AAPL');
+    expect(fullDataAfterItem.allItems.first.price, 1500);
+
+    await db.deleteWallet(wallet.id);
     await db.delete(db.users).go();
 
     expect(await db.select(db.users).getSingleOrNull(), null);
     expect(await db.select(db.wallets).getSingleOrNull(), null);
     expect(await db.select(db.items).getSingleOrNull(), null);
     expect((await db.userExists().getSingle()), 0);
+
+    // getDefaultUser safely recreates a user if none exists.
+    final recreatedUserId = await db.getDefaultUser();
+    expect(recreatedUserId, greaterThan(0));
+  });
+
+  test('getColorByQuantile assigns colors per wallet without overwriting', () {
+    const w1 = Wallet(
+      id: 1,
+      name: 'Stocks',
+      colorName: 'emerald',
+      targetPercent: -1,
+      userId: 1,
+    );
+    const w2 = Wallet(
+      id: 2,
+      name: 'Crypto',
+      colorName: 'amber',
+      targetPercent: -1,
+      userId: 1,
+    );
+    final groupMap = <int, WalletData>{
+      1: WalletData(w1, 400),
+      2: WalletData(w2, 50),
+    };
+    const item1 = Item(
+      id: 1,
+      name: 'AAPL',
+      quantity: 1,
+      price: 100,
+      targetPercent: -1,
+      walletId: 1,
+      userId: 1,
+    );
+    const item2 = Item(
+      id: 2,
+      name: 'MSFT',
+      quantity: 1,
+      price: 300,
+      targetPercent: -1,
+      walletId: 1,
+      userId: 1,
+    );
+    const item3 = Item(
+      id: 3,
+      name: 'BTC',
+      quantity: 1,
+      price: 50,
+      targetPercent: -1,
+      walletId: 2,
+      userId: 1,
+    );
+    final itemsMap = <int, List<Item>>{
+      1: [item1, item2],
+      2: [item3],
+    };
+
+    final colors =
+        getColorByQuantile(itemsMap, groupMap, [item1, item2, item3]);
+    expect(colors.keys, containsAll([1, 2, 3]));
+    expect(colors[1], isNotNull);
+    expect(colors[2], isNotNull);
+    expect(colors[3], isNotNull);
+    // Wallet 1 items and Wallet 2 items use their respective wallet colors.
+    expect(colors[1], isNot(equals(colors[3])));
+  });
+
+  test('retrieveSpacedList handles empty, zero-total, and normal lists', () {
+    expect(retrieveSpacedList([], 200), isEmpty);
+
+    const zeroItem = Item(
+      id: 1,
+      name: 'Zero',
+      quantity: 1,
+      price: 0,
+      targetPercent: -1,
+      walletId: 1,
+      userId: 1,
+    );
+    final zeroResult = retrieveSpacedList([zeroItem], 200);
+    expect(zeroResult, [0.0]);
+
+    const i1 = Item(
+      id: 1,
+      name: 'I1',
+      quantity: 1,
+      price: 50,
+      targetPercent: -1,
+      walletId: 1,
+      userId: 1,
+    );
+    const i2 = Item(
+      id: 2,
+      name: 'I2',
+      quantity: 1,
+      price: 50,
+      targetPercent: -1,
+      walletId: 1,
+      userId: 1,
+    );
+    final spaced = retrieveSpacedList([i1, i2], 200);
+    expect(spaced, [99.0, 99.0]);
   });
 }

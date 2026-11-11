@@ -9,9 +9,7 @@ import '../l10n/l10n.dart';
 import '../widgets/dialog_screen_base.dart';
 import 'currency_symbol_dialog.dart';
 
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
-
+class const SettingsPage({super.key}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DataCubit, FullData?>(

@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class WhenEmptyCard extends StatelessWidget {
-  const WhenEmptyCard({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    super.key,
-  });
-
-  final String title;
-  final String subtitle;
-  final IconData icon;
-
+class const WhenEmptyCard({
+  required final String title,
+  required final String subtitle,
+  required final IconData icon,
+  super.key,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(

@@ -3,18 +3,25 @@ import 'package:flutter/material.dart';
 
 import '../util/tailwind_colors.dart';
 
-class ColorPicker extends StatefulWidget {
-  final String initialSelection;
-  final ValueChanged<String> onChanged;
-
-  const ColorPicker(this.initialSelection, this.onChanged, {super.key});
-
+class const ColorPicker(
+  final String initialSelection,
+  final ValueChanged<String> onChanged, {
+  super.key,
+}) extends StatefulWidget {
   @override
   State<ColorPicker> createState() => _ColorPickerState();
 }
 
 class _ColorPickerState extends State<ColorPicker> {
   late String selected = widget.initialSelection;
+
+  @override
+  void didUpdateWidget(ColorPicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialSelection != widget.initialSelection) {
+      selected = widget.initialSelection;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,19 +56,13 @@ class _ColorPickerState extends State<ColorPicker> {
   }
 }
 
-class AnimatedColorItem extends StatelessWidget {
-  final Color color;
-  final bool isSelected;
-  final VoidCallback? onSelected;
-
-  const AnimatedColorItem({
-    required this.color,
-    required this.isSelected,
-    this.onSelected,
-    super.key,
-  });
-
-  final maxSize = 36.0;
+class const AnimatedColorItem({
+  required final Color color,
+  required final bool isSelected,
+  final VoidCallback? onSelected,
+  super.key,
+}) extends StatelessWidget {
+  static const maxSize = 36.0;
 
   @override
   Widget build(BuildContext context) {

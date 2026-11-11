@@ -42,19 +42,13 @@ sealed class DbResult<T> {
 }
 
 /// Successful database operation result
-class Success<T> extends DbResult<T> {
-  final T data;
-
-  const Success(this.data);
-}
+class const Success<T>(final T data) extends DbResult<T>;
 
 /// Failed database operation result
-class Failure<T> extends DbResult<T> {
-  final String message;
-  final Exception? exception;
-
-  const Failure(this.message, {this.exception});
-}
+class const Failure<T>(
+  final String message, {
+  final Exception? exception,
+}) extends DbResult<T>;
 
 /// Helper function to safely execute database operations
 Future<DbResult<T>> safeDbOperation<T>(

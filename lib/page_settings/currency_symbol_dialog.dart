@@ -5,11 +5,8 @@ import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 
 import '../l10n/l10n.dart';
 
-class CurrencySymbolDialog extends StatefulWidget {
-  final String initialValue;
-
-  const CurrencySymbolDialog({super.key, required this.initialValue});
-
+class const CurrencySymbolDialog({super.key, required final String initialValue})
+    extends StatefulWidget {
   @override
   State<CurrencySymbolDialog> createState() => _CurrencySymbolDialogState();
 }
@@ -55,6 +52,7 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
               },
               decoration: InputDecoration(
                 filled: true,
+                fillColor: getInputFillColor(context),
                 labelText: AppLocalizations.of(context).currencySymbol,
                 labelStyle: TextStyle(color: primaryColor),
                 // border is used when there is an error

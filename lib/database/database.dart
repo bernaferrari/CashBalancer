@@ -50,13 +50,10 @@ class Items extends Table {
 @DriftDatabase(
   tables: [Users, Wallets, Items],
   queries: {
-    // '_resetCategory': 'UPDATE todos SET category = NULL WHERE category = ?',
-    'userExists': """SELECT count(1) where exists (select * from users)"""
+    'userExists': '''SELECT count(1) where exists (select * from users)''',
   },
 )
-class Database extends _$Database {
-  Database(super.e);
-
+class Database(super.e) extends _$Database {
   @override
   int get schemaVersion => 1;
 
@@ -168,68 +165,6 @@ class Database extends _$Database {
     });
   }
 
-// Stream<List<FullData>> watchItems(int userId) {
-//   final queryUser = select(users)..where((user) => user.id.equals(userId));
-//
-//   final query = queryUser.join([
-//     leftOuterJoin(
-//       items,
-//       items.userId.equalsExp(users.id),
-//     ),
-//     // leftOuterJoin(
-//     //   groups,
-//     //   groups.id.equalsExp(items.groupId),
-//     // ),
-//   ]);
-//
-//   return query.watch().map((rows) {
-//     print("rows are $rows");
-//     // read both the entry and the associated category for each row
-//     return rows.map((row) {
-//       return FullData(
-//         row.readTable(users),
-//         row.readTable(items),
-//         row.readTable(groups),
-//       );
-//     }).toList();
-//   });
-// }
-
-// Stream<FullDataExtended> watchItemsGroupedHome() {
-//   return watchGroups().map((data) {
-//     final List<FullDataNullable> sortedData = [...data]..sort((a, b) {
-//         return (b.item.price * b.item.quantity)
-//             .compareTo((a.item.price * a.item.quantity));
-//       });
-//
-//     final Map<int, List<FullData>> groupedData = groupByKind(sortedData);
-//
-//     final Map<FullData, Color> colors =
-//         getColorByQuantile(groupedData, sortedData);
-//
-//     return FullDataExtended(groupedData, colors, sortedData);
-//   });
-// }
-
-// Stream<FullDataExtended> watchItemsGrouped(int userId) =>
-//     watchItems(userId).map((data) {
-//       print("watchItemsGrouped was updated, now $data");
-//
-//       final List<FullData> sortedData = [...data]..sort((a, b) {
-//           return (b.item.price * b.item.quantity)
-//               .compareTo((a.item.price * a.item.quantity));
-//         });
-//
-//       final Map<int, List<FullData>> groupedData = groupByKind(sortedData);
-//       print("sortedData: $sortedData groupedData $groupedData");
-//
-//       final Map<FullData, Color> colors =
-//           getColorByQuantile(groupedData, sortedData);
-//       print("colors: $colors");
-//
-//       return FullDataExtended(groupedData, colors, sortedData);
-//     });
-
   Map<int, List<Item>> groupItemByWalletId(List<Item> itemList) {
     final groupedList = <int, List<Item>>{};
 
@@ -262,30 +197,6 @@ class Database extends _$Database {
 
     return groupedList;
   }
-
-// Stream<List<FullData>> watchMainGroups() {
-//   final query = select(users).join([
-//     leftOuterJoin(
-//       items,
-//       users.id.equalsExp(items.userId),
-//     ),
-//     leftOuterJoin(
-//       groups,
-//       groups.id.equalsExp(items.groupId),
-//     ),
-//   ]);
-//
-//   return query.watch().map((rows) {
-//     // read both the entry and the associated category for each row
-//     return rows.map((row) {
-//       return FullData(
-//         row.readTable(users),
-//         row.readTable(items),
-//         row.readTable(groups),
-//       );
-//     }).toList();
-//   });
-// }
 
   Future<int> createUser(String description) {
     return into(users).insert(UsersCompanion.insert(name: description));
@@ -359,7 +270,13 @@ class Database extends _$Database {
     await (delete(wallets)..where((t) => t.id.equals(walletId))).go();
   }
 
-  Future<int> getDefaultUser() async => (await select(users).get())[0].id;
+  Future<int> getDefaultUser() async {
+    final existingUsers = await select(users).get();
+    if (existingUsers.isNotEmpty) {
+      return existingUsers.first.id;
+    }
+    return into(users).insert(UsersCompanion.insert(name: 'Wallet #1'));
+  }
 
   Future<Item?> getItemFromId(int id) async {
     return (select(items)..where((t) => t.id.equals(id))).getSingleOrNull();

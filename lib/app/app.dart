@@ -130,28 +130,31 @@ final simpleBuilder = RoutesLocationBuilder(routes: {
       return const ErrorPage();
     }
 
-    final state = context.read<DataCubit>().state;
-    if (state != null && state.allItems.isNotEmpty) {
-      final previousItem =
-          state.allItems.firstWhere((element) => element.id == itemId);
-
-      return BeamerMaterialTransitionPage(
-        key: ValueKey('item-$itemId'),
-        title: 'Edit Item',
-        child: CRUDItemPage(
-          userId: state.userId,
-          previousItem: previousItem,
-          colorName: previousItem.colorName,
-          walletId: previousItem.walletId,
-          totalValue: state.totalValue,
-          currency: state.settings.currencySymbol,
-        ),
-        fillColor:
-            getScaffoldDialogBackgroundColor(context, previousItem.colorName),
-      );
-    } else if (state == null) {
+    final dataState = context.read<DataCubit>().state;
+    if (dataState == null) {
       return beamerLoadingPage();
     }
+
+    final previousItem =
+        dataState.allItems.where((element) => element.id == itemId).firstOrNull;
+    if (previousItem == null) {
+      return const ErrorPage();
+    }
+
+    return BeamerMaterialTransitionPage(
+      key: ValueKey('item-$itemId'),
+      title: 'Edit Item',
+      child: CRUDItemPage(
+        userId: dataState.userId,
+        previousItem: previousItem,
+        colorName: previousItem.colorName,
+        walletId: previousItem.walletId,
+        totalValue: dataState.totalValue,
+        currency: dataState.settings.currencySymbol,
+      ),
+      fillColor:
+          getScaffoldDialogBackgroundColor(context, previousItem.colorName),
+    );
   },
   '/moveItem/:itemId': (context, state, obj) {
     final beamState = context.currentBeamLocation.state as BeamState;
@@ -161,33 +164,39 @@ final simpleBuilder = RoutesLocationBuilder(routes: {
       return const ErrorPage();
     }
 
-    final state = context.read<DataCubit>().state;
-
-    if (state != null && state.allItems.isNotEmpty) {
-      final item = state.allItems.firstWhere((element) => element.id == itemId);
-
-      return BeamerMaterialTransitionPage(
-        key: ValueKey('moveItem-$itemId'),
-        title: 'Move Item',
-        popToNamed: '/editItem/$itemId',
-        child: MoveItemPage(
-          userId: state.userId,
-          item: item,
-          wallets: state.walletsMap.values.toList(),
-          bloc: context.read<DataCubit>(),
-          totalValue: state.totalValue,
-        ),
-        fillColor: getScaffoldDialogBackgroundColor(context, item.colorName),
-      );
-    } else if (state == null) {
+    final dataState = context.read<DataCubit>().state;
+    if (dataState == null) {
       return beamerLoadingPage();
     }
-  }
+
+    final item =
+        dataState.allItems.where((element) => element.id == itemId).firstOrNull;
+    if (item == null) {
+      return const ErrorPage();
+    }
+
+    return BeamerMaterialTransitionPage(
+      key: ValueKey('moveItem-$itemId'),
+      title: 'Move Item',
+      popToNamed: '/editItem/$itemId',
+      child: MoveItemPage(
+        userId: dataState.userId,
+        item: item,
+        wallets: dataState.walletsMap.values.toList(),
+        bloc: context.read<DataCubit>(),
+        totalValue: dataState.totalValue,
+      ),
+      fillColor: getScaffoldDialogBackgroundColor(context, item.colorName),
+    );
+  },
 });
 
-class App extends StatelessWidget {
-  App({super.key});
+class const App({super.key}) extends StatefulWidget {
+  @override
+  State<App> createState() => _AppState();
+}
 
+class _AppState extends State<App> {
   final _routerDelegate = BeamerDelegate(
     notFoundPage: const BeamPage(
       key: ValueKey('home'),
@@ -242,14 +251,19 @@ class App extends StatelessWidget {
             colorScheme: const ColorScheme.light(
               primary: Color(0xff162783),
               secondary: Color(0xff059669),
-              // background: Color(0xff18170f),
-              // surface: Color(0xff201f15),
             ),
             dialogTheme: DialogThemeData(
-              backgroundColor: const Color(0xff18170f),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
+            ),
+            floatingActionButtonTheme: const FloatingActionButtonThemeData(
+              backgroundColor: Color(0xff059669),
+              foregroundColor: Colors.white,
+              shape: StadiumBorder(),
+            ),
+            dividerTheme: DividerThemeData(
+              color: Colors.black.withValues(alpha: 0.12),
             ),
             appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF13B9FF)),
             typography: Typography.material2021(),
@@ -262,6 +276,7 @@ class App extends StatelessWidget {
           ),
           darkTheme: ThemeData(
             brightness: Brightness.dark,
+            scaffoldBackgroundColor: const Color(0xff121212),
             colorScheme: const ColorScheme.dark(
               primary: Color(0xffe4d75a),
               secondary: Color(0xff5ae492),
@@ -271,6 +286,14 @@ class App extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
+            ),
+            floatingActionButtonTheme: const FloatingActionButtonThemeData(
+              backgroundColor: Color(0xff5ae492),
+              foregroundColor: Colors.black,
+              shape: StadiumBorder(),
+            ),
+            dividerTheme: DividerThemeData(
+              color: Colors.white.withValues(alpha: 0.12),
             ),
             typography: Typography.material2021(),
             visualDensity: VisualDensity.standard,
@@ -317,17 +340,13 @@ BeamPage beamerLoadingPage() {
   );
 }
 
-class BeamerMaterialTransitionPage extends BeamPage {
-  final Color? fillColor;
-
-  const BeamerMaterialTransitionPage({
-    super.key,
-    required super.child,
-    String super.title = '',
-    super.popToNamed,
-    this.fillColor,
-  });
-
+class const BeamerMaterialTransitionPage({
+  super.key,
+  required super.child,
+  String super.title = '',
+  super.popToNamed,
+  final Color? fillColor,
+}) extends BeamPage {
   @override
   Route createRoute(BuildContext context) {
     return SharedAxisPageRoute(
@@ -339,13 +358,14 @@ class BeamerMaterialTransitionPage extends BeamPage {
   }
 }
 
-class SharedAxisPageRoute extends PageRouteBuilder<Object> {
-  SharedAxisPageRoute({
-    required Widget page,
-    required SharedAxisTransitionType transitionType,
-    required super.settings,
-    Color? fillColor,
-  }) : super(
+class SharedAxisPageRoute({
+  required Widget page,
+  required SharedAxisTransitionType transitionType,
+  required super.settings,
+  Color? fillColor,
+}) extends PageRouteBuilder<Object> {
+  this
+      : super(
           pageBuilder: (context, primaryAnimation, secondaryAnimation) => page,
           transitionsBuilder: (
             context,
@@ -364,9 +384,7 @@ class SharedAxisPageRoute extends PageRouteBuilder<Object> {
         );
 }
 
-class ErrorPage extends StatelessWidget {
-  const ErrorPage({super.key});
-
+class const ErrorPage({super.key}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

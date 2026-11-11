@@ -12,16 +12,11 @@ import '../util/tailwind_colors.dart';
 import '../widgets/color_picker.dart';
 import '../widgets/dialog_screen_base.dart';
 
-class CRUDWalletPage extends StatefulWidget {
-  final WalletData? previousWallet;
-  final int userId;
-
-  const CRUDWalletPage({
-    required this.userId,
-    this.previousWallet,
-    super.key,
-  });
-
+class const CRUDWalletPage({
+  required final int userId,
+  final WalletData? previousWallet,
+  super.key,
+}) extends StatefulWidget {
   @override
   State<CRUDWalletPage> createState() => _CRUDWalletPageState();
 }
@@ -36,10 +31,15 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
       TextEditingController(text: widget.previousWallet?.name);
 
   late final TextEditingController targetEditingController =
-      (widget.previousWallet?.targetPercent != -1)
-          ? TextEditingController(
-              text: widget.previousWallet?.targetPercent.toInt().toString())
-          : TextEditingController();
+      TextEditingController(
+    text: (widget.previousWallet != null &&
+            widget.previousWallet!.targetPercent >= 0)
+        ? (widget.previousWallet!.targetPercent ==
+                widget.previousWallet!.targetPercent.truncateToDouble()
+            ? widget.previousWallet!.targetPercent.toInt().toString()
+            : widget.previousWallet!.targetPercent.toString())
+        : '',
+  );
 
   @override
   void dispose() {
@@ -76,6 +76,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
             },
             decoration: InputDecoration(
               filled: true,
+              fillColor: getInputFillColor(context),
               labelText: AppLocalizations.of(context).dialogAssetName,
               labelStyle: TextStyle(color: primaryColor),
               // border is used when there is an error
@@ -160,6 +161,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
                           labelText:
                               AppLocalizations.of(context).dialogAssetTarget,
                           filled: true,
+                          fillColor: getInputFillColor(context),
                           suffixText: ".00 %",
                           labelStyle: TextStyle(color: primaryColorWeaker),
                           // border is used when there is an error
@@ -191,7 +193,10 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
           if (widget.previousWallet != null) ...[
             const SizedBox(height: 8),
             OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: primaryColor,
+                side: BorderSide(color: primaryColor.withValues(alpha: 0.4)),
+              ),
               label: Text(AppLocalizations.of(context).dialogDelete),
               icon: const Icon(Icons.delete_outline_outlined),
               onPressed: onDelete,

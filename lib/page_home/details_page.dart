@@ -12,10 +12,9 @@ import '../util/retrieve_spaced_list.dart';
 import '../util/row_column_spacer.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/circle_percentage_painter.dart';
+import '../widgets/when_empty_card.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
+class const HomePage({super.key}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DataCubit, FullData?>(builder: (context, state) {
@@ -28,11 +27,8 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class HomePageImpl extends StatelessWidget {
-  final FullData data;
-
-  const HomePageImpl(this.data, {super.key});
-
+class const HomePageImpl(final FullData data, {super.key})
+    extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,6 +39,7 @@ class HomePageImpl extends StatelessWidget {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0,
         centerTitle: true,
         actions: [
           IconButton(
@@ -59,14 +56,14 @@ class HomePageImpl extends StatelessWidget {
             Beamer.of(context).beamToNamed("/addWallet/${data.userId}"),
         label: Text(
           AppLocalizations.of(context).addWallet,
-          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
         ),
         icon: Icon(
           Icons.add,
-          color: Theme.of(context).colorScheme.onPrimary,
+          color: Theme.of(context).colorScheme.onSecondary,
         ),
       ),
-      body: (data.walletsMap.isEmpty == true)
+      body: data.walletsMap.isEmpty
           ? WhenEmptyCard(
               title: AppLocalizations.of(context).mainEmptyTitle,
               subtitle: AppLocalizations.of(context).mainEmptySubtitle,
@@ -77,74 +74,10 @@ class HomePageImpl extends StatelessWidget {
   }
 }
 
-class WhenEmptyCard extends StatelessWidget {
-  const WhenEmptyCard({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    super.key,
-  });
-
-  final String title;
-  final String subtitle;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        margin: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            width: 2,
-            color: Theme.of(context).colorScheme.secondary,
-          ),
-        ),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 300),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                icon,
-                size: 32,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                style: GoogleFonts.rubik(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                subtitle,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge!
-                    .copyWith(fontSize: 14),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class MainList extends StatelessWidget {
-  final FullData data;
-
-  const MainList({
-    super.key,
-    required this.data,
-  });
-
+class const MainList({
+  super.key,
+  required final FullData data,
+}) extends StatelessWidget {
   static const double margin = 20.0;
 
   @override
@@ -152,7 +85,7 @@ class MainList extends StatelessWidget {
     final double totalValue =
         data.allItems.fold(0, (a, b) => a + b.price * b.quantity);
 
-    final bool longWidth = MediaQuery.of(context).size.width > 400;
+    final bool longWidth = MediaQuery.sizeOf(context).width > 400;
 
     return Center(
       child: ConstrainedBox(
@@ -168,8 +101,10 @@ class MainList extends StatelessWidget {
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color:
-                    Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.10),
               ),
               child: VerticalProgressBar(data: data, totalValue: totalValue),
             ),
@@ -182,7 +117,7 @@ class MainList extends StatelessWidget {
                   bottom: 6 * margin,
                 ),
                 children: [
-                  if (data.allItems.isNotEmpty) ...[
+                  if (data.allItems.isNotEmpty && data.totalValue > 0) ...[
                     TextButton(
                       onPressed: () {
                         Beamer.of(context).beamToNamed("/analysis");
@@ -196,7 +131,9 @@ class MainList extends StatelessWidget {
                             "Total: ${data.settings.currencySymbol} ${toCurrency(data.totalValue)}",
                             style: TextStyle(
                               fontSize: 12,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -226,22 +163,17 @@ class MainList extends StatelessWidget {
   }
 }
 
-class VerticalProgressBar extends StatelessWidget {
-  final FullData data;
-  final double totalValue;
-
-  const VerticalProgressBar({
-    required this.data,
-    required this.totalValue,
-    super.key,
-  });
-
+class const VerticalProgressBar({
+  required final FullData data,
+  required final double totalValue,
+  super.key,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final List<ItemData> nonZeroItems =
-            data.allItems.where((element) => element.price != 0).toList();
+            data.allItems.where((element) => element.price > 0).toList();
 
         final List<double> spacedList =
             retrieveSpacedList(nonZeroItems, constraints.maxHeight);
@@ -267,7 +199,7 @@ class VerticalProgressBar extends StatelessWidget {
                       ),
                       onPressed: () => Beamer.of(context)
                           .beamToNamed('/editItem/${nonZeroItems[i].id}'),
-                      child: Container(),
+                      child: const SizedBox.expand(),
                     ),
                   ),
                 ),
@@ -279,22 +211,14 @@ class VerticalProgressBar extends StatelessWidget {
   }
 }
 
-class GroupCard extends StatelessWidget {
-  final List<ItemData>? itemsList;
-  final WalletData group;
-  final int userId;
-  final double allTotalValue;
-  final SettingsData settings;
-
-  const GroupCard({
-    super.key,
-    required this.itemsList,
-    required this.group,
-    required this.userId,
-    required this.allTotalValue,
-    required this.settings,
-  });
-
+class const GroupCard({
+  super.key,
+  required final List<ItemData>? itemsList,
+  required final WalletData group,
+  required final int userId,
+  required final double allTotalValue,
+  required final SettingsData settings,
+}) extends StatelessWidget {
   // Make it reusable.
   Widget customContainer({
     required Widget child,
@@ -335,7 +259,8 @@ class GroupCard extends StatelessWidget {
         ),
       );
     } else {
-      final double totalLocalPercent = (group.totalValue / allTotalValue) * 100;
+      final double totalLocalPercent =
+          allTotalValue > 0 ? (group.totalValue / allTotalValue) * 100 : 0;
 
       return customContainer(
         context: context,
@@ -372,8 +297,10 @@ class GroupCard extends StatelessWidget {
                 Container(
                   height: 1,
                   margin: const EdgeInsets.symmetric(horizontal: 8),
-                  color:
-                      Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.10),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.08),
                 ),
             ],
             const SizedBox(height: 8),
@@ -442,25 +369,21 @@ class GroupCard extends StatelessWidget {
   }
 }
 
-class AddItem extends StatelessWidget {
-  final Color color;
-  final int userId;
-  final int groupId;
-
-  const AddItem({
-    super.key,
-    required this.color,
-    required this.userId,
-    required this.groupId,
-  });
-
+class const AddItem({
+  super.key,
+  required final Color color,
+  required final int userId,
+  required final int groupId,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         padding: EdgeInsets.zero,
         minimumSize: Size.zero,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         fixedSize: const Size(64, 40),
       ),
       child: const Icon(Icons.add_rounded),
@@ -469,21 +392,17 @@ class AddItem extends StatelessWidget {
   }
 }
 
-class EditWallet extends StatelessWidget {
-  final Color color;
-  final int groupId;
-
-  const EditWallet({
-    super.key,
-    required this.color,
-    required this.groupId,
-  });
-
+class const EditWallet({
+  super.key,
+  required final Color color,
+  required final int groupId,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
         foregroundColor: color,
+        side: BorderSide(color: color.withValues(alpha: 0.35)),
         minimumSize: Size.zero,
         padding: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -495,20 +414,13 @@ class EditWallet extends StatelessWidget {
   }
 }
 
-class CircularProgress extends StatelessWidget {
-  final double totalLocalPercent;
-  final Color color;
-  final double size;
-  final bool hasText;
-
-  const CircularProgress({
-    super.key,
-    required this.totalLocalPercent,
-    required this.color,
-    this.size = 40,
-    this.hasText = true,
-  });
-
+class const CircularProgress({
+  super.key,
+  required final double totalLocalPercent,
+  required final Color color,
+  final double size = 40,
+  final bool hasText = true,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -546,18 +458,12 @@ class CircularProgress extends StatelessWidget {
   }
 }
 
-class WalletCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final Widget? widget;
-
-  const WalletCard({
-    super.key,
-    required this.title,
-    required this.subtitle,
-    this.widget,
-  });
-
+class const WalletCard({
+  super.key,
+  required final String title,
+  required final String subtitle,
+  final Widget? widget,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -587,21 +493,20 @@ class WalletCard extends StatelessWidget {
 }
 
 extension Percent on double {
-  String toPercent() => (this * 100).toStringAsFixed(0);
+  String toPercent() => isFinite ? (this * 100).toStringAsFixed(0) : '0';
 }
 
-class ItemCard extends StatelessWidget {
-  final ItemData item;
-  final double totalValue;
-  final String nameColor;
-  final String currencySymbol;
-
-  const ItemCard(
-      this.item, this.totalValue, this.nameColor, this.currencySymbol,
-      {super.key});
-
+class const ItemCard(
+  final ItemData item,
+  final double totalValue,
+  final String nameColor,
+  final String currencySymbol, {
+  super.key,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final double ratio = totalValue > 0 ? item.price / totalValue : 0;
+
     return TextButton(
       style: TextButton.styleFrom(
         padding: const EdgeInsets.all(10.0),
@@ -662,7 +567,7 @@ class ItemCard extends StatelessWidget {
                   totalValue: totalValue,
                   leftWidget: Expanded(
                     child: Text(
-                      "$currencySymbol ${toCurrency(item.price)} (${(item.price / totalValue).toPercent()}%)",
+                      "$currencySymbol ${toCurrency(item.price)} (${ratio.toPercent()}%)",
                       style: GoogleFonts.firaSans(
                         color: Theme.of(context)
                             .colorScheme
@@ -684,26 +589,23 @@ class ItemCard extends StatelessWidget {
   }
 }
 
-class PercentArrow extends StatelessWidget {
-  final double itemValue;
-  final double totalValue;
-  final double targetPercent;
-
-  const PercentArrow({
-    required this.itemValue,
-    required this.totalValue,
-    required this.targetPercent,
-    super.key,
-  });
-
+class const PercentArrow({
+  required final double itemValue,
+  required final double totalValue,
+  required final double targetPercent,
+  super.key,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final double ratio = totalValue > 0 ? itemValue / totalValue : 0;
+
     return Row(
       children: [
         Text(
-          "${(itemValue / totalValue).toPercent()}%",
+          "${ratio.toPercent()}%",
           style: GoogleFonts.firaSans(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.50),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.50),
             fontSize: 18,
             fontWeight: FontWeight.w400,
           ),
@@ -713,7 +615,8 @@ class PercentArrow extends StatelessWidget {
           child: Icon(
             Icons.arrow_forward_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.50),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.50),
           ),
         ),
         Text(
@@ -732,22 +635,14 @@ class PercentArrow extends StatelessWidget {
   }
 }
 
-class UpDownDiffText extends StatelessWidget {
-  final String currencySymbol;
-  final double itemValue;
-  final double targetPercent;
-  final double totalValue;
-  final Widget? leftWidget;
-
-  const UpDownDiffText({
-    required this.currencySymbol,
-    required this.itemValue,
-    required this.targetPercent,
-    required this.totalValue,
-    this.leftWidget,
-    super.key,
-  });
-
+class const UpDownDiffText({
+  required final String currencySymbol,
+  required final double itemValue,
+  required final double targetPercent,
+  required final double totalValue,
+  final Widget? leftWidget,
+  super.key,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final greenColor = Theme.of(context).brightness == Brightness.dark
@@ -758,17 +653,19 @@ class UpDownDiffText extends StatelessWidget {
         ? const Color(0xffff5a74)
         : const Color(0xffCC0020);
 
+    final double currentRatio = totalValue > 0 ? itemValue / totalValue : 0;
+    final double targetRatio = targetPercent / 100;
+    final bool isUnderOrEqual = targetRatio >= currentRatio;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         ?leftWidget,
         if (targetPercent != -1)
           Text(
-            "${targetPercent / 100 > itemValue / totalValue ? "↑" : "↓"} $currencySymbol ${toCurrency(totalValue * targetPercent / 100 - itemValue)} (${(targetPercent / 100 - itemValue / totalValue).toPercent()}%)",
+            "${isUnderOrEqual ? "↑" : "↓"} $currencySymbol ${toCurrency(totalValue * targetRatio - itemValue)} (${(targetRatio - currentRatio).toPercent()}%)",
             style: GoogleFonts.firaSans(
-              color: targetPercent / 100 > itemValue / totalValue
-                  ? greenColor
-                  : redColor,
+              color: isUnderOrEqual ? greenColor : redColor,
               fontSize: 12,
               fontWeight: FontWeight.w700,
             ),

@@ -36,28 +36,26 @@ Color getBackgroundDialogColor(BuildContext context, String colorName) {
       : tailwindColors[colorName]![100]!;
 }
 
+Color getInputFillColor(BuildContext context) {
+  return Theme.of(context).brightness == Brightness.dark
+      ? Colors.black.withValues(alpha: 0.20)
+      : Colors.white.withValues(alpha: 0.50);
+}
+
 InputBorder getInputDecorationBorder(Color primaryColorWeaker) =>
     OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
       borderSide: BorderSide(color: primaryColorWeaker),
     );
 
-class DialogScreenBase extends StatelessWidget {
-  final String colorName;
-  final List<Widget> children;
-  final String appBarTitle;
-  final List<Widget>? appBarActions;
-  final Color? backgroundDialogColor;
-
-  const DialogScreenBase({
-    super.key,
-    required this.children,
-    required this.colorName,
-    required this.appBarTitle,
-    this.backgroundDialogColor,
-    this.appBarActions,
-  });
-
+class const DialogScreenBase({
+  super.key,
+  required final List<Widget> children,
+  required final String colorName,
+  required final String appBarTitle,
+  final Color? backgroundDialogColor,
+  final List<Widget>? appBarActions,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,8 +64,8 @@ class DialogScreenBase extends StatelessWidget {
         top: true,
         bottom: true,
         child: Shortcuts(
-          shortcuts: <LogicalKeySet, Intent>{
-            LogicalKeySet(LogicalKeyboardKey.escape): const PopIntent(),
+          shortcuts: const <ShortcutActivator, Intent>{
+            SingleActivator(LogicalKeyboardKey.escape): PopIntent(),
           },
           child: Actions(
             actions: <Type, Action<Intent>>{
@@ -83,12 +81,7 @@ class DialogScreenBase extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(24),
                     color: backgroundDialogColor ??
-                        (Theme.of(context).brightness == Brightness.dark
-                            ? Color.alphaBlend(
-                                Colors.black.withValues(alpha: 0.60),
-                                tailwindColors[colorName]![900]!,
-                              )
-                            : tailwindColors[colorName]![100]!),
+                        getBackgroundDialogColor(context, colorName),
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -97,7 +90,9 @@ class DialogScreenBase extends StatelessWidget {
                         foregroundColor:
                             Theme.of(context).colorScheme.onSurface,
                         title: Text(appBarTitle),
+                        centerTitle: true,
                         elevation: 0,
+                        scrolledUnderElevation: 0,
                         backgroundColor:
                             Theme.of(context).brightness == Brightness.dark
                                 ? tailwindColors[colorName]![900]!
@@ -123,6 +118,4 @@ class DialogScreenBase extends StatelessWidget {
   }
 }
 
-class PopIntent extends Intent {
-  const PopIntent();
-}
+class const PopIntent() extends Intent;

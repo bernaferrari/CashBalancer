@@ -6,11 +6,10 @@ import '../blocs/data_bloc.dart';
 import '../database/data.dart';
 import '../l10n/l10n.dart';
 import '../page_home/details_page.dart';
+import '../widgets/when_empty_card.dart';
 import 'bar_chart_section.dart';
 
-class AnalysisPage extends StatelessWidget {
-  const AnalysisPage({super.key});
-
+class const AnalysisPage({super.key}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DataCubit, FullData?>(builder: (context, state) {
@@ -23,11 +22,8 @@ class AnalysisPage extends StatelessWidget {
   }
 }
 
-class DetailsPageImpl extends StatelessWidget {
-  final FullData data;
-
-  const DetailsPageImpl(this.data, {super.key});
-
+class const DetailsPageImpl(final FullData data, {super.key})
+    extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,9 +40,10 @@ class DetailsPageImpl extends StatelessWidget {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0,
         centerTitle: true,
       ),
-      body: (data.walletsMap.isEmpty == true)
+      body: (data.walletsMap.isEmpty || data.allItems.isEmpty)
           ? WhenEmptyCard(
               title: AppLocalizations.of(context).mainEmptyTitle,
               subtitle: AppLocalizations.of(context).mainEmptySubtitle,
@@ -57,14 +54,10 @@ class DetailsPageImpl extends StatelessWidget {
   }
 }
 
-class MainList extends StatelessWidget {
-  final FullData data;
-
-  const MainList({
-    super.key,
-    required this.data,
-  });
-
+class const MainList({
+  super.key,
+  required final FullData data,
+}) extends StatelessWidget {
   static const double margin = 20.0;
 
   @override
@@ -72,7 +65,7 @@ class MainList extends StatelessWidget {
     final double totalValue =
         data.allItems.fold(0, (a, b) => a + b.price * b.quantity);
 
-    final bool longWidth = MediaQuery.of(context).size.width > 400;
+    final bool longWidth = MediaQuery.sizeOf(context).width > 400;
 
     return Center(
       child: ConstrainedBox(
@@ -88,8 +81,10 @@ class MainList extends StatelessWidget {
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color:
-                    Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.10),
               ),
               child: VerticalProgressBar(data: data, totalValue: totalValue),
             ),
@@ -125,18 +120,15 @@ class MainList extends StatelessWidget {
   }
 }
 
-class ItemsList extends StatelessWidget {
-  final FullData data;
-
-  const ItemsList(this.data, {super.key});
-
+class const ItemsList(final FullData data, {super.key})
+    extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final List<ItemData> sortedItems;
+    final List<ItemData> sortedItems = [...data.allItems];
     if (data.settings.sortBy == 0) {
-      sortedItems = data.allItems..sort((a, b) => b.price.compareTo(a.price));
+      sortedItems.sort((a, b) => b.price.compareTo(a.price));
     } else {
-      sortedItems = data.allItems..sort((a, b) => a.name.compareTo(b.name));
+      sortedItems.sort((a, b) => a.name.compareTo(b.name));
     }
 
     return Column(
@@ -160,7 +152,10 @@ class ItemsList extends StatelessWidget {
             Container(
               height: 1,
               margin: const EdgeInsets.symmetric(horizontal: 8),
-              color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.10),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.08),
             ),
         ],
       ],

@@ -13,23 +13,24 @@ Map<int, Color> getColorByQuantile(
   final colors = <int, Color>{};
 
   for (final element in itemsMap.entries) {
+    final wallet = groupMap[element.key];
+    if (wallet == null || element.value.isEmpty) continue;
+
     final List<double> arr =
         element.value.map((e) => e.quantity * e.price).toList();
 
-    // final quartile25 = q25(arr);
-    // final quartile50 = q50(arr);
-    // final quartile75 = q75(arr);
     final quartile33 = q33(arr);
     final quartile66 = q66(arr);
+    final palette = _getColor(wallet.colorName);
 
-    for (final item in itemsList) {
-      final colorName = groupMap[item.walletId]!.colorName;
-      if (item.price >= quartile66) {
-        colors[item.id] = _getColor(colorName)[500]!;
-      } else if (item.price >= quartile33) {
-        colors[item.id] = _getColor(colorName)[300]!;
+    for (final item in element.value) {
+      final itemValue = item.quantity * item.price;
+      if (itemValue >= quartile66) {
+        colors[item.id] = palette[500]!;
+      } else if (itemValue >= quartile33) {
+        colors[item.id] = palette[300]!;
       } else {
-        colors[item.id] = _getColor(colorName)[200]!;
+        colors[item.id] = palette[200]!;
       }
     }
   }
@@ -38,5 +39,5 @@ Map<int, Color> getColorByQuantile(
 }
 
 Map<int, Color> _getColor(String colorType) {
-  return tailwindColors[colorType]!;
+  return tailwindColors[colorType] ?? tailwindColors['gray']!;
 }

@@ -5,9 +5,7 @@ import 'widgets/color_picker.dart';
 
 void main() => runApp(const StorybookApp());
 
-class StorybookApp extends StatelessWidget {
-  const StorybookApp({super.key});
-
+class const StorybookApp({super.key}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Storybook(
         stories: [

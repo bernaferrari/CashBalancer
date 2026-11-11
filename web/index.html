@@ -23,6 +23,7 @@
     <meta name="twitter:image" content="https://bernaferrari.github.io/CashBalancer/og.png">
 
     <!-- iOS meta tags & icons -->
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Cash Balancer">
@@ -38,13 +39,6 @@
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('flutter-first-frame', function () {
-            navigator.serviceWorker.register('flutter_service_worker.js');
-        });
-    }
-</script>
 <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

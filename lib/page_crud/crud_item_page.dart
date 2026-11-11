@@ -10,42 +10,36 @@ import '../l10n/l10n.dart';
 import '../utils/error_handler.dart';
 import '../widgets/dialog_screen_base.dart';
 
-class CRUDItemPage extends StatefulWidget {
-  final Item? previousItem;
-  final String colorName;
-  final double totalValue;
-  final String currency;
-
-  // Only used when previousItem != null.
-  final int userId;
-  final int walletId;
-
-  const CRUDItemPage({
-    required this.colorName,
-    required this.totalValue,
-    required this.walletId,
-    required this.userId,
-    required this.currency,
-    this.previousItem,
-    super.key,
-  });
-
+class const CRUDItemPage({
+  required final String colorName,
+  required final double totalValue,
+  required final int walletId,
+  required final int userId,
+  required final String currency,
+  final Item? previousItem,
+  super.key,
+}) extends StatefulWidget {
   @override
   State<CRUDItemPage> createState() => _CRUDItemPageState();
 }
 
 class _CRUDItemPageState extends State<CRUDItemPage> {
+  static String _formatInitialNumber(double? value) {
+    if (value == null || value < 0) return '';
+    return value == value.truncateToDouble()
+        ? value.toInt().toString()
+        : value.toString();
+  }
+
   late final TextEditingController nameEditingController =
       TextEditingController(text: widget.previousItem?.name);
   late final TextEditingController moneyEditingController =
       TextEditingController(
-          text: widget.previousItem?.price.toInt().toString());
+          text: _formatInitialNumber(widget.previousItem?.price));
 
   late final TextEditingController targetEditingController =
-      (widget.previousItem?.targetPercent != -1)
-          ? TextEditingController(
-              text: widget.previousItem?.targetPercent.toInt().toString())
-          : TextEditingController();
+      TextEditingController(
+          text: _formatInitialNumber(widget.previousItem?.targetPercent));
 
   String relativePercentage = '';
 
@@ -128,6 +122,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                       },
                       decoration: InputDecoration(
                         filled: true,
+                        fillColor: getInputFillColor(context),
                         labelText: AppLocalizations.of(context).dialogAssetName,
                         labelStyle: TextStyle(color: primaryColor),
                         // border is used when there is an error
@@ -180,6 +175,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         filled: true,
+                        fillColor: getInputFillColor(context),
                         labelText: AppLocalizations.of(context).value,
                         // prefixIcon: Icon(
                         //   Icons.money_rounded,
@@ -273,6 +269,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                               labelText: AppLocalizations.of(context)
                                   .dialogAssetTarget,
                               filled: true,
+                              fillColor: getInputFillColor(context),
                               suffixText: ".00 %",
                               labelStyle: TextStyle(color: primaryColorWeaker),
                               border:
@@ -309,14 +306,20 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
           const SizedBox(height: 8),
           if (widget.previousItem == null)
             OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: primaryColor,
+                side: BorderSide(color: primaryColor.withValues(alpha: 0.4)),
+              ),
               icon: const Icon(Icons.checklist_outlined),
               label: Text(AppLocalizations.of(context).dialogSaveAddMore),
               onPressed: onSaveAddMore,
             )
           else
             OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: primaryColor,
+                side: BorderSide(color: primaryColor.withValues(alpha: 0.4)),
+              ),
               icon: const Icon(Icons.delete_outline_outlined),
               label: Text(AppLocalizations.of(context).dialogDelete),
               onPressed: onDelete,
@@ -378,23 +381,17 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
   void onChanged([String? value]) {
     final moneyValue = double.tryParse(moneyEditingController.text) ?? 0;
 
-    final String finalPercent;
-    if (moneyValue == 0 && widget.totalValue == 0) {
-      finalPercent = '0';
-    } else if (widget.previousItem == null) {
-      finalPercent = (moneyValue / (widget.totalValue + moneyValue) * 100)
-          .toStringAsFixed(2);
-    } else {
-      // Remove the previous price before adding the updated one.
-      finalPercent = (moneyValue /
-              (widget.totalValue + moneyValue - widget.previousItem!.price) *
-              100)
-          .toStringAsFixed(2);
-    }
+    final double newTotal = widget.previousItem == null
+        ? widget.totalValue + moneyValue
+        : widget.totalValue + moneyValue - widget.previousItem!.price;
+
+    final String finalPercent = newTotal <= 0
+        ? '0'
+        : (moneyValue / newTotal * 100).toStringAsFixed(2);
 
     setState(() {
       relativePercentage =
-          '\$${toCurrencyString(moneyEditingController.text)} ${AppLocalizations.of(context).isGoingToBe} $finalPercent%';
+          '${widget.currency}${toCurrencyString(moneyEditingController.text)} ${AppLocalizations.of(context).isGoingToBe} $finalPercent%';
     });
   }
 
@@ -420,6 +417,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
             nameEditingController.text = '';
             moneyEditingController.text = '';
             targetEditingController.text = '';
+            onChanged();
           },
           error: (error) {
             showErrorSnackbar(context, error);

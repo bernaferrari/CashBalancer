@@ -2,15 +2,13 @@ import 'dart:ui';
 
 import 'database.dart';
 
-class ItemData extends Item {
-  final String colorName;
-  final Color color;
-
-  ItemData({
-    required Item item,
-    required this.colorName,
-    required this.color,
-  }) : super(
+class ItemData({
+  required Item item,
+  required final String colorName,
+  required final Color color,
+}) extends Item {
+  this
+      : super(
           id: item.id,
           walletId: item.walletId,
           userId: item.userId,
@@ -21,13 +19,12 @@ class ItemData extends Item {
         );
 }
 
-class WalletData extends Wallet {
-  final double totalValue;
-
-  WalletData(
-    Wallet wallet,
-    this.totalValue,
-  ) : super(
+class WalletData(
+  Wallet wallet,
+  final double totalValue,
+) extends Wallet {
+  this
+      : super(
           id: wallet.id,
           userId: wallet.userId,
           name: wallet.name,
@@ -36,38 +33,17 @@ class WalletData extends Wallet {
         );
 }
 
-class FullData {
-  const FullData({
-    required this.userId,
-    required this.totalValue,
-    required this.allItems,
-    required this.walletsItems,
-    required this.walletsMap,
-    required this.settings,
-  });
+class const FullData({
+  required final int userId,
+  required final double totalValue,
+  required final List<ItemData> allItems,
+  required final Map<int, List<ItemData>> walletsItems,
+  required final Map<int, WalletData> walletsMap,
+  required final SettingsData settings,
+});
 
-  final int userId;
-  final double totalValue;
-  final SettingsData settings;
-
-  // List of Items
-  final List<ItemData> allItems;
-
-  // walletID -> Items
-  final Map<int, List<ItemData>> walletsItems;
-
-  // walletID -> Groups
-  final Map<int, WalletData> walletsMap;
-}
-
-class SettingsData {
-  const SettingsData({
-    required this.relativeTarget,
-    required this.currencySymbol,
-    required this.sortBy,
-  });
-
-  final bool relativeTarget;
-  final String currencySymbol;
-  final int sortBy;
-}
+class const SettingsData({
+  required final bool relativeTarget,
+  required final String currencySymbol,
+  required final int sortBy,
+});

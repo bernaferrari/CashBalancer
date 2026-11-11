@@ -7,48 +7,31 @@ import '../database/data.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/dialog_screen_base.dart';
 
-class MoveItemPage extends StatefulWidget {
-  final ItemData item;
-  final double totalValue;
-  final DataCubit bloc;
-  final List<WalletData> wallets;
-  final int userId;
-
-  const MoveItemPage(
-      {required this.totalValue,
-      required this.bloc,
-      required this.userId,
-      required this.item,
-      required this.wallets,
-      super.key});
-
+class const MoveItemPage({
+  required final double totalValue,
+  required final DataCubit bloc,
+  required final int userId,
+  required final ItemData item,
+  required final List<WalletData> wallets,
+  super.key,
+}) extends StatefulWidget {
   @override
   State<MoveItemPage> createState() => _MoveItemPageState();
 }
 
 class _MoveItemPageState extends State<MoveItemPage> {
-  // late String relativePercentage;
-  late int selectedGroupId = widget.wallets.first.id;
+  late int selectedGroupId =
+      widget.wallets.any((w) => w.id == widget.item.walletId)
+          ? widget.item.walletId
+          : widget.wallets.first.id;
 
   late final String colorName = widget.item.colorName;
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = Theme.of(context).brightness == Brightness.dark
-        ? tailwindColors[colorName]![200]!
-        : tailwindColors[colorName]![800]!;
-
-    final primaryColorWeaker = Theme.of(context).brightness == Brightness.dark
-        ? tailwindColors[colorName]![300]!
-        : tailwindColors[colorName]![700]!;
-
-    final backgroundDialogColor =
-        Theme.of(context).brightness == Brightness.dark
-            ? Color.alphaBlend(
-                Colors.black.withValues(alpha: 0.60),
-                tailwindColors[colorName]![900]!,
-              )
-            : tailwindColors[colorName]![100]!;
+    final primaryColor = getPrimaryColor(context, colorName);
+    final primaryColorWeaker = getPrimaryColorWeaker(context, colorName);
+    final backgroundDialogColor = getBackgroundDialogColor(context, colorName);
 
     return DialogScreenBase(
       backgroundDialogColor: backgroundDialogColor,
@@ -108,12 +91,13 @@ class _MoveItemPageState extends State<MoveItemPage> {
     );
   }
 
-  void onSubmit([String? value]) {
-    widget.bloc.db.updateItemWallet(
+  Future<void> onSubmit([String? value]) async {
+    await widget.bloc.db.updateItemWallet(
       item: widget.item,
       walletId: selectedGroupId,
     );
 
+    if (!mounted) return;
     Beamer.of(context).popToNamed('/');
   }
 }
