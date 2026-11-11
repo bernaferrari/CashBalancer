@@ -7,9 +7,8 @@ import 'package:cash_balancer/page_crud/move_item_page.dart';
 import 'package:cash_balancer/page_home/details_page.dart';
 import 'package:cash_balancer/page_rebalance/rebalance_page.dart';
 import 'package:cash_balancer/page_settings/settings_page.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../blocs/data_bloc.dart';
@@ -363,12 +362,7 @@ class _AppState extends State<App> {
               textButtonTheme: textButtonTheme,
               textTheme: textTheme,
             ),
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           title: 'Cash Balancer',
           routerDelegate: _routerDelegate,

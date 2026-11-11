@@ -1,6 +1,6 @@
 import 'package:beamer/beamer.dart';
 import 'package:cash_balancer/page_home/pie_chart_section.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_multi_formatter/formatters/formatter_utils.dart';
 import 'package:google_fonts/google_fonts.dart';

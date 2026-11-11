@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:beamer/beamer.dart';
 import 'package:cash_balancer/database/data.dart';
 import 'package:cash_balancer/page_home/details_page.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class const BarChartSection(final FullData data, {super.key})
     extends StatelessWidget {

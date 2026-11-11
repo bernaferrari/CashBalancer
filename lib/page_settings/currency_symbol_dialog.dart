@@ -1,6 +1,6 @@
 import 'package:cash_balancer/util/tailwind_colors.dart';
 import 'package:cash_balancer/widgets/dialog_screen_base.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 
 import '../l10n/l10n.dart';

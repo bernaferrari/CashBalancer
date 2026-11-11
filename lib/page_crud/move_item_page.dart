@@ -1,6 +1,6 @@
 import 'package:beamer/beamer.dart';
 import 'package:cash_balancer/l10n/l10n.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';

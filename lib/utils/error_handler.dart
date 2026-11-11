@@ -2,7 +2,7 @@
 //
 // This file provides utilities for safely handling errors from database
 // operations and displaying appropriate feedback to users.
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../util/tailwind_colors.dart';
 

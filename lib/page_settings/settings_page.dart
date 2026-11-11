@@ -1,7 +1,7 @@
 import 'package:cash_balancer/blocs/data_bloc.dart';
 import 'package:cash_balancer/database/data.dart';
 import 'package:cash_balancer/page_settings/sort_by_dialog.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';

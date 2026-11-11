@@ -2,7 +2,7 @@ import 'package:cash_balancer/database/data.dart';
 import 'package:cash_balancer/page_home/details_page.dart';
 import 'package:cash_balancer/util/tailwind_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class const PieChartSection(final FullData data, {super.key})

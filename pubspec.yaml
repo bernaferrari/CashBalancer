@@ -21,7 +21,8 @@ dependencies:
   path_provider: ^2.1.6
   path: ^1.9.1
   rxdart: ^0.28.0
-  storybook_flutter: ^0.14.1
+  material_ui: ^1.11.0
+  cupertino_ui: ^1.0.0
   flutter_multi_formatter: ^2.13.11
   shared_preferences: ^2.5.6
   rx_shared_preferences: ^4.0.0
@@ -37,4 +38,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  generate: true
