@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:beamer/beamer.dart';
 import 'package:cash_balancer/database/data.dart';
-import 'package:cash_balancer/util/row_column_spacer.dart';
 import 'package:flutter/material.dart';
 
 class const BarChartSection(final FullData data, {super.key})
@@ -27,28 +26,27 @@ class const BarChartSection(final FullData data, {super.key})
       height: 200,
       width: double.infinity,
       child: Center(
-        child: ListView(
-          shrinkWrap: true,
+        child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          children: spaceRow(
-            16,
-            [
-              ...sortedItems.map((item) {
-                return RectangularPercentageWidget(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 16,
+            children: [
+              for (final item in sortedItems)
+                RectangularPercentageWidget(
                   id: item.id,
                   percent: maximumPrice > 0 ? item.price / maximumPrice : 0,
                   size: 40,
                   backgroundColor: Theme.of(context)
                       .colorScheme
-                      .onSurface
+                      .onPrimary
                       .withValues(alpha: 0.10),
                   borderWidth: 0,
                   progressColor: item.color,
                   direction: Axis.vertical,
                   verticalDirection: VerticalDirection.up,
                   borderRadius: 8,
-                );
-              }),
+                ),
             ],
           ),
         ),

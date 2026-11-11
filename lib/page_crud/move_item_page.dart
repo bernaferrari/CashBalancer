@@ -8,9 +8,7 @@ import '../util/tailwind_colors.dart';
 import '../widgets/dialog_screen_base.dart';
 
 class const MoveItemPage({
-  required final double totalValue,
   required final DataCubit bloc,
-  required final int userId,
   required final ItemData item,
   required final List<WalletData> wallets,
   super.key,

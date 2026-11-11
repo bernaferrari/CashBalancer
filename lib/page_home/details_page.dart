@@ -9,7 +9,6 @@ import '../blocs/data_bloc.dart';
 import '../database/data.dart';
 import '../l10n/l10n.dart';
 import '../util/retrieve_spaced_list.dart';
-import '../util/row_column_spacer.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/circle_percentage_painter.dart';
 import '../widgets/when_empty_card.dart';
@@ -82,9 +81,6 @@ class const MainList({
 
   @override
   Widget build(BuildContext context) {
-    final double totalValue =
-        data.allItems.fold(0, (a, b) => a + b.price * b.quantity);
-
     final bool longWidth = MediaQuery.sizeOf(context).width > 400;
 
     return Center(
@@ -106,7 +102,7 @@ class const MainList({
                     .onSurface
                     .withValues(alpha: 0.10),
               ),
-              child: VerticalProgressBar(data: data, totalValue: totalValue),
+              child: VerticalProgressBar(data: data),
             ),
             Expanded(
               child: ListView(
@@ -124,9 +120,9 @@ class const MainList({
                       },
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
+                        spacing: 16,
                         children: [
                           PieChartSection(data),
-                          const SizedBox(height: 16),
                           Text(
                             "Total: ${data.settings.currencySymbol} ${toCurrency(data.totalValue)}",
                             style: TextStyle(
@@ -141,17 +137,17 @@ class const MainList({
                     ),
                     const Divider(height: 40),
                   ],
-                  ...spaceColumn(
-                    20,
-                    data.walletsMap.values.map(
-                      (group) => GroupCard(
-                        itemsList: data.walletsItems[group.id],
-                        group: group,
-                        allTotalValue: data.totalValue,
-                        userId: data.userId,
-                        settings: data.settings,
-                      ),
-                    ),
+                  Column(
+                    spacing: 20,
+                    children: [
+                      for (final group in data.walletsMap.values)
+                        GroupCard(
+                          itemsList: data.walletsItems[group.id],
+                          group: group,
+                          allTotalValue: data.totalValue,
+                          settings: data.settings,
+                        ),
+                    ],
                   ),
                 ],
               ),
@@ -165,7 +161,6 @@ class const MainList({
 
 class const VerticalProgressBar({
   required final FullData data,
-  required final double totalValue,
   super.key,
 }) extends StatelessWidget {
   @override
@@ -180,31 +175,29 @@ class const VerticalProgressBar({
 
         return Column(
           mainAxisSize: MainAxisSize.min,
-          children: spaceColumn(
-            2,
-            [
-              for (int i = 0; i < nonZeroItems.length; i++)
-                Tooltip(
-                  message: nonZeroItems[i].name,
-                  child: SizedBox(
-                    height: spacedList[i],
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: nonZeroItems[i].color,
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        fixedSize: Size(100, spacedList[i]),
-                        shape: const RoundedRectangleBorder(),
-                        elevation: 0,
-                      ),
-                      onPressed: () => Beamer.of(context)
-                          .beamToNamed('/editItem/${nonZeroItems[i].id}'),
-                      child: const SizedBox.expand(),
+          spacing: 2,
+          children: [
+            for (int i = 0; i < nonZeroItems.length; i++)
+              Tooltip(
+                message: nonZeroItems[i].name,
+                child: SizedBox(
+                  height: spacedList[i],
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: nonZeroItems[i].color,
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      fixedSize: Size(100, spacedList[i]),
+                      shape: const RoundedRectangleBorder(),
+                      elevation: 0,
                     ),
+                    onPressed: () => Beamer.of(context)
+                        .beamToNamed('/editItem/${nonZeroItems[i].id}'),
+                    child: const SizedBox.expand(),
                   ),
                 ),
-            ],
-          ),
+              ),
+          ],
         );
       },
     );
@@ -215,7 +208,6 @@ class const GroupCard({
   super.key,
   required final List<ItemData>? itemsList,
   required final WalletData group,
-  required final int userId,
   required final double allTotalValue,
   required final SettingsData settings,
 }) extends StatelessWidget {
@@ -250,10 +242,10 @@ class const GroupCard({
           title: group.name,
           subtitle: AppLocalizations.of(context).pressToAdd,
           widget: Row(
+            spacing: 8,
             children: [
               EditWallet(color: color, groupId: group.id),
-              const SizedBox(width: 8),
-              AddItem(color: color, userId: userId, groupId: group.id),
+              AddItem(color: color, groupId: group.id),
             ],
           ),
         ),
@@ -275,10 +267,10 @@ class const GroupCard({
                   "Total: ${settings.currencySymbol} ${toCurrency(group.totalValue)}",
               widget: Row(
                 mainAxisSize: MainAxisSize.min,
+                spacing: 8,
                 children: [
                   EditWallet(color: color, groupId: group.id),
-                  const SizedBox(width: 8),
-                  AddItem(color: color, userId: userId, groupId: group.id),
+                  AddItem(color: color, groupId: group.id),
                 ],
               ),
             ),
@@ -289,7 +281,6 @@ class const GroupCard({
                 child: ItemCard(
                   itemsList![i],
                   settings.relativeTarget ? group.totalValue : allTotalValue,
-                  group.colorName,
                   settings.currencySymbol,
                 ),
               ),
@@ -299,8 +290,8 @@ class const GroupCard({
                   margin: const EdgeInsets.symmetric(horizontal: 8),
                   color: Theme.of(context)
                       .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.08),
+                      .onPrimary
+                      .withValues(alpha: 0.10),
                 ),
             ],
             const SizedBox(height: 8),
@@ -372,7 +363,6 @@ class const GroupCard({
 class const AddItem({
   super.key,
   required final Color color,
-  required final int userId,
   required final int groupId,
 }) extends StatelessWidget {
   @override
@@ -381,6 +371,7 @@ class const AddItem({
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        elevation: 0,
         padding: EdgeInsets.zero,
         minimumSize: Size.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -402,7 +393,6 @@ class const EditWallet({
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
         foregroundColor: color,
-        side: BorderSide(color: color.withValues(alpha: 0.35)),
         minimumSize: Size.zero,
         padding: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -499,7 +489,6 @@ extension Percent on double {
 class const ItemCard(
   final ItemData item,
   final double totalValue,
-  final String nameColor,
   final String currencySymbol, {
   super.key,
 }) extends StatelessWidget {

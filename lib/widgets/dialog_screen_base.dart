@@ -38,8 +38,8 @@ Color getBackgroundDialogColor(BuildContext context, String colorName) {
 
 Color getInputFillColor(BuildContext context) {
   return Theme.of(context).brightness == Brightness.dark
-      ? Colors.black.withValues(alpha: 0.20)
-      : Colors.white.withValues(alpha: 0.50);
+      ? Colors.white.withValues(alpha: 0.05)
+      : Colors.black.withValues(alpha: 0.04);
 }
 
 InputBorder getInputDecorationBorder(Color primaryColorWeaker) =>

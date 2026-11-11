@@ -62,9 +62,6 @@ class const MainList({
 
   @override
   Widget build(BuildContext context) {
-    final double totalValue =
-        data.allItems.fold(0, (a, b) => a + b.price * b.quantity);
-
     final bool longWidth = MediaQuery.sizeOf(context).width > 400;
 
     return Center(
@@ -86,7 +83,7 @@ class const MainList({
                     .onSurface
                     .withValues(alpha: 0.10),
               ),
-              child: VerticalProgressBar(data: data, totalValue: totalValue),
+              child: VerticalProgressBar(data: data),
             ),
             Expanded(
               child: ListView(
@@ -144,7 +141,6 @@ class const ItemsList(final FullData data, {super.key})
                 data.settings.relativeTarget
                     ? data.walletsMap[sortedItems[i].walletId]?.totalValue ?? 0
                     : data.totalValue,
-                data.walletsMap[sortedItems[i].walletId]?.colorName ?? 'gray',
                 data.settings.currencySymbol,
               ),
             ),
@@ -154,8 +150,8 @@ class const ItemsList(final FullData data, {super.key})
               margin: const EdgeInsets.symmetric(horizontal: 8),
               color: Theme.of(context)
                   .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.08),
+                  .onPrimary
+                  .withValues(alpha: 0.10),
             ),
         ],
       ],

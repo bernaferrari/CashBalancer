@@ -180,18 +180,16 @@ final simpleBuilder = RoutesLocationBuilder(routes: {
       title: 'Move Item',
       popToNamed: '/editItem/$itemId',
       child: MoveItemPage(
-        userId: dataState.userId,
         item: item,
         wallets: dataState.walletsMap.values.toList(),
         bloc: context.read<DataCubit>(),
-        totalValue: dataState.totalValue,
       ),
       fillColor: getScaffoldDialogBackgroundColor(context, item.colorName),
     );
   },
 });
 
-class const App({super.key}) extends StatefulWidget {
+class const App({super.key, final Database? db}) extends StatefulWidget {
   @override
   State<App> createState() => _AppState();
 }
@@ -209,11 +207,18 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     final textTheme = TextTheme(
-      bodyLarge: GoogleFonts.inter(),
-      bodyMedium: GoogleFonts.ibmPlexMono(),
-      labelSmall: GoogleFonts.ibmPlexMono(),
-      headlineSmall: GoogleFonts.rubikMonoOne(),
-      titleLarge: GoogleFonts.rubik(),
+      bodyLarge: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400),
+      bodyMedium:
+          GoogleFonts.ibmPlexMono(fontSize: 14, fontWeight: FontWeight.w400),
+      bodySmall: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w400),
+      labelSmall: GoogleFonts.ibmPlexMono(
+        fontSize: 10,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 1.5,
+      ),
+      headlineSmall:
+          GoogleFonts.rubikMonoOne(fontSize: 24, fontWeight: FontWeight.w400),
+      titleLarge: GoogleFonts.rubik(fontSize: 20, fontWeight: FontWeight.w500),
     );
 
     final textButtonTheme = TextButtonThemeData(
@@ -226,21 +231,30 @@ class _AppState extends State<App> {
     final elevatedButtonTheme = ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         minimumSize: const Size(48, 48),
+        elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         textStyle: GoogleFonts.rubik(fontWeight: FontWeight.w700),
       ),
     );
 
-    final outlinedButtonTheme = OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size(48, 48),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: GoogleFonts.rubik(fontWeight: FontWeight.w700),
-      ),
-    );
+    OutlinedButtonThemeData buildOutlinedButtonTheme(Color borderColor) =>
+        OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(48, 48),
+            side: BorderSide(color: borderColor),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            textStyle: GoogleFonts.rubik(fontWeight: FontWeight.w700),
+          ),
+        );
 
-    return RepositoryProvider(
-      create: (context) => constructDb(),
+    return RepositoryProvider<Database>(
+      create: (context) => widget.db ?? constructDb(),
+      dispose: (db) {
+        if (widget.db == null) {
+          db.close();
+        }
+      },
       child: BlocProvider<DataCubit>(
         create: (context) {
           final db = RepositoryProvider.of<Database>(context);
@@ -248,6 +262,7 @@ class _AppState extends State<App> {
         },
         child: MaterialApp.router(
           theme: ThemeData(
+            scaffoldBackgroundColor: Colors.white,
             colorScheme: const ColorScheme.light(
               primary: Color(0xff162783),
               secondary: Color(0xff059669),
@@ -263,14 +278,15 @@ class _AppState extends State<App> {
               shape: StadiumBorder(),
             ),
             dividerTheme: DividerThemeData(
-              color: Colors.black.withValues(alpha: 0.12),
+              color: Colors.black.withValues(alpha: 0.08),
             ),
             appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF13B9FF)),
             typography: Typography.material2021(),
             visualDensity: VisualDensity.standard,
             applyElevationOverlayColor: false,
             elevatedButtonTheme: elevatedButtonTheme,
-            outlinedButtonTheme: outlinedButtonTheme,
+            outlinedButtonTheme:
+                buildOutlinedButtonTheme(Colors.black.withValues(alpha: 0.12)),
             textButtonTheme: textButtonTheme,
             textTheme: textTheme,
           ),
@@ -293,13 +309,14 @@ class _AppState extends State<App> {
               shape: StadiumBorder(),
             ),
             dividerTheme: DividerThemeData(
-              color: Colors.white.withValues(alpha: 0.12),
+              color: Colors.white.withValues(alpha: 0.08),
             ),
             typography: Typography.material2021(),
             visualDensity: VisualDensity.standard,
             applyElevationOverlayColor: false,
             elevatedButtonTheme: elevatedButtonTheme,
-            outlinedButtonTheme: outlinedButtonTheme,
+            outlinedButtonTheme:
+                buildOutlinedButtonTheme(Colors.white.withValues(alpha: 0.12)),
             textButtonTheme: textButtonTheme,
             textTheme: textTheme,
           ),

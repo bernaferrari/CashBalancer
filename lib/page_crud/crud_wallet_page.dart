@@ -69,7 +69,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
             autofocus: true,
             textCapitalization: TextCapitalization.sentences,
             validator: (value) {
-              if (value == null || value.isEmpty) {
+              if (value == null || value.trim().isEmpty) {
                 return AppLocalizations.of(context).mainDialogValidator;
               }
               return null;
@@ -152,17 +152,22 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
                           return null;
                         },
                         textAlign: TextAlign.right,
-                        keyboardType: TextInputType.number,
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        onChanged: (_) => setState(() {}),
                         inputFormatters: <TextInputFormatter>[
                           FilteringTextInputFormatter.allow(
-                              RegExp(r'^[0-9.]*')),
+                              RegExp(r'^\d*\.?\d{0,2}')),
                         ],
                         decoration: InputDecoration(
                           labelText:
                               AppLocalizations.of(context).dialogAssetTarget,
                           filled: true,
                           fillColor: getInputFillColor(context),
-                          suffixText: ".00 %",
+                          suffixText:
+                              targetEditingController.text.contains('.')
+                                  ? " %"
+                                  : ".00 %",
                           labelStyle: TextStyle(color: primaryColorWeaker),
                           // border is used when there is an error
                           border: getInputDecorationBorder(primaryColorWeaker),
@@ -193,10 +198,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
           if (widget.previousWallet != null) ...[
             const SizedBox(height: 8),
             OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: primaryColor,
-                side: BorderSide(color: primaryColor.withValues(alpha: 0.4)),
-              ),
+              style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
               label: Text(AppLocalizations.of(context).dialogDelete),
               icon: const Icon(Icons.delete_outline_outlined),
               onPressed: onDelete,
@@ -214,15 +216,16 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
     );
   }
 
-  void onSubmit([String? value]) async {
+  Future<void> onSubmit([String? value]) async {
     if (_formKey.currentState!.validate()) {
       final isCreating = widget.previousWallet == null;
+      final trimmedName = nameEditingController.text.trim();
 
       final result = isCreating
           ? await safeDbOperation(
               () => context.read<DataCubit>().db.createGroup(
                     id: widget.userId,
-                    name: nameEditingController.text,
+                    name: trimmedName,
                     colorName: colorName,
                     targetPercent:
                         double.tryParse(targetEditingController.text) ?? -1,
@@ -232,7 +235,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
           : await safeDbOperation(
               () => context.read<DataCubit>().db.editWallet(
                     widget.previousWallet!.copyWith(
-                      name: nameEditingController.text,
+                      name: trimmedName,
                       colorName: colorName,
                       targetPercent:
                           double.tryParse(targetEditingController.text) ?? -1,
@@ -243,24 +246,14 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
 
       if (mounted) {
         result.when(
-          success: (_) {
-            showSuccessSnackbar(
-              context,
-              isCreating
-                  ? 'Wallet created successfully'
-                  : 'Wallet updated successfully',
-            );
-            Navigator.of(context).pop();
-          },
-          error: (error) {
-            showErrorSnackbar(context, error);
-          },
+          success: (_) => Navigator.of(context).pop(),
+          error: (error) => showErrorSnackbar(context, error),
         );
       }
     }
   }
 
-  void onDelete() async {
+  Future<void> onDelete() async {
     final result = await safeDbOperation(
       () => context.read<DataCubit>().db.deleteWallet(widget.previousWallet!.id),
       errorMessage: 'Failed to delete wallet',
@@ -268,13 +261,8 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
 
     if (mounted) {
       result.when(
-        success: (_) {
-          showSuccessSnackbar(context, 'Wallet deleted successfully');
-          Navigator.of(context).pop();
-        },
-        error: (error) {
-          showErrorSnackbar(context, error);
-        },
+        success: (_) => Navigator.of(context).pop(),
+        error: (error) => showErrorSnackbar(context, error),
       );
     }
   }

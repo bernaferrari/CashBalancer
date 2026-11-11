@@ -114,7 +114,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                       keyboardType: TextInputType.text,
                       textCapitalization: TextCapitalization.sentences,
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
+                        if (value == null || value.trim().isEmpty) {
                           return AppLocalizations.of(context)
                               .mainDialogValidator;
                         }
@@ -169,20 +169,20 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                         return null;
                       },
                       inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(RegExp(r'^[0-9.]*')),
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'^\d*\.?\d{0,2}')),
                       ],
                       textAlign: TextAlign.right,
-                      keyboardType: TextInputType.number,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: getInputFillColor(context),
                         labelText: AppLocalizations.of(context).value,
-                        // prefixIcon: Icon(
-                        //   Icons.money_rounded,
-                        //   color: primaryColor,
-                        // ),
                         prefixText: widget.currency,
-                        suffixText: ".00",
+                        suffixText: moneyEditingController.text.contains('.')
+                            ? null
+                            : ".00",
                         labelStyle: TextStyle(color: primaryColor),
                         // border is used when there is an error
                         border: getInputDecorationBorder(primaryColor),
@@ -260,17 +260,22 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                               return null;
                             },
                             textAlign: TextAlign.right,
-                            keyboardType: TextInputType.number,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            onChanged: (_) => setState(() {}),
                             inputFormatters: <TextInputFormatter>[
                               FilteringTextInputFormatter.allow(
-                                  RegExp(r'^[0-9.]*')),
+                                  RegExp(r'^\d*\.?\d{0,2}')),
                             ],
                             decoration: InputDecoration(
                               labelText: AppLocalizations.of(context)
                                   .dialogAssetTarget,
                               filled: true,
                               fillColor: getInputFillColor(context),
-                              suffixText: ".00 %",
+                              suffixText:
+                                  targetEditingController.text.contains('.')
+                                      ? " %"
+                                      : ".00 %",
                               labelStyle: TextStyle(color: primaryColorWeaker),
                               border:
                                   getInputDecorationBorder(primaryColorWeaker),
@@ -306,20 +311,14 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
           const SizedBox(height: 8),
           if (widget.previousItem == null)
             OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: primaryColor,
-                side: BorderSide(color: primaryColor.withValues(alpha: 0.4)),
-              ),
+              style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
               icon: const Icon(Icons.checklist_outlined),
               label: Text(AppLocalizations.of(context).dialogSaveAddMore),
               onPressed: onSaveAddMore,
             )
           else
             OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: primaryColor,
-                side: BorderSide(color: primaryColor.withValues(alpha: 0.4)),
-              ),
+              style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
               icon: const Icon(Icons.delete_outline_outlined),
               label: Text(AppLocalizations.of(context).dialogDelete),
               onPressed: onDelete,
@@ -336,16 +335,17 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
     );
   }
 
-  void onSubmit([String? value]) async {
+  Future<void> onSubmit([String? value]) async {
     if (_formKey.currentState!.validate()) {
       final isCreating = widget.previousItem == null;
+      final trimmedName = nameEditingController.text.trim();
 
       final result = isCreating
           ? await safeDbOperation(
               () => context.read<DataCubit>().db.createItem(
                     walletId: widget.walletId,
                     userId: widget.userId,
-                    name: nameEditingController.text,
+                    name: trimmedName,
                     value: moneyEditingController.text,
                     target: targetEditingController.text,
                   ),
@@ -354,7 +354,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
           : await safeDbOperation(
               () => context.read<DataCubit>().db.updateItem(
                     item: widget.previousItem!,
-                    name: nameEditingController.text,
+                    name: trimmedName,
                     price: moneyEditingController.text,
                     target: targetEditingController.text,
                   ),
@@ -363,16 +363,8 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
 
       if (mounted) {
         result.when(
-          success: (_) {
-            showSuccessSnackbar(
-              context,
-              isCreating ? 'Item created successfully' : 'Item updated successfully',
-            );
-            Navigator.of(context).pop();
-          },
-          error: (error) {
-            showErrorSnackbar(context, error);
-          },
+          success: (_) => Navigator.of(context).pop(),
+          error: (error) => showErrorSnackbar(context, error),
         );
       }
     }
@@ -380,10 +372,12 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
 
   void onChanged([String? value]) {
     final moneyValue = double.tryParse(moneyEditingController.text) ?? 0;
+    final currentTotal =
+        context.read<DataCubit>().state?.totalValue ?? widget.totalValue;
 
     final double newTotal = widget.previousItem == null
-        ? widget.totalValue + moneyValue
-        : widget.totalValue + moneyValue - widget.previousItem!.price;
+        ? currentTotal + moneyValue
+        : currentTotal + moneyValue - widget.previousItem!.price;
 
     final String finalPercent = newTotal <= 0
         ? '0'
@@ -401,7 +395,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
         () => context.read<DataCubit>().db.createItem(
               walletId: widget.walletId,
               userId: widget.userId,
-              name: nameEditingController.text,
+              name: nameEditingController.text.trim(),
               value: moneyEditingController.text,
               target: targetEditingController.text,
             ),
@@ -411,7 +405,6 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
       if (mounted) {
         result.when(
           success: (_) {
-            showSuccessSnackbar(context, 'Item created successfully');
             nameFocusNode.requestFocus();
             _formKey.currentState?.reset();
             nameEditingController.text = '';
@@ -419,15 +412,13 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
             targetEditingController.text = '';
             onChanged();
           },
-          error: (error) {
-            showErrorSnackbar(context, error);
-          },
+          error: (error) => showErrorSnackbar(context, error),
         );
       }
     }
   }
 
-  void onDelete() async {
+  Future<void> onDelete() async {
     final result = await safeDbOperation(
       () => context.read<DataCubit>().db.deleteItem(widget.previousItem!),
       errorMessage: 'Failed to delete item',
@@ -435,13 +426,8 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
 
     if (mounted) {
       result.when(
-        success: (_) {
-          showSuccessSnackbar(context, 'Item deleted successfully');
-          Navigator.of(context).pop();
-        },
-        error: (error) {
-          showErrorSnackbar(context, error);
-        },
+        success: (_) => Navigator.of(context).pop(),
+        error: (error) => showErrorSnackbar(context, error),
       );
     }
   }

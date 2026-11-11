@@ -45,7 +45,7 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
               validator: (value) {
-                if (value == null || value.isEmpty) {
+                if (value == null || value.trim().isEmpty) {
                   return AppLocalizations.of(context).pleaseEnterCurrency;
                 }
                 return null;
@@ -85,7 +85,7 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
   Future<void> onSubmit([String? value]) async {
     if (_formKey.currentState!.validate()) {
       await RxSharedPreferences.getInstance()
-          .setString('currencySymbol', currencyEditingController.text);
+          .setString('currencySymbol', currencyEditingController.text.trim());
       if (!mounted) return;
       Navigator.of(context).pop();
     }

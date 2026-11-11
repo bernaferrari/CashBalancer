@@ -32,7 +32,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get editWallet => 'Editar Carteira';
 
   @override
-  String get allItems => 'Todos os items';
+  String get allItems => 'Todos os itens';
 
   @override
   String get targetSettings =>
