@@ -615,6 +615,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Update price'**
   String get quickPrice;
+
+  /// No description provided for @walletsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallets'**
+  String get walletsLabel;
+
+  /// No description provided for @enterAmountToApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount to apply trades. Enter 0 to rebalance without adding cash.'**
+  String get enterAmountToApply;
 }
 
 class _AppLocalizationsDelegate

@@ -53,14 +53,26 @@ void main() {
         userId: user,
         name: 'Tiny',
         value: '0.00002',
+        quantity: '0',
+        target: '',
+      );
+      final savings = await db.createItem(
+        walletId: wallet,
+        userId: user,
+        name: 'Savings',
+        value: '1200',
         quantity: '',
         target: '',
       );
+      expect((await db.getItemFromId(savings))!.quantity, 1);
       final rows = await db.select(db.items).get();
-      await db.applyTrades(rows, {id: 200, tiny: 40});
+      await db.applyTrades(rows, {id: 200, tiny: 40, savings: 300});
       final updated = (await db.getItemFromId(id))!;
       expect(updated.quantity, closeTo(8 + 200 / 220, 0.0000001));
       expect(updated.price, 220);
+      final savingsUpdated = (await db.getItemFromId(savings))!;
+      expect(savingsUpdated.quantity, 1);
+      expect(savingsUpdated.price, 1500);
       final tinyUpdated = (await db.getItemFromId(tiny))!;
       expect(tinyUpdated.price, 0.00002);
       expect(tinyUpdated.quantity, closeTo(2000000, 0.001));

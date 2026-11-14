@@ -124,14 +124,6 @@ class const HomePageImpl(final FullData data, {super.key})
           : PortfolioSplitView(
               data: data,
               children: [
-                if (data.hasIncompleteTargets)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Text(
-                      context.l10n.targetTotalWarning,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
                 if (data.allItems.isNotEmpty && data.totalValue > 0) ...[
                   Column(
                     mainAxisSize: MainAxisSize.min,

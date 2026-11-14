@@ -82,5 +82,7 @@
   "sampleCrypto": "暗号資産",
   "sampleCash": "現金",
   "sampleSavings": "高金利預金",
-  "quickPrice": "価格を更新"
+  "quickPrice": "価格を更新",
+  "walletsLabel": "ウォレット",
+  "enterAmountToApply": "取引を適用するには金額を入力してください。資金を追加せずにリバランスするには 0 を入力してください。"
 }

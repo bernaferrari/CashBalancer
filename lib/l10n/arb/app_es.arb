@@ -82,5 +82,7 @@
   "sampleCrypto": "Criptomonedas",
   "sampleCash": "Efectivo",
   "sampleSavings": "Ahorro de alto rendimiento",
-  "quickPrice": "Actualizar precio"
+  "quickPrice": "Actualizar precio",
+  "walletsLabel": "Carteras",
+  "enterAmountToApply": "Introduce un importe para aplicar las operaciones. Introduce 0 para rebalancear sin añadir dinero."
 }

@@ -76,20 +76,19 @@ class _RebalancePageState extends State<RebalancePage> {
             state.settings.relativeTarget && targetedItems.isNotEmpty;
         final groups = {
           for (final wallet in state.walletsMap.values)
-            if (targetedItems.any((item) => item.walletId == wallet.id))
-              wallet.id: (
-                value: wallet.totalValue,
-                weight: wallet.targetPercent,
-                holdings: [
-                  for (final item in targetedItems)
-                    if (item.walletId == wallet.id)
-                      (
-                        id: item.id,
-                        value: item.totalValue,
-                        target: item.targetPercent,
-                      ),
-                ],
-              ),
+            wallet.id: (
+              value: wallet.totalValue,
+              weight: wallet.targetPercent,
+              holdings: [
+                for (final item in targetedItems)
+                  if (item.walletId == wallet.id)
+                    (
+                      id: item.id,
+                      value: item.totalValue,
+                      target: item.targetPercent,
+                    ),
+              ],
+            ),
         };
         final holdings = targetedItems.isEmpty ? walletHoldings : itemHoldings;
         final autoFillCash = relative
@@ -114,6 +113,7 @@ class _RebalancePageState extends State<RebalancePage> {
             .toList();
         final invalidTrade = trades.any(
           (item) =>
+              item.quantity != 1 &&
               !(quantityAfterTrade(
                     item.price,
                     item.totalValue,
@@ -121,18 +121,21 @@ class _RebalancePageState extends State<RebalancePage> {
                   )?.isFinite ??
                   false),
         );
-        final invalidTargets =
-            (relative
-                    ? groups.values.map((group) => group.holdings)
-                    : [holdings])
-                .any(
-                  (group) =>
-                      group.isNotEmpty &&
-                      (group.fold(0.0, (sum, holding) => sum + holding.target) -
-                                  100)
-                              .abs() >
-                          0.000001,
-                );
+        final walletTargetsIncomplete =
+            (relative || targetedItems.isEmpty) &&
+            targetsIncomplete(walletHoldings.map((wallet) => wallet.target));
+        final assetTargetsIncomplete =
+            !relative &&
+            targetedItems.isNotEmpty &&
+            targetsIncomplete(itemHoldings.map((item) => item.target));
+        final walletsWithIncompleteAssetTargets = [
+          if (relative)
+            for (final entry in groups.entries)
+              if (targetsIncomplete(
+                entry.value.holdings.map((item) => item.target),
+              ))
+                state.walletsMap[entry.key]!.name,
+        ];
 
         return DialogScreenBase(
           colorName: colorName,
@@ -166,6 +169,10 @@ class _RebalancePageState extends State<RebalancePage> {
                 filled: true,
                 fillColor: getInputFillColor(context),
                 labelText: context.l10n.amountToInvest,
+                helperText: targetedItems.isNotEmpty
+                    ? context.l10n.enterAmountToApply
+                    : null,
+                helperMaxLines: 3,
                 hintText: '0.00',
                 prefixText: '$currency ',
                 labelStyle: TextStyle(color: primaryColor),
@@ -251,16 +258,29 @@ class _RebalancePageState extends State<RebalancePage> {
                     color: item.color,
                     currentValue: item.totalValue,
                     delta: activeDeltas[item.id] ?? 0,
-                    units: quantityAfterTrade(
-                      item.price,
-                      0,
-                      (activeDeltas[item.id] ?? 0).abs(),
-                    ),
+                    units: item.quantity == 1
+                        ? null
+                        : quantityAfterTrade(
+                            item.price,
+                            0,
+                            (activeDeltas[item.id] ?? 0).abs(),
+                          ),
                     targetPercent: item.targetPercent,
                     currency: currency,
                   ),
             ],
-            if (invalidTargets) Text(context.l10n.targetTotalWarning),
+            if (walletTargetsIncomplete)
+              Text(
+                '${context.l10n.walletsLabel}: ${context.l10n.targetTotalWarning}',
+              ),
+            if (assetTargetsIncomplete)
+              Text(
+                '${context.l10n.allItems}: ${context.l10n.targetTotalWarning}',
+              ),
+            for (final name in walletsWithIncompleteAssetTargets)
+              Text(
+                '$name • ${context.l10n.allItems}: ${context.l10n.targetTotalWarning}',
+              ),
             if (unallocated >= 0.005 && holdings.isNotEmpty)
               Text(
                 '${context.l10n.unallocatedCash}: ${money(context, currency, unallocated)}',

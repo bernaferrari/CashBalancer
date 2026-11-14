@@ -24,6 +24,8 @@ class const CRUDWalletPage({
 class _CRUDWalletPageState extends State<CRUDWalletPage> {
   final _formKey = GlobalKey<FormState>();
 
+  bool _saving = false;
+
   late String colorName = widget.previousWallet != null
       ? TailwindColor.fromName(widget.previousWallet!.colorName).name
       : TailwindColor.random().name;
@@ -120,7 +122,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
             ),
             label: Text(context.l10n.dialogSave),
             icon: const Icon(Icons.check_rounded),
-            onPressed: onSubmit,
+            onPressed: _saving ? null : onSubmit,
           ),
           if (widget.previousWallet != null) ...[
             const SizedBox(height: 8),
@@ -128,7 +130,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
               style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
               label: Text(context.l10n.dialogDelete),
               icon: const Icon(Icons.delete_outline_outlined),
-              onPressed: onDelete,
+              onPressed: _saving ? null : onDelete,
             ),
           ],
           const SizedBox(height: 8),
@@ -144,7 +146,8 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
   }
 
   Future<void> onSubmit([String? value]) async {
-    if (_formKey.currentState!.validate()) {
+    if (!_saving && _formKey.currentState!.validate()) {
+      setState(() => _saving = true);
       final isCreating = widget.previousWallet == null;
       final trimmedName = nameEditingController.text.trim();
 
@@ -172,6 +175,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
             );
 
       if (mounted) {
+        setState(() => _saving = false);
         result.when(
           success: (_) => Navigator.of(context).pop(),
           error: (error) => showErrorSnackbar(context, error),
@@ -181,9 +185,14 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
   }
 
   Future<void> onDelete() async {
+    if (_saving) return;
+    setState(() => _saving = true);
     final db = context.read<DataCubit>().db;
     final wallet = widget.previousWallet!;
-    if (!await confirmDelete(context, wallet.name) || !mounted) return;
-    await deleteAndClose(context, () => db.deleteWallet(wallet.id));
+    if (await confirmDelete(context, wallet.name) && mounted) {
+      if (await deleteAndClose(context, () => db.deleteWallet(wallet.id)))
+        return;
+    }
+    if (mounted) setState(() => _saving = false);
   }
 }

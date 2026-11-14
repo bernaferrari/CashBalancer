@@ -268,4 +268,11 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get quickPrice => 'कीमत बदलें';
+
+  @override
+  String get walletsLabel => 'वॉलेट';
+
+  @override
+  String get enterAmountToApply =>
+      'लेन-देन लागू करने के लिए राशि दर्ज करें। बिना नकदी जोड़े पुनर्संतुलन के लिए 0 दर्ज करें।';
 }

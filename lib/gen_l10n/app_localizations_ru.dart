@@ -270,4 +270,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get quickPrice => 'Обновить цену';
+
+  @override
+  String get walletsLabel => 'Кошельки';
+
+  @override
+  String get enterAmountToApply =>
+      'Введите сумму для применения сделок. Введите 0 для ребалансировки без пополнения.';
 }

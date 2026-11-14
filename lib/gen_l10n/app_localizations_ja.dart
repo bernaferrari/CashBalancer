@@ -260,4 +260,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get quickPrice => '価格を更新';
+
+  @override
+  String get walletsLabel => 'ウォレット';
+
+  @override
+  String get enterAmountToApply =>
+      '取引を適用するには金額を入力してください。資金を追加せずにリバランスするには 0 を入力してください。';
 }

@@ -82,5 +82,7 @@
   "sampleCrypto": "加密货币",
   "sampleCash": "现金",
   "sampleSavings": "高收益储蓄",
-  "quickPrice": "更新价格"
+  "quickPrice": "更新价格",
+  "walletsLabel": "钱包",
+  "enterAmountToApply": "输入金额以应用交易。若要在不增加资金的情况下再平衡，请输入 0。"
 }

@@ -82,5 +82,7 @@
   "sampleCrypto": "Criptovalute",
   "sampleCash": "Liquidità",
   "sampleSavings": "Risparmio ad alto rendimento",
-  "quickPrice": "Aggiorna il prezzo"
+  "quickPrice": "Aggiorna il prezzo",
+  "walletsLabel": "Portafogli",
+  "enterAmountToApply": "Inserisci un importo per applicare le operazioni. Inserisci 0 per ribilanciare senza aggiungere denaro."
 }

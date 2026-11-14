@@ -45,24 +45,6 @@ class const FullData({
   required final Map<int, WalletData> walletsMap,
   required final SettingsData settings,
 }) {
-  bool get hasIncompleteTargets {
-    bool incomplete(Iterable<double> values) {
-      final targets = values.where((target) => target >= 0);
-      return targets.isNotEmpty &&
-          (targets.fold(0.0, (total, target) => total + target) - 100).abs() >
-              0.000001;
-    }
-
-    return incomplete(
-          walletsMap.values.map((wallet) => wallet.targetPercent),
-        ) ||
-        (settings.relativeTarget
-            ? walletsItems.values.any(
-                (items) => incomplete(items.map((item) => item.targetPercent)),
-              )
-            : incomplete(allItems.map((item) => item.targetPercent)));
-  }
-
   /// Minimum portfolio total required to reach wallet targets without selling.
   double get buyOnlyTotalForWallets {
     double requiredTotal = totalValue;

@@ -26,24 +26,37 @@ Map<int, double> allocateRelative(
   required double cash,
   required bool buyOnly,
 }) {
-  final explicitlyWeighted =
-      wallets.isNotEmpty &&
-      wallets.values.every((wallet) => wallet.weight >= 0);
-  final weights = wallets.map(
-    (id, wallet) =>
-        MapEntry(id, explicitlyWeighted ? wallet.weight : wallet.value),
+  final walletTargets = [
+    for (final entry in wallets.entries)
+      (id: entry.key, value: entry.value.value, target: entry.value.weight),
+  ];
+  final walletTotal = walletTargets.fold(
+    0.0,
+    (sum, wallet) => sum + wallet.value,
   );
-  final totalWeight = weights.values.fold(0.0, (a, b) => a + b);
+  final walletDeltas = allocate(
+    walletTargets,
+    total: walletTotal,
+    cash: cash,
+    buyOnly: buyOnly,
+  );
+  final eligible = wallets.values.where((wallet) => wallet.holdings.isNotEmpty);
+  final eligibleTotal = eligible.fold(0.0, (sum, wallet) => sum + wallet.value);
+  double walletCash(int id) {
+    final wallet = wallets[id]!;
+    if (walletDeltas.isNotEmpty) return walletDeltas[id] ?? 0;
+    if (wallet.holdings.isEmpty) return 0;
+    return eligibleTotal > 0
+        ? cash * (wallet.value / eligibleTotal)
+        : cash / eligible.length;
+  }
+
   return {
     for (final entry in wallets.entries)
       ...allocate(
         entry.value.holdings,
         total: entry.value.value,
-        cash: totalWeight > 0
-            ? cash * (weights[entry.key]! / totalWeight)
-            : explicitlyWeighted
-            ? 0
-            : cash / wallets.length,
+        cash: walletCash(entry.key),
         buyOnly: buyOnly,
       ),
   };
@@ -68,3 +81,10 @@ double? minimumBuyOnlyCash(Iterable<Holding> holdings, double total) {
 
 double? quantityAfterTrade(double price, double value, double delta) =>
     price > 0 ? math.max(0, value + delta) / price : null;
+
+bool targetsIncomplete(Iterable<double> values) {
+  final targets = values.where((target) => target >= 0);
+  return targets.isNotEmpty &&
+      (targets.fold(0.0, (total, target) => total + target) - 100).abs() >
+          0.000001;
+}

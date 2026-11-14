@@ -82,5 +82,7 @@
   "sampleCrypto": "Kryptowährungen",
   "sampleCash": "Bargeld",
   "sampleSavings": "Hochverzinstes Sparkonto",
-  "quickPrice": "Preis aktualisieren"
+  "quickPrice": "Preis aktualisieren",
+  "walletsLabel": "Wallets",
+  "enterAmountToApply": "Gib einen Betrag ein, um die Trades anzuwenden. Gib 0 ein, um ohne Einzahlung umzuschichten."
 }

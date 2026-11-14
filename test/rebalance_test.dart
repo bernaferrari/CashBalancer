@@ -3,29 +3,43 @@ import 'package:cash_balancer/util/numbers.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test(
-    'relative targets spend the deposit once, weighted by wallet targets',
-    () {
-      final wallets = {
-        1: (
-          value: 500.0,
-          weight: 25.0,
-          holdings: [(id: 11, value: 500.0, target: 100.0)],
-        ),
-        2: (
-          value: 500.0,
-          weight: 75.0,
-          holdings: [(id: 22, value: 500.0, target: 100.0)],
-        ),
-      };
-      for (final buyOnly in [false, true]) {
-        expect(allocateRelative(wallets, cash: 1000, buyOnly: buyOnly), {
-          11: 250,
-          22: 750,
-        });
-      }
-    },
-  );
+  test('relative targets spend the deposit once, according to wallet gaps', () {
+    final wallets = {
+      1: (
+        value: 500.0,
+        weight: 25.0,
+        holdings: [(id: 11, value: 500.0, target: 100.0)],
+      ),
+      2: (
+        value: 500.0,
+        weight: 75.0,
+        holdings: [(id: 22, value: 500.0, target: 100.0)],
+      ),
+    };
+    for (final buyOnly in [false, true]) {
+      expect(allocateRelative(wallets, cash: 1000, buyOnly: buyOnly), {
+        11: 0,
+        22: 1000,
+      });
+    }
+    expect(allocateRelative(wallets, cash: 0, buyOnly: false), {
+      11: -250,
+      22: 250,
+    });
+  });
+
+  test('relative targets keep a wallet without asset targets in the portfolio base', () {
+    final wallets = {
+      1: (value: 500.0, weight: 25.0, holdings: <Holding>[]),
+      2: (
+        value: 500.0,
+        weight: 75.0,
+        holdings: [(id: 22, value: 500.0, target: 100.0)],
+      ),
+    };
+    expect(allocateRelative(wallets, cash: 1000, buyOnly: true), {22: 1000});
+    expect(allocateRelative(wallets, cash: 0, buyOnly: false), {22: 250});
+  });
 
   test('buy-only caps each gap and leaves excess cash alone', () {
     const holdings = [(id: 1, value: 50.0, target: 10.0)];

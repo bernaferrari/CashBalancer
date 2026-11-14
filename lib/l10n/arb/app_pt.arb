@@ -91,5 +91,7 @@
   "sampleCrypto": "Cripto",
   "sampleCash": "Dinheiro",
   "sampleSavings": "Poupança de alto rendimento",
-  "quickPrice": "Atualizar preço"
+  "quickPrice": "Atualizar preço",
+  "walletsLabel": "Carteiras",
+  "enterAmountToApply": "Digite um valor para aplicar as operações. Digite 0 para rebalancear sem adicionar dinheiro."
 }

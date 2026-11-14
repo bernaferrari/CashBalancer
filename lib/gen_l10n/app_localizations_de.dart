@@ -273,4 +273,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get quickPrice => 'Preis aktualisieren';
+
+  @override
+  String get walletsLabel => 'Wallets';
+
+  @override
+  String get enterAmountToApply =>
+      'Gib einen Betrag ein, um die Trades anzuwenden. Gib 0 ein, um ohne Einzahlung umzuschichten.';
 }

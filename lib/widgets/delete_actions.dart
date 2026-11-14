@@ -26,12 +26,15 @@ Future<bool> confirmDelete(BuildContext context, String name) async =>
 void showDeleted(BuildContext context, Future<void> Function() undo) {
   final messenger = ScaffoldMessenger.of(context);
   final strings = context.l10n;
+  var restoring = false;
   messenger.showSnackBar(
     SnackBar(
       content: Text(strings.deleted),
       action: SnackBarAction(
         label: strings.undo,
         onPressed: () async {
+          if (restoring) return;
+          restoring = true;
           try {
             await undo();
           } catch (_) {
@@ -47,18 +50,28 @@ void showDeleted(BuildContext context, Future<void> Function() undo) {
   );
 }
 
-Future<void> deleteAndClose(
+final _deletingRoutes = Expando<bool>();
+
+bool isDeletingRoute(ModalRoute<dynamic> route) =>
+    _deletingRoutes[route] == true;
+
+Future<bool> deleteAndClose(
   BuildContext context,
   Future<Future<void> Function()> Function() delete,
 ) async {
+  final route = ModalRoute.of(context);
+  if (route != null) _deletingRoutes[route] = true;
   try {
     final undo = await delete();
-    if (!context.mounted) return;
+    if (!context.mounted) return true;
     showDeleted(context, undo);
-    Navigator.of(context).pop();
+    if (route?.isCurrent == true) Navigator.of(context).pop();
+    return true;
   } catch (_) {
+    if (route != null) _deletingRoutes[route] = null;
     if (context.mounted) {
       showErrorSnackbar(context, context.l10n.operationFailed);
     }
+    return false;
   }
 }

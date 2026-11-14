@@ -91,5 +91,7 @@
   "sampleCrypto": "Crypto",
   "sampleCash": "Cash",
   "sampleSavings": "High-yield savings",
-  "quickPrice": "Update price"
+  "quickPrice": "Update price",
+  "walletsLabel": "Wallets",
+  "enterAmountToApply": "Enter an amount to apply trades. Enter 0 to rebalance without adding cash."
 }

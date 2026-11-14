@@ -29,6 +29,7 @@ dependencies:
   file_selector: ^1.1.0
   share_plus: ^13.3.1
   sqlite3: ^3.9.1
+  web: ^1.1.2
 
 dev_dependencies:
   drift_dev: ^2.35.3

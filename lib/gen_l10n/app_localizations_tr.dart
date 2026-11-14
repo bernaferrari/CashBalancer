@@ -269,4 +269,11 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get quickPrice => 'Fiyatı güncelle';
+
+  @override
+  String get walletsLabel => 'Cüzdanlar';
+
+  @override
+  String get enterAmountToApply =>
+      'İşlemleri uygulamak için bir tutar girin. Nakit eklemeden dengelemek için 0 girin.';
 }

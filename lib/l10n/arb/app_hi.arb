@@ -82,5 +82,7 @@
   "sampleCrypto": "क्रिप्टो",
   "sampleCash": "नकदी",
   "sampleSavings": "उच्च ब्याज वाली बचत",
-  "quickPrice": "कीमत बदलें"
+  "quickPrice": "कीमत बदलें",
+  "walletsLabel": "वॉलेट",
+  "enterAmountToApply": "लेन-देन लागू करने के लिए राशि दर्ज करें। बिना नकदी जोड़े पुनर्संतुलन के लिए 0 दर्ज करें।"
 }

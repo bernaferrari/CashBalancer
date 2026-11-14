@@ -22,14 +22,15 @@ import '../database/data.dart';
 import '../database/database.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/dialog_screen_base.dart';
+import '../widgets/delete_actions.dart';
 
 final simpleBuilder = RoutesLocationBuilder(
   routes: {
     '/': (context, state, obj) {
-      return const BeamPage(
-        key: ValueKey('home'),
-        title: 'Cash Balancer',
-        child: HomePage(),
+      return BeamPage(
+        key: const ValueKey('home'),
+        title: context.l10n.appTitle,
+        child: const HomePage(),
       );
     },
     '/settings': (context, state, obj) => BeamerMaterialTransitionPage(
@@ -77,6 +78,7 @@ final simpleBuilder = RoutesLocationBuilder(
           previousWallet: state.walletsMap[id]!,
         );
       },
+      walletColor: (state, id) => state.walletsMap[id]?.colorName,
     ),
     '/addItem/:walletId': (context, state, obj) => _dataPage(
       context,
@@ -93,6 +95,7 @@ final simpleBuilder = RoutesLocationBuilder(
           currency: state.settings.currencySymbol,
         );
       },
+      walletColor: (state, id) => state.walletsMap[id]?.colorName,
     ),
     '/editItem/:itemId': (context, state, obj) => _dataPage(
       context,
@@ -111,6 +114,8 @@ final simpleBuilder = RoutesLocationBuilder(
           currency: state.settings.currencySymbol,
         );
       },
+      walletColor: (state, id) =>
+          state.allItems.where((item) => item.id == id).firstOrNull?.colorName,
     ),
     '/moveItem/:itemId': (context, state, obj) => _dataPage(
       context,
@@ -126,6 +131,8 @@ final simpleBuilder = RoutesLocationBuilder(
           bloc: context.read<DataCubit>(),
         );
       },
+      walletColor: (state, id) =>
+          state.allItems.where((item) => item.id == id).firstOrNull?.colorName,
     ),
   },
 );
@@ -329,7 +336,7 @@ class _AppState extends State<App> {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: AppLocalizations.supportedLocales,
-            title: 'Cash Balancer',
+            onGenerateTitle: (context) => context.l10n.appTitle,
             routerDelegate: _routerDelegate,
             routeInformationParser: BeamerParser(),
             backButtonDispatcher: BeamerBackButtonDispatcher(
@@ -347,25 +354,66 @@ BeamPage _dataPage(
   String route,
   String? parameter,
   String title,
-  Widget Function(BuildContext, FullData, int) build,
-) {
+  Widget Function(BuildContext, FullData, int) build, {
+  String? Function(FullData, int)? walletColor,
+}) {
   final id = int.tryParse(parameter ?? '');
-  return BeamerMaterialTransitionPage(
+  return BeamPage(
     key: ValueKey('$route-$id'),
     title: title,
     popToNamed: '/',
-    child: BlocBuilder<DataCubit, FullData?>(
-      builder: (context, state) {
-        if (id == null) return const ErrorPage();
-        if (state == null) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        return build(context, state, id);
-      },
+    child: _DataRouteContent(id, build, walletColor),
+    routeBuilder: (context, settings, child) => PageRouteBuilder<Object>(
+      settings: settings,
+      pageBuilder: (context, animation, secondaryAnimation) => child,
     ),
   );
+}
+
+class const _DataRouteContent(
+  final int? id,
+  final Widget Function(BuildContext, FullData, int) resolve,
+  final String? Function(FullData, int)? walletColor,
+) extends StatefulWidget {
+  @override
+  State<_DataRouteContent> createState() => _DataRouteContentState();
+}
+
+class _DataRouteContentState extends State<_DataRouteContent> {
+  FullData? _lastAvailable;
+
+  @override
+  Widget build(BuildContext context) {
+    final route = ModalRoute.of(context)!;
+    final id = widget.id;
+    return BlocBuilder<DataCubit, FullData?>(
+      builder: (context, data) {
+        final closing = route.animation!.status == AnimationStatus.reverse;
+        // Drift can publish the deletion before Navigator starts reversing.
+        if ((closing || isDeletingRoute(route)) && _lastAvailable != null) {
+          data = _lastAvailable;
+        }
+        final child = id == null
+            ? const ErrorPage()
+            : data == null
+            ? const Scaffold(body: Center(child: CircularProgressIndicator()))
+            : widget.resolve(context, data, id);
+        if (child is! ErrorPage && data != null) _lastAvailable = data;
+        final color = id == null || data == null
+            ? null
+            : widget.walletColor?.call(data, id);
+        return SharedAxisTransition(
+          animation: route.animation!,
+          secondaryAnimation: route.secondaryAnimation!,
+          transitionType: SharedAxisTransitionType.horizontal,
+          fillColor: color == null
+              ? null
+              : getScaffoldDialogBackgroundColor(context, color),
+          child: child,
+        );
+      },
+    );
+  }
 }
 
 class const BeamerMaterialTransitionPage({

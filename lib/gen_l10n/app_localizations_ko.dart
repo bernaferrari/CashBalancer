@@ -260,4 +260,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get quickPrice => '가격 업데이트';
+
+  @override
+  String get walletsLabel => '지갑';
+
+  @override
+  String get enterAmountToApply =>
+      '거래를 적용하려면 금액을 입력하세요. 자금을 추가하지 않고 리밸런싱하려면 0을 입력하세요.';
 }

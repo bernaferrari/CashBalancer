@@ -269,4 +269,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get quickPrice => 'Atualizar preço';
+
+  @override
+  String get walletsLabel => 'Carteiras';
+
+  @override
+  String get enterAmountToApply =>
+      'Digite um valor para aplicar as operações. Digite 0 para rebalancear sem adicionar dinheiro.';
 }

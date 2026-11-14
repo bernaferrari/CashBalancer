@@ -82,5 +82,7 @@
   "sampleCrypto": "Kripto",
   "sampleCash": "Nakit",
   "sampleSavings": "Yüksek getirili tasarruf",
-  "quickPrice": "Fiyatı güncelle"
+  "quickPrice": "Fiyatı güncelle",
+  "walletsLabel": "Cüzdanlar",
+  "enterAmountToApply": "İşlemleri uygulamak için bir tutar girin. Nakit eklemeden dengelemek için 0 girin."
 }

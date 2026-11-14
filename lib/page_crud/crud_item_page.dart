@@ -336,7 +336,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
   void onChanged([String? value]) {
     final unitPrice = double.tryParse(moneyEditingController.text) ?? 0;
     if (!mounted) return;
-    final qty = double.tryParse(quantityEditingController.text) ?? 0;
+    final qty = double.tryParse(quantityEditingController.text) ?? 1;
     final moneyValue = unitPrice * qty;
     final data = context.read<DataCubit>().state;
     final currentTotal = data?.settings.relativeTarget == true
@@ -397,7 +397,10 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
     final db = context.read<DataCubit>().db;
     if (_saving) return;
     setState(() => _saving = true);
-    await deleteAndClose(context, () => db.deleteItem(widget.previousItem!));
-    if (mounted) setState(() => _saving = false);
+    final deleted = await deleteAndClose(
+      context,
+      () => db.deleteItem(widget.previousItem!),
+    );
+    if (mounted && !deleted) setState(() => _saving = false);
   }
 }

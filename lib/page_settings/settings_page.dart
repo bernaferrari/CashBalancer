@@ -18,6 +18,7 @@ import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 import '../l10n/l10n.dart';
 import '../widgets/dialog_screen_base.dart';
 import 'currency_symbol_dialog.dart';
+import 'backup_download.dart';
 
 const _supportedLanguageNames = <String, String>{
   'en': 'English',
@@ -319,10 +320,13 @@ Future<void> _export(BuildContext context) async {
   try {
     final backup = await context.read<DataCubit>().db.exportBackup();
     if (!context.mounted) return;
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.linux) {
-      final target = await picker.getSaveLocation(
-        suggestedName: 'cash-balancer-backup.json',
-      );
+    const filename = 'cash-balancer-backup.json';
+    if (kIsWeb) {
+      downloadBackup(backup, filename);
+      return;
+    }
+    if (defaultTargetPlatform == TargetPlatform.linux) {
+      final target = await picker.getSaveLocation(suggestedName: filename);
       if (target != null) {
         await XFile.fromData(utf8.encode(backup)).saveTo(target.path);
       }
@@ -337,7 +341,7 @@ Future<void> _export(BuildContext context) async {
             mimeType: 'application/json',
           ),
         ],
-        fileNameOverrides: ['cash-balancer-backup.json'],
+        fileNameOverrides: [filename],
         sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
       ),
     );

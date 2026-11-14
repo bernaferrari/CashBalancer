@@ -82,5 +82,7 @@
   "sampleCrypto": "Cryptomonnaies",
   "sampleCash": "Liquidités",
   "sampleSavings": "Épargne à haut rendement",
-  "quickPrice": "Mettre à jour le prix"
+  "quickPrice": "Mettre à jour le prix",
+  "walletsLabel": "Portefeuilles",
+  "enterAmountToApply": "Saisissez un montant pour appliquer les opérations. Saisissez 0 pour rééquilibrer sans ajouter de fonds."
 }

@@ -260,4 +260,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get quickPrice => '更新价格';
+
+  @override
+  String get walletsLabel => '钱包';
+
+  @override
+  String get enterAmountToApply => '输入金额以应用交易。若要在不增加资金的情况下再平衡，请输入 0。';
 }

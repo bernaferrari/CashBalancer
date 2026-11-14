@@ -261,7 +261,7 @@ class Database(super.e) extends _$Database {
     required String target,
     String quantity = '1',
   }) {
-    final parsedQty = quantity.trim().isEmpty ? 0.0 : double.parse(quantity);
+    final parsedQty = quantity.trim().isEmpty ? 1.0 : double.parse(quantity);
     return into(items).insert(
       ItemsCompanion.insert(
         walletId: walletId,
@@ -284,7 +284,7 @@ class Database(super.e) extends _$Database {
     final parsedQty = quantity == null
         ? item.quantity
         : quantity.trim().isEmpty
-        ? 0.0
+        ? 1.0
         : double.parse(quantity);
     return update(items).replace(
       item.copyWith(
@@ -301,13 +301,16 @@ class Database(super.e) extends _$Database {
         for (final item in holdings) {
           final delta = deltas[item.id] ?? 0;
           if (delta.abs() < 0.005) continue;
-          final quantity = quantityAfterTrade(
-            item.price,
-            item.totalValue,
-            delta,
-          );
+          final amountOnly = item.quantity == 1;
+          final price = amountOnly
+              ? (item.totalValue + delta).clamp(0.0, double.infinity)
+              : item.price;
+          final quantity = amountOnly
+              ? 1.0
+              : quantityAfterTrade(item.price, item.totalValue, delta);
           final current = await getItemFromId(item.id);
-          if (quantity == null ||
+          if (!price.isFinite ||
+              quantity == null ||
               !quantity.isFinite ||
               current == null ||
               current.price != item.price ||
@@ -317,7 +320,7 @@ class Database(super.e) extends _$Database {
             throw StateError('Holdings changed or trade has no valid price');
           }
           await (update(items)..where((t) => t.id.equals(item.id))).write(
-            ItemsCompanion(quantity: Value(quantity)),
+            ItemsCompanion(quantity: Value(quantity), price: Value(price)),
           );
         }
       });
@@ -339,13 +342,21 @@ class Database(super.e) extends _$Database {
     List<Item> itemRows = const [],
   }) =>
       () => transaction(() async {
-        if (portfolio != null) await into(users).insert(portfolio);
+        if (portfolio != null) {
+          final current = await (select(
+            users,
+          )..where((u) => u.id.equals(portfolio.id))).getSingleOrNull();
+          if (current != portfolio) await into(users).insert(portfolio);
+        }
         for (final wallet in walletRows) {
           final parent = await (select(
             users,
           )..where((u) => u.id.equals(wallet.userId))).getSingleOrNull();
           if (parent == null) throw StateError('Portfolio no longer exists');
-          await into(wallets).insert(wallet);
+          final current = await (select(
+            wallets,
+          )..where((w) => w.id.equals(wallet.id))).getSingleOrNull();
+          if (current != wallet) await into(wallets).insert(wallet);
         }
         for (final item in itemRows) {
           final parent =
@@ -356,7 +367,8 @@ class Database(super.e) extends _$Database {
                   ))
                   .getSingleOrNull();
           if (parent == null) throw StateError('Wallet no longer exists');
-          await into(items).insert(item);
+          if (await getItemFromId(item.id) != item)
+            await into(items).insert(item);
         }
       });
 

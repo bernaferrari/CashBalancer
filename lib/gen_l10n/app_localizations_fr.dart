@@ -272,4 +272,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get quickPrice => 'Mettre à jour le prix';
+
+  @override
+  String get walletsLabel => 'Portefeuilles';
+
+  @override
+  String get enterAmountToApply =>
+      'Saisissez un montant pour appliquer les opérations. Saisissez 0 pour rééquilibrer sans ajouter de fonds.';
 }
