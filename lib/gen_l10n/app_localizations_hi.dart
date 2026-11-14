@@ -57,9 +57,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get optional => 'वैकल्पिक';
 
   @override
-  String get totalAmount => 'आपके पास मौजूद कुल राशि।';
-
-  @override
   String get value => 'मूल्य';
 
   @override
@@ -78,9 +75,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get dialogAssetName => 'नाम';
-
-  @override
-  String get dialogAssetValue => 'मूल्य';
 
   @override
   String get dialogAssetTarget => 'लक्ष्य';
@@ -164,9 +158,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get newPortfolio => 'नया पोर्टफोलियो / लक्ष्य';
 
   @override
-  String get portfolioName => 'पोर्टफोलियो का नाम';
-
-  @override
   String get themeAuto => 'ऑटो';
 
   @override
@@ -185,8 +176,96 @@ class AppLocalizationsHi extends AppLocalizations {
   String get language => 'भाषा';
 
   @override
-  String get exportBackup => 'JSON निर्यात';
+  String get exportBackup => 'सभी पोर्टफ़ोलियो निर्यात करें';
 
   @override
-  String get importBackup => 'JSON आयात';
+  String get importBackup => 'बैकअप बहाल करें';
+
+  @override
+  String get total => 'कुल';
+
+  @override
+  String get unitPrice => 'प्रति इकाई मूल्य';
+
+  @override
+  String get unitPriceHelper =>
+      'कुल मूल्य के लिए एक इकाई की कीमत को मात्रा से गुणा करें।';
+
+  @override
+  String get defaultPortfolio => 'पोर्टफ़ोलियो #1';
+
+  @override
+  String get operationFailed => 'बदलाव सहेजा नहीं जा सका। फिर से कोशिश करें।';
+
+  @override
+  String get confirmSales =>
+      'इस योजना में बिक्री शामिल है। क्या खरीद और बिक्री के अनुसार संपत्ति की मात्रा बदलें?';
+
+  @override
+  String get targetTotalWarning => 'लक्ष्यों का योग 100% नहीं है।';
+
+  @override
+  String get unallocatedCash => 'बिना आवंटन की नकदी';
+
+  @override
+  String get additionalCash => 'अतिरिक्त नकदी चाहिए';
+
+  @override
+  String get tradeRequiresPrice =>
+      'लेन-देन लागू करने से पहले शून्य से अधिक इकाई मूल्य दर्ज करें।';
+
+  @override
+  String get confirmDeleteContents => 'इसकी सारी सामग्री भी हट जाएगी।';
+
+  @override
+  String get deleted => 'हटा दिया गया';
+
+  @override
+  String get undo => 'पहले जैसा करें';
+
+  @override
+  String get edit => 'संपादित करें';
+
+  @override
+  String get pageNotFound => 'पेज नहीं मिला';
+
+  @override
+  String get goHome => 'होम पर लौटें';
+
+  @override
+  String get chooseBackupFile => 'JSON फ़ाइल चुनें';
+
+  @override
+  String get pasteBackup => 'क्लिपबोर्ड से चिपकाएँ';
+
+  @override
+  String get replace => 'बदलें';
+
+  @override
+  String get merge => 'मिलाएँ';
+
+  @override
+  String get restoreExplanation =>
+      'मिलाने पर मौजूदा डेटा रहता है और छूटी प्रविष्टियाँ जुड़ती हैं। बदलने पर पूर्ण बैकअप सभी पोर्टफ़ोलियो को और पुराना बैकअप सक्रिय पोर्टफ़ोलियो को बदल देता है।';
+
+  @override
+  String get backupRestored => 'बैकअप बहाल हो गया';
+
+  @override
+  String get invalidBackup => 'यह Cash Balancer की मान्य बैकअप फ़ाइल नहीं है।';
+
+  @override
+  String get sampleStocks => 'शेयर';
+
+  @override
+  String get sampleCrypto => 'क्रिप्टो';
+
+  @override
+  String get sampleCash => 'नकदी';
+
+  @override
+  String get sampleSavings => 'उच्च ब्याज वाली बचत';
+
+  @override
+  String get quickPrice => 'कीमत बदलें';
 }

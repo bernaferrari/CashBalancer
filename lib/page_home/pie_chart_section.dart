@@ -1,9 +1,10 @@
+import '../util/numbers.dart';
+import '../l10n/l10n.dart';
+
 import 'package:cash_balancer/database/data.dart';
-import 'package:cash_balancer/page_home/details_page.dart';
 import 'package:cash_balancer/util/tailwind_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class const PieChartSection(final FullData data, {super.key})
     extends StatefulWidget {
@@ -23,8 +24,8 @@ class _PieChartSectionState extends State<PieChartSection> {
 
     final touchedWallet =
         (_touchedIndex >= 0 && _touchedIndex < nonZeroWallets.length)
-            ? nonZeroWallets[_touchedIndex]
-            : null;
+        ? nonZeroWallets[_touchedIndex]
+        : null;
     final touchedPalette = touchedWallet != null
         ? tailwindPalette(touchedWallet.colorName)
         : null;
@@ -53,8 +54,10 @@ class _PieChartSectionState extends State<PieChartSection> {
               borderData: FlBorderData(show: false),
               sectionsSpace: 3,
               centerSpaceRadius: 56,
-              sections:
-                  _showingSections(nonZeroWallets, widget.data.totalValue),
+              sections: _showingSections(
+                nonZeroWallets,
+                widget.data.totalValue,
+              ),
             ),
             duration: const Duration(milliseconds: 350),
             curve: Curves.easeOutCubic,
@@ -74,7 +77,8 @@ class _PieChartSectionState extends State<PieChartSection> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.rubik(
+                            style: TextStyle(
+                              fontFamily: 'Rubik',
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
                               color: isDark
@@ -84,12 +88,17 @@ class _PieChartSectionState extends State<PieChartSection> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            '${widget.data.settings.currencySymbol}${toCurrency(touchedWallet.totalValue)}',
+                            money(
+                              context,
+                              widget.data.settings.currencySymbol,
+                              touchedWallet.totalValue,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.ibmPlexMono(
-                              fontSize: 11,
+                            style: TextStyle(
+                              fontFamily: 'IBM Plex Mono',
+                              fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
@@ -104,9 +113,10 @@ class _PieChartSectionState extends State<PieChartSection> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Total',
-                            style: GoogleFonts.inter(
-                              fontSize: 11,
+                            context.l10n.total,
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 12,
                               fontWeight: FontWeight.w500,
                               color: Theme.of(context)
                                   .colorScheme
@@ -115,12 +125,17 @@ class _PieChartSectionState extends State<PieChartSection> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            '${widget.data.settings.currencySymbol}${toCurrency(widget.data.totalValue)}',
+                            money(
+                              context,
+                              widget.data.settings.currencySymbol,
+                              widget.data.totalValue,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.ibmPlexMono(
-                              fontSize: 11,
+                            style: TextStyle(
+                              fontFamily: 'IBM Plex Mono',
+                              fontSize: 12,
                               fontWeight: FontWeight.w700,
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
@@ -151,9 +166,11 @@ class _PieChartSectionState extends State<PieChartSection> {
           return PieChartSectionData(
             color: sliceColor,
             value: percent,
-            title: '${percent.toStringAsFixed(0)}%',
+            title:
+                '${formatPercent(percent.roundToDouble(), Localizations.localeOf(context).toString())}%',
             radius: isTouched ? 54 : 48,
-            titleStyle: GoogleFonts.rubik(
+            titleStyle: TextStyle(
+              fontFamily: 'Rubik',
               fontSize: isTouched ? 15 : 13,
               fontWeight: FontWeight.w700,
               color: sliceColor.highContrastOnColor,

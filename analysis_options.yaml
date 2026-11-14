@@ -10,6 +10,7 @@ analyzer:
     missing_return: warning
   exclude:
     - build/**
+    - lib/gen_l10n/**
     - android/**
     - ios/**
     - web/**

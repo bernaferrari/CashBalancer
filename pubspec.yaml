@@ -15,7 +15,6 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   bloc: ^9.2.1
-  google_fonts: ^9.0.0
   intl: ^0.20.3
   drift: ^2.35.4
   path_provider: ^2.1.6
@@ -23,11 +22,13 @@ dependencies:
   rxdart: ^0.28.0
   material_ui: ^1.11.0
   cupertino_ui: ^1.0.0
-  flutter_multi_formatter: ^2.13.11
   shared_preferences: ^2.5.6
   rx_shared_preferences: ^4.0.0
   fl_chart: ^1.3.1
   beamer: ^1.7.0
+  file_selector: ^1.1.0
+  share_plus: ^13.3.1
+  sqlite3: ^3.9.1
 
 dev_dependencies:
   drift_dev: ^2.35.3
@@ -38,3 +39,34 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
+  assets:
+    - assets/fonts/firasans-OFL.txt
+    - assets/fonts/ibmplexmono-OFL.txt
+    - assets/fonts/inter-OFL.txt
+    - assets/fonts/rubik-OFL.txt
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter[opsz,wght].ttf
+    - family: Rubik
+      fonts:
+        - asset: assets/fonts/Rubik[wght].ttf
+    - family: Fira Sans
+      fonts:
+        - asset: assets/fonts/FiraSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/FiraSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/FiraSans-Bold.ttf
+          weight: 700
+    - family: IBM Plex Mono
+      fonts:
+        - asset: assets/fonts/IBMPlexMono-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/IBMPlexMono-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/IBMPlexMono-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/IBMPlexMono-Bold.ttf
+          weight: 700

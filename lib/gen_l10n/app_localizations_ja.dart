@@ -55,9 +55,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get optional => '任意';
 
   @override
-  String get totalAmount => '保有している合計金額。';
-
-  @override
   String get value => '評価額';
 
   @override
@@ -76,9 +73,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get dialogAssetName => '名前';
-
-  @override
-  String get dialogAssetValue => '金額';
 
   @override
   String get dialogAssetTarget => '目標';
@@ -159,9 +153,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get newPortfolio => '新しいポートフォリオ / 目標';
 
   @override
-  String get portfolioName => 'ポートフォリオ名';
-
-  @override
   String get themeAuto => '自動';
 
   @override
@@ -180,8 +171,93 @@ class AppLocalizationsJa extends AppLocalizations {
   String get language => '言語';
 
   @override
-  String get exportBackup => 'JSON出力';
+  String get exportBackup => 'すべてのポートフォリオをエクスポート';
 
   @override
-  String get importBackup => 'JSON読込';
+  String get importBackup => 'バックアップを復元';
+
+  @override
+  String get total => '合計';
+
+  @override
+  String get unitPrice => '単価';
+
+  @override
+  String get unitPriceHelper => '1単位あたりの価格です。数量を掛けると合計額になります。';
+
+  @override
+  String get defaultPortfolio => 'ポートフォリオ #1';
+
+  @override
+  String get operationFailed => '変更を保存できませんでした。もう一度お試しください。';
+
+  @override
+  String get confirmSales => 'このプランには売却が含まれます。購入と売却を資産の数量に反映しますか？';
+
+  @override
+  String get targetTotalWarning => '目標の合計が100%ではありません。';
+
+  @override
+  String get unallocatedCash => '未配分の資金';
+
+  @override
+  String get additionalCash => '追加で必要な資金';
+
+  @override
+  String get tradeRequiresPrice => '取引を適用するには正の単価を設定してください。';
+
+  @override
+  String get confirmDeleteContents => '中身もすべて削除されます。';
+
+  @override
+  String get deleted => '削除しました';
+
+  @override
+  String get undo => '元に戻す';
+
+  @override
+  String get edit => '編集';
+
+  @override
+  String get pageNotFound => 'ページが見つかりません';
+
+  @override
+  String get goHome => 'ホームに戻る';
+
+  @override
+  String get chooseBackupFile => 'JSONファイルを選択';
+
+  @override
+  String get pasteBackup => 'クリップボードから貼り付け';
+
+  @override
+  String get replace => '置換';
+
+  @override
+  String get merge => '統合';
+
+  @override
+  String get restoreExplanation =>
+      '統合では既存データを保持し、不足分を追加します。置換は完全バックアップなら全ポートフォリオ、旧形式なら現在のポートフォリオを上書きします。';
+
+  @override
+  String get backupRestored => 'バックアップを復元しました';
+
+  @override
+  String get invalidBackup => '有効なCash Balancerのバックアップではありません。';
+
+  @override
+  String get sampleStocks => '株式';
+
+  @override
+  String get sampleCrypto => '暗号資産';
+
+  @override
+  String get sampleCash => '現金';
+
+  @override
+  String get sampleSavings => '高金利預金';
+
+  @override
+  String get quickPrice => '価格を更新';
 }

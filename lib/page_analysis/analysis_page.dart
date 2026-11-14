@@ -1,3 +1,5 @@
+import '../util/numbers.dart';
+
 import 'package:beamer/beamer.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,13 +14,15 @@ import 'bar_chart_section.dart';
 class const AnalysisPage({super.key}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DataCubit, FullData?>(builder: (context, state) {
-      if (state == null) {
-        return const SizedBox();
-      } else {
-        return DetailsPageImpl(state);
-      }
-    });
+    return BlocBuilder<DataCubit, FullData?>(
+      builder: (context, state) {
+        if (state == null) {
+          return const SizedBox();
+        } else {
+          return DetailsPageImpl(state);
+        }
+      },
+    );
   }
 }
 
@@ -56,7 +60,7 @@ class const DetailsPageImpl(final FullData data, {super.key})
                 const SizedBox(height: 16),
                 Center(
                   child: Text(
-                    "Total: ${data.settings.currencySymbol} ${toCurrency(data.totalValue)}",
+                    "${context.l10n.total}: ${money(context, data.settings.currencySymbol, data.totalValue)}",
                     style: TextStyle(
                       fontSize: 12,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -79,7 +83,9 @@ class const ItemsList(final FullData data, {super.key})
     if (data.settings.sortBy == 0) {
       sortedItems.sort((a, b) => b.totalValue.compareTo(a.totalValue));
     } else {
-      sortedItems.sort((a, b) => a.name.compareTo(b.name));
+      sortedItems.sort(
+        (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+      );
     }
 
     return Column(

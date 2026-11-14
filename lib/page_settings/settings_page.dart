@@ -1,3 +1,12 @@
+import 'package:flutter/foundation.dart';
+
+import 'dart:convert';
+
+import 'package:file_selector/file_selector.dart' as picker;
+import 'package:share_plus/share_plus.dart';
+
+import '../util/error_handler.dart';
+
 import 'package:cash_balancer/blocs/data_bloc.dart';
 import 'package:cash_balancer/database/data.dart';
 import 'package:cash_balancer/page_settings/sort_by_dialog.dart';
@@ -42,7 +51,8 @@ class const SettingsPage({super.key}) extends StatelessWidget {
 
         final rxPrefs = RxSharedPreferences.getInstance();
         final currentLang = state.settings.languageCode;
-        final currentLangLabel = (currentLang != null &&
+        final currentLangLabel =
+            (currentLang != null &&
                 _supportedLanguageNames.containsKey(currentLang))
             ? _supportedLanguageNames[currentLang]!
             : context.l10n.themeAuto;
@@ -57,8 +67,8 @@ class const SettingsPage({super.key}) extends StatelessWidget {
               subtitle: Text(
                 context.l10n.targetSettings,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               value: state.settings.relativeTarget,
               onChanged: (value) async {
@@ -71,8 +81,8 @@ class const SettingsPage({super.key}) extends StatelessWidget {
               subtitle: Text(
                 context.l10n.buyOnlyRebalanceSubtitle,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               value: state.settings.buyOnly,
               onChanged: (value) async {
@@ -101,9 +111,7 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                         ),
                         Text(
                           state.settings.currencySymbol,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
+                          style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: Theme.of(context).colorScheme.primary,
@@ -116,6 +124,7 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                         context: context,
                         builder: (_) => CurrencySymbolDialog(
                           initialValue: state.settings.currencySymbol,
+                          portfolioId: state.userId,
                         ),
                       );
                     },
@@ -139,9 +148,7 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                         ),
                         Text(
                           getSortByString(context, state.settings.sortBy),
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
+                          style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: Theme.of(context).colorScheme.primary,
@@ -177,9 +184,7 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                         Text(
                           currentLangLabel,
                           overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
+                          style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: Theme.of(context).colorScheme.primary,
@@ -190,9 +195,8 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                     onPressed: () {
                       showDialog<Object>(
                         context: context,
-                        builder: (_) => _LanguageDialog(
-                          currentLanguageCode: currentLang,
-                        ),
+                        builder: (_) =>
+                            _LanguageDialog(currentLanguageCode: currentLang),
                       );
                     },
                   ),
@@ -212,20 +216,15 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                           horizontal: 8,
                         ),
                         backgroundColor: state.settings.themeMode == modeId
-                            ? Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withValues(alpha: 0.14)
+                            ? Theme.of(context).colorScheme.primary
+                                  .withValues(alpha: 0.14)
                             : null,
                         foregroundColor: state.settings.themeMode == modeId
                             ? Theme.of(context).colorScheme.primary
                             : Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                       icon: Icon(icon, size: 16),
-                      label: Text(
-                        label,
-                        style: const TextStyle(fontSize: 12),
-                      ),
+                      label: Text(label, style: const TextStyle(fontSize: 12)),
                       onPressed: () async {
                         await rxPrefs.setInt('themeMode', modeId);
                       },
@@ -234,55 +233,15 @@ class const SettingsPage({super.key}) extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            Row(
-              spacing: 12,
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.copy_all_rounded, size: 18),
-                    label: Text(
-                      context.l10n.exportBackup,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    onPressed: () async {
-                      final db = context.read<DataCubit>().db;
-                      final jsonStr =
-                          await db.exportPortfolioJson(state.userId);
-                      await Clipboard.setData(ClipboardData(text: jsonStr));
-                      if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('${context.l10n.exportBackup} ✓'),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.paste_rounded, size: 18),
-                    label: Text(
-                      context.l10n.importBackup,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    onPressed: () async {
-                      final cubit = context.read<DataCubit>();
-                      final clip =
-                          await Clipboard.getData(Clipboard.kTextPlain);
-                      if (!context.mounted) return;
-                      showDialog<Object>(
-                        context: context,
-                        builder: (_) => _ImportBackupDialog(
-                          cubit: cubit,
-                          userId: state.userId,
-                          initialJson: clip?.text ?? '',
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
+            OutlinedButton.icon(
+              icon: const Icon(Icons.file_upload_outlined),
+              label: Text(context.l10n.exportBackup),
+              onPressed: () => _export(context),
+            ),
+            OutlinedButton.icon(
+              icon: const Icon(Icons.file_download_outlined),
+              label: Text(context.l10n.importBackup),
+              onPressed: () => _import(context, state.userId),
             ),
             const SizedBox(height: 16),
             Text(
@@ -303,9 +262,8 @@ class const SettingsPage({super.key}) extends StatelessWidget {
   }
 }
 
-class const _LanguageDialog({
-  required final String? currentLanguageCode,
-}) extends StatelessWidget {
+class const _LanguageDialog({required final String? currentLanguageCode})
+    extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rxPrefs = RxSharedPreferences.getInstance();
@@ -325,16 +283,15 @@ class const _LanguageDialog({
             children: [
               for (final (code, label) in entries)
                 () {
-                  final isSelected = (code ?? '') == (currentLanguageCode ?? '');
+                  final isSelected =
+                      (code ?? '') == (currentLanguageCode ?? '');
                   return SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         backgroundColor: isSelected
-                            ? Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withValues(alpha: 0.14)
+                            ? Theme.of(context).colorScheme.primary
+                                  .withValues(alpha: 0.14)
                             : null,
                       ),
                       onPressed: () async {
@@ -358,60 +315,112 @@ class const _LanguageDialog({
   }
 }
 
-class const _ImportBackupDialog({
-  required final DataCubit cubit,
-  required final int userId,
-  required final String initialJson,
-}) extends StatefulWidget {
-  @override
-  State<_ImportBackupDialog> createState() => _ImportBackupDialogState();
+Future<void> _export(BuildContext context) async {
+  try {
+    final backup = await context.read<DataCubit>().db.exportBackup();
+    if (!context.mounted) return;
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.linux) {
+      final target = await picker.getSaveLocation(
+        suggestedName: 'cash-balancer-backup.json',
+      );
+      if (target != null) {
+        await XFile.fromData(utf8.encode(backup)).saveTo(target.path);
+      }
+      return;
+    }
+    final box = context.findRenderObject()! as RenderBox;
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [
+          XFile.fromData(
+            Uint8List.fromList(utf8.encode(backup)),
+            mimeType: 'application/json',
+          ),
+        ],
+        fileNameOverrides: ['cash-balancer-backup.json'],
+        sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
+      ),
+    );
+  } catch (_) {
+    if (context.mounted) {
+      showErrorSnackbar(context, context.l10n.operationFailed);
+    }
+  }
 }
 
-class _ImportBackupDialogState extends State<_ImportBackupDialog> {
-  late final TextEditingController _controller =
-      TextEditingController(text: widget.initialJson);
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
+Future<void> _import(BuildContext context, int userId) async {
+  final cubit = context.read<DataCubit>();
+  final source = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
       title: Text(context.l10n.importBackup),
-      content: SizedBox(
-        width: 320,
-        child: TextField(
-          controller: _controller,
-          maxLines: 6,
-          decoration: const InputDecoration(
-            hintText: '{"wallets": [...]}',
-            border: OutlineInputBorder(),
-          ),
-        ),
-      ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(context.l10n.dialogCancel),
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(context.l10n.pasteBackup),
         ),
-        ElevatedButton(
-          onPressed: () async {
-            final text = _controller.text.trim();
-            if (text.isEmpty) return;
-            try {
-              await widget.cubit.db.importPortfolioJson(widget.userId, text);
-              if (!context.mounted) return;
-              Navigator.of(context).pop();
-            } on Object {
-              // Ignore malformed JSON.
-            }
-          },
-          child: Text(context.l10n.dialogSave),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: Text(context.l10n.chooseBackupFile),
         ),
       ],
+    ),
+  );
+  if (!context.mounted || source == null) return;
+  try {
+    final String? backup;
+    if (source) {
+      const group = picker.XTypeGroup(
+        label: 'JSON',
+        extensions: ['json'],
+        mimeTypes: ['application/json'],
+        uniformTypeIdentifiers: ['public.json'],
+      );
+      final file = await picker.openFile(acceptedTypeGroups: [group]);
+      if (file == null) return;
+      backup = await file.readAsString();
+    } else {
+      backup = (await Clipboard.getData(Clipboard.kTextPlain))?.text;
+    }
+    if (!context.mounted) return;
+    if (backup == null || backup.trim().isEmpty) throw const FormatException();
+    final replace = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.l10n.importBackup),
+        content: Text(context.l10n.restoreExplanation),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(context.l10n.dialogCancel),
+          ),
+          OutlinedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(context.l10n.replace),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(context.l10n.merge),
+          ),
+        ],
+      ),
     );
+    if (replace == null || !context.mounted) return;
+    final id = await cubit.db.importPortfolioJson(
+      userId,
+      backup,
+      replace: replace,
+    );
+    if (replace) await cubit.switchPortfolio(id);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(context.l10n.backupRestored)));
+    }
+  } on FormatException {
+    if (context.mounted) showErrorSnackbar(context, context.l10n.invalidBackup);
+  } catch (_) {
+    if (context.mounted) {
+      showErrorSnackbar(context, context.l10n.operationFailed);
+    }
   }
 }

@@ -55,9 +55,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get optional => '선택사항';
 
   @override
-  String get totalAmount => '보유 중인 총 금액입니다.';
-
-  @override
   String get value => '금액';
 
   @override
@@ -76,9 +73,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get dialogAssetName => '이름';
-
-  @override
-  String get dialogAssetValue => '금액';
 
   @override
   String get dialogAssetTarget => '목표';
@@ -159,9 +153,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get newPortfolio => '새 포트폴리오 / 목표';
 
   @override
-  String get portfolioName => '포트폴리오 이름';
-
-  @override
   String get themeAuto => '자동';
 
   @override
@@ -180,8 +171,93 @@ class AppLocalizationsKo extends AppLocalizations {
   String get language => '언어';
 
   @override
-  String get exportBackup => 'JSON 내보내기';
+  String get exportBackup => '모든 포트폴리오 내보내기';
 
   @override
-  String get importBackup => 'JSON 가져오기';
+  String get importBackup => '백업 복원';
+
+  @override
+  String get total => '합계';
+
+  @override
+  String get unitPrice => '단가';
+
+  @override
+  String get unitPriceHelper => '한 단위의 가격입니다. 수량을 곱하면 총액이 됩니다.';
+
+  @override
+  String get defaultPortfolio => '포트폴리오 #1';
+
+  @override
+  String get operationFailed => '변경사항을 저장하지 못했습니다. 다시 시도해 주세요.';
+
+  @override
+  String get confirmSales => '이 계획에는 매도가 포함됩니다. 매수와 매도를 자산 수량에 반영할까요?';
+
+  @override
+  String get targetTotalWarning => '목표의 합계가 100%가 아닙니다.';
+
+  @override
+  String get unallocatedCash => '미배정 현금';
+
+  @override
+  String get additionalCash => '추가로 필요한 현금';
+
+  @override
+  String get tradeRequiresPrice => '거래를 적용하기 전에 양수인 단가를 설정하세요.';
+
+  @override
+  String get confirmDeleteContents => '들어 있는 항목도 모두 삭제됩니다.';
+
+  @override
+  String get deleted => '삭제됨';
+
+  @override
+  String get undo => '실행 취소';
+
+  @override
+  String get edit => '편집';
+
+  @override
+  String get pageNotFound => '페이지를 찾을 수 없음';
+
+  @override
+  String get goHome => '홈으로 돌아가기';
+
+  @override
+  String get chooseBackupFile => 'JSON 파일 선택';
+
+  @override
+  String get pasteBackup => '클립보드에서 붙여넣기';
+
+  @override
+  String get replace => '바꾸기';
+
+  @override
+  String get merge => '병합';
+
+  @override
+  String get restoreExplanation =>
+      '병합은 기존 데이터를 유지하고 빠진 항목을 추가합니다. 바꾸기는 전체 백업이면 모든 포트폴리오를, 이전 형식이면 현재 포트폴리오를 덮어씁니다.';
+
+  @override
+  String get backupRestored => '백업을 복원했습니다.';
+
+  @override
+  String get invalidBackup => '올바른 Cash Balancer 백업 파일이 아닙니다.';
+
+  @override
+  String get sampleStocks => '주식';
+
+  @override
+  String get sampleCrypto => '암호화폐';
+
+  @override
+  String get sampleCash => '현금';
+
+  @override
+  String get sampleSavings => '고금리 저축';
+
+  @override
+  String get quickPrice => '가격 업데이트';
 }

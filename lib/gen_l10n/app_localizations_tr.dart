@@ -57,9 +57,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get optional => 'İSTEĞE BAĞLI';
 
   @override
-  String get totalAmount => 'Sahip olduğunuz toplam tutar.';
-
-  @override
   String get value => 'Değer';
 
   @override
@@ -78,9 +75,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get dialogAssetName => 'Ad';
-
-  @override
-  String get dialogAssetValue => 'Değer';
 
   @override
   String get dialogAssetTarget => 'Hedef';
@@ -164,9 +158,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get newPortfolio => 'Yeni Portföy / Hedef';
 
   @override
-  String get portfolioName => 'Portföy adı';
-
-  @override
   String get themeAuto => 'Otomatik';
 
   @override
@@ -185,8 +176,97 @@ class AppLocalizationsTr extends AppLocalizations {
   String get language => 'Dil';
 
   @override
-  String get exportBackup => 'JSON Dışa Aktar';
+  String get exportBackup => 'Tüm portföyleri dışa aktar';
 
   @override
-  String get importBackup => 'JSON İçe Aktar';
+  String get importBackup => 'Yedeği geri yükle';
+
+  @override
+  String get total => 'Toplam';
+
+  @override
+  String get unitPrice => 'Birim fiyat';
+
+  @override
+  String get unitPriceHelper =>
+      'Bir birimin fiyatı. Toplamı bulmak için miktarla çarpın.';
+
+  @override
+  String get defaultPortfolio => 'Portföy #1';
+
+  @override
+  String get operationFailed => 'Değişiklik kaydedilemedi. Tekrar deneyin.';
+
+  @override
+  String get confirmSales =>
+      'Bu plan satış içeriyor. Alış ve satışlar varlık miktarlarına uygulansın mı?';
+
+  @override
+  String get targetTotalWarning => 'Hedeflerin toplamı %100 değil.';
+
+  @override
+  String get unallocatedCash => 'Ayrılmamış nakit';
+
+  @override
+  String get additionalCash => 'Gereken ek nakit';
+
+  @override
+  String get tradeRequiresPrice =>
+      'İşlemleri uygulamadan önce pozitif birim fiyat girin.';
+
+  @override
+  String get confirmDeleteContents => 'İçindeki her şey de silinecek.';
+
+  @override
+  String get deleted => 'Silindi';
+
+  @override
+  String get undo => 'Geri al';
+
+  @override
+  String get edit => 'Düzenle';
+
+  @override
+  String get pageNotFound => 'Sayfa bulunamadı';
+
+  @override
+  String get goHome => 'Ana sayfaya dön';
+
+  @override
+  String get chooseBackupFile => 'JSON dosyası seç';
+
+  @override
+  String get pasteBackup => 'Panodan yapıştır';
+
+  @override
+  String get replace => 'Değiştir';
+
+  @override
+  String get merge => 'Birleştir';
+
+  @override
+  String get restoreExplanation =>
+      'Birleştirme mevcut verileri korur ve eksik kayıtları ekler. Değiştirme tam yedekte tüm portföylerin, eski yedekte etkin portföyün üzerine yazar.';
+
+  @override
+  String get backupRestored => 'Yedek geri yüklendi';
+
+  @override
+  String get invalidBackup =>
+      'Bu dosya geçerli bir Cash Balancer yedeği değil.';
+
+  @override
+  String get sampleStocks => 'Hisseler';
+
+  @override
+  String get sampleCrypto => 'Kripto';
+
+  @override
+  String get sampleCash => 'Nakit';
+
+  @override
+  String get sampleSavings => 'Yüksek getirili tasarruf';
+
+  @override
+  String get quickPrice => 'Fiyatı güncelle';
 }

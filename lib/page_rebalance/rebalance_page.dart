@@ -1,15 +1,16 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
 import '../l10n/l10n.dart';
-import '../page_home/details_page.dart';
+import '../util/numbers.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/dialog_screen_base.dart';
+import '../util/error_handler.dart';
+import 'rebalance_plan.dart';
 
 class const RebalancePage({super.key}) extends StatefulWidget {
   @override
@@ -18,6 +19,8 @@ class const RebalancePage({super.key}) extends StatefulWidget {
 
 class _RebalancePageState extends State<RebalancePage> {
   final TextEditingController _amountController = TextEditingController();
+
+  bool _applying = false;
 
   @override
   void dispose() {
@@ -36,31 +39,100 @@ class _RebalancePageState extends State<RebalancePage> {
         const colorName = 'emerald';
         final primaryColor = getPrimaryColor(context, colorName);
         final primaryColorWeaker = getPrimaryColorWeaker(context, colorName);
-        final backgroundDialogColor =
-            getBackgroundDialogColor(context, colorName);
+        final backgroundDialogColor = getBackgroundDialogColor(
+          context,
+          colorName,
+        );
         final currency = state.settings.currencySymbol;
         final buyOnly = state.settings.buyOnly;
         final rxPrefs = RxSharedPreferences.getInstance();
 
-        final deposit = double.tryParse(_amountController.text) ?? 0.0;
-
-        final targetedItems =
-            state.allItems.where((i) => i.targetPercent > 0).toList();
-        final targetedWallets = state.walletsMap.values
-            .where((w) => w.targetPercent > 0)
+        final parsedDeposit = double.tryParse(_amountController.text);
+        final explicitDeposit =
+            parsedDeposit != null &&
+            parsedDeposit.isFinite &&
+            parsedDeposit >= 0 &&
+            (state.totalValue + parsedDeposit).isFinite;
+        final deposit = explicitDeposit ? parsedDeposit : 0.0;
+        final targetedItems = state.allItems
+            .where((i) => i.targetPercent >= 0)
             .toList();
-
-        final minCashForItems =
-            (state.buyOnlyTotalForItems() - state.totalValue)
-                .clamp(0.0, double.infinity);
-        final minCashForWallets =
-            (state.buyOnlyTotalForWallets - state.totalValue)
-                .clamp(0.0, double.infinity);
-        final autoFillCash =
-            targetedItems.isNotEmpty ? minCashForItems : minCashForWallets;
-
-        final itemDeltas = _computeItemDeltas(state, deposit, buyOnly);
-        final walletDeltas = _computeWalletDeltas(state, deposit, buyOnly);
+        final targetedWallets = state.walletsMap.values
+            .where((w) => w.targetPercent >= 0)
+            .toList();
+        final itemHoldings = [
+          for (final item in targetedItems)
+            (id: item.id, value: item.totalValue, target: item.targetPercent),
+        ];
+        final walletHoldings = [
+          for (final wallet in targetedWallets)
+            (
+              id: wallet.id,
+              value: wallet.totalValue,
+              target: wallet.targetPercent,
+            ),
+        ];
+        final relative =
+            state.settings.relativeTarget && targetedItems.isNotEmpty;
+        final groups = {
+          for (final wallet in state.walletsMap.values)
+            if (targetedItems.any((item) => item.walletId == wallet.id))
+              wallet.id: (
+                value: wallet.totalValue,
+                weight: wallet.targetPercent,
+                holdings: [
+                  for (final item in targetedItems)
+                    if (item.walletId == wallet.id)
+                      (
+                        id: item.id,
+                        value: item.totalValue,
+                        target: item.targetPercent,
+                      ),
+                ],
+              ),
+        };
+        final holdings = targetedItems.isEmpty ? walletHoldings : itemHoldings;
+        final autoFillCash = relative
+            ? null
+            : minimumBuyOnlyCash(holdings, state.totalValue);
+        final activeDeltas = relative
+            ? allocateRelative(groups, cash: deposit, buyOnly: buyOnly)
+            : allocate(
+                holdings,
+                total: state.totalValue,
+                cash: deposit,
+                buyOnly: buyOnly,
+              );
+        final actionableDeltas = {
+          for (final entry in activeDeltas.entries)
+            if (entry.value.abs() >= 0.005) entry.key: entry.value,
+        };
+        final unallocated =
+            deposit - actionableDeltas.values.fold(0.0, (a, b) => a + b);
+        final trades = targetedItems
+            .where((item) => actionableDeltas.containsKey(item.id))
+            .toList();
+        final invalidTrade = trades.any(
+          (item) =>
+              !(quantityAfterTrade(
+                    item.price,
+                    item.totalValue,
+                    activeDeltas[item.id]!,
+                  )?.isFinite ??
+                  false),
+        );
+        final invalidTargets =
+            (relative
+                    ? groups.values.map((group) => group.holdings)
+                    : [holdings])
+                .any(
+                  (group) =>
+                      group.isNotEmpty &&
+                      (group.fold(0.0, (sum, holding) => sum + holding.target) -
+                                  100)
+                              .abs() >
+                          0.000001,
+                );
 
         return DialogScreenBase(
           colorName: colorName,
@@ -84,8 +156,9 @@ class _RebalancePageState extends State<RebalancePage> {
               controller: _amountController,
               onChanged: (_) => setState(() {}),
               textAlign: TextAlign.right,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               inputFormatters: const <TextInputFormatter>[
                 DecimalTextInputFormatter(),
               ],
@@ -106,7 +179,7 @@ class _RebalancePageState extends State<RebalancePage> {
               spacing: 8,
               runSpacing: 8,
               children: [
-                if (autoFillCash > 0.005)
+                if (buyOnly && autoFillCash != null && autoFillCash > 0.005)
                   ActionChip(
                     visualDensity: VisualDensity.compact,
                     avatar: Icon(
@@ -115,29 +188,35 @@ class _RebalancePageState extends State<RebalancePage> {
                       color: primaryColor,
                     ),
                     label: Text(
-                      '${context.l10n.autoFillBuyOnly}: $currency${toCurrency(autoFillCash)}',
-                      style: const TextStyle(fontSize: 11),
+                      '${context.l10n.autoFillBuyOnly}: ${money(context, currency, autoFillCash)}',
+                      style: const TextStyle(fontSize: 12),
                     ),
                     onPressed: () {
                       setState(() {
-                        _amountController.text =
-                            autoFillCash.toStringAsFixed(2);
+                        _amountController.text = editableNumber(
+                          autoFillCash < 1e15
+                              ? (autoFillCash * 100).ceilToDouble() / 100
+                              : autoFillCash,
+                        );
                       });
                     },
                   ),
                 for (final preset in const ['100', '500', '1000'])
                   ActionChip(
                     visualDensity: VisualDensity.compact,
-                    label: Text('+$currency$preset'),
+                    label: Text(
+                      '+${money(context, currency, double.parse(preset))}',
+                    ),
                     onPressed: () {
                       final current =
                           double.tryParse(_amountController.text) ?? 0;
                       final next = current + double.parse(preset);
                       setState(() {
-                        _amountController.text =
-                            next == next.truncateToDouble()
-                                ? next.toInt().toString()
-                                : next.toStringAsFixed(2);
+                        _amountController.text = editableNumber(
+                          next < 1e15
+                              ? double.parse(next.toStringAsFixed(2))
+                              : next,
+                        );
                       });
                     },
                   ),
@@ -154,17 +233,16 @@ class _RebalancePageState extends State<RebalancePage> {
                 ),
               )
             else ...[
-              if (targetedWallets.isNotEmpty) ...[
+              if (targetedItems.isEmpty) ...[
                 for (final wallet in targetedWallets)
                   _AllocationTile(
                     name: wallet.name,
                     color: tailwindPalette(wallet.colorName).s500,
                     currentValue: wallet.totalValue,
-                    delta: walletDeltas[wallet.id] ?? 0,
+                    delta: activeDeltas[wallet.id] ?? 0,
                     targetPercent: wallet.targetPercent,
                     currency: currency,
                   ),
-                if (targetedItems.isNotEmpty) const Divider(height: 24),
               ],
               if (targetedItems.isNotEmpty)
                 for (final item in targetedItems)
@@ -172,13 +250,27 @@ class _RebalancePageState extends State<RebalancePage> {
                     name: item.name,
                     color: item.color,
                     currentValue: item.totalValue,
-                    delta: itemDeltas[item.id] ?? 0,
+                    delta: activeDeltas[item.id] ?? 0,
+                    units: quantityAfterTrade(
+                      item.price,
+                      0,
+                      (activeDeltas[item.id] ?? 0).abs(),
+                    ),
                     targetPercent: item.targetPercent,
                     currency: currency,
                   ),
             ],
-            if (targetedItems.isNotEmpty &&
-                itemDeltas.values.any((d) => d.abs() >= 0.01)) ...[
+            if (invalidTargets) Text(context.l10n.targetTotalWarning),
+            if (unallocated >= 0.005 && holdings.isNotEmpty)
+              Text(
+                '${context.l10n.unallocatedCash}: ${money(context, currency, unallocated)}',
+              ),
+            if (unallocated <= -0.005)
+              Text(
+                '${context.l10n.additionalCash}: ${money(context, currency, -unallocated)}',
+              ),
+            if (invalidTrade) Text(context.l10n.tradeRequiresPrice),
+            if (trades.isNotEmpty) ...[
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
@@ -187,7 +279,13 @@ class _RebalancePageState extends State<RebalancePage> {
                 ),
                 icon: const Icon(Icons.check_rounded),
                 label: Text(context.l10n.applyInvestment),
-                onPressed: () => _applyItemDeltas(state, itemDeltas),
+                onPressed:
+                    _applying ||
+                        !explicitDeposit ||
+                        invalidTrade ||
+                        unallocated < -0.000001
+                    ? null
+                    : () => _applyItemDeltas(state, actionableDeltas),
               ),
             ],
             const SizedBox(height: 8),
@@ -203,137 +301,38 @@ class _RebalancePageState extends State<RebalancePage> {
     );
   }
 
-  Map<int, double> _computeWalletDeltas(
-    FullData state,
-    double deposit,
-    bool buyOnly,
-  ) {
-    final targeted =
-        state.walletsMap.values.where((w) => w.targetPercent > 0).toList();
-    if (targeted.isEmpty) return const {};
-
-    if (!buyOnly) {
-      final newTotal = state.totalValue + deposit;
-      return {
-        for (final w in targeted)
-          w.id: newTotal * (w.targetPercent / 100) - w.totalValue,
-      };
+  Future<void> _applyItemDeltas(FullData state, Map<int, double> deltas) async {
+    if (_applying) return;
+    setState(() => _applying = true);
+    try {
+      final db = context.read<DataCubit>().db;
+      if (deltas.values.any((delta) => delta <= -0.005)) {
+        final accepted = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(context.l10n.applyInvestment),
+            content: Text(context.l10n.confirmSales),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(context.l10n.dialogCancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(context.l10n.applyInvestment),
+              ),
+            ],
+          ),
+        );
+        if (!mounted || accepted != true) return;
+      }
+      await db.applyTrades(state.allItems, deltas);
+      if (mounted) Navigator.of(context).pop();
+    } catch (_) {
+      if (mounted) showErrorSnackbar(context, context.l10n.operationFailed);
+    } finally {
+      if (mounted) setState(() => _applying = false);
     }
-
-    if (deposit <= 0) {
-      final reqTotal = state.buyOnlyTotalForWallets;
-      return {
-        for (final w in targeted)
-          w.id: (reqTotal * (w.targetPercent / 100) - w.totalValue)
-              .clamp(0.0, double.infinity),
-      };
-    }
-
-    final newTotal = state.totalValue + deposit;
-    final gaps = <int, double>{
-      for (final w in targeted)
-        w.id: (newTotal * (w.targetPercent / 100) - w.totalValue)
-            .clamp(0.0, double.infinity),
-    };
-    final totalGap = gaps.values.fold<double>(0, (a, b) => a + b);
-    if (totalGap > 0) {
-      return {
-        for (final w in targeted) w.id: deposit * (gaps[w.id]! / totalGap),
-      };
-    }
-    final totalTargetWeight =
-        targeted.fold<double>(0, (a, w) => a + w.targetPercent);
-    return {
-      for (final w in targeted)
-        w.id: totalTargetWeight > 0
-            ? deposit * (w.targetPercent / totalTargetWeight)
-            : 0,
-    };
-  }
-
-  Map<int, double> _computeItemDeltas(
-    FullData state,
-    double deposit,
-    bool buyOnly,
-  ) {
-    final targeted =
-        state.allItems.where((i) => i.targetPercent > 0).toList();
-    if (targeted.isEmpty) return const {};
-
-    if (!buyOnly) {
-      final newTotal = state.totalValue + deposit;
-      return {
-        for (final item in targeted)
-          item.id: () {
-            final base = state.settings.relativeTarget
-                ? (state.walletsMap[item.walletId]?.totalValue ?? 0) + deposit
-                : newTotal;
-            return base * (item.targetPercent / 100) - item.totalValue;
-          }(),
-      };
-    }
-
-    if (deposit <= 0) {
-      return {
-        for (final item in targeted)
-          item.id: () {
-            final reqTotal = state.buyOnlyTotalForItems(item.walletId);
-            return (reqTotal * (item.targetPercent / 100) - item.totalValue)
-                .clamp(0.0, double.infinity);
-          }(),
-      };
-    }
-
-    final newTotal = state.totalValue + deposit;
-    final gaps = <int, double>{
-      for (final item in targeted)
-        item.id: () {
-          final base = state.settings.relativeTarget
-              ? (state.walletsMap[item.walletId]?.totalValue ?? 0) + deposit
-              : newTotal;
-          return (base * (item.targetPercent / 100) - item.totalValue)
-              .clamp(0.0, double.infinity);
-        }(),
-    };
-    final totalGap = gaps.values.fold<double>(0, (a, b) => a + b);
-    if (totalGap > 0) {
-      return {
-        for (final item in targeted)
-          item.id: deposit * (gaps[item.id]! / totalGap),
-      };
-    }
-    final totalTargetWeight =
-        targeted.fold<double>(0, (a, i) => a + i.targetPercent);
-    return {
-      for (final item in targeted)
-        item.id: totalTargetWeight > 0
-            ? deposit * (item.targetPercent / totalTargetWeight)
-            : 0,
-    };
-  }
-
-  Future<void> _applyItemDeltas(
-    FullData state,
-    Map<int, double> deltas,
-  ) async {
-    final db = context.read<DataCubit>().db;
-    for (final item in state.allItems) {
-      final delta = deltas[item.id] ?? 0;
-      if (delta.abs() < 0.01) continue;
-      final newTotalValue =
-          (item.totalValue + delta).clamp(0.0, double.infinity);
-      final newUnitPrice =
-          item.quantity > 0 ? newTotalValue / item.quantity : newTotalValue;
-      await db.updateItem(
-        item: item,
-        name: item.name,
-        price: newUnitPrice.toStringAsFixed(2),
-        quantity: item.quantity.toString(),
-        target: item.targetPercent >= 0 ? item.targetPercent.toString() : '',
-      );
-    }
-    if (!mounted) return;
-    Navigator.of(context).pop();
   }
 }
 
@@ -344,6 +343,7 @@ class const _AllocationTile({
   required final double delta,
   required final double targetPercent,
   required final String currency,
+  final double? units,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -383,16 +383,18 @@ class const _AllocationTile({
               children: [
                 Text(
                   name,
-                  style: GoogleFonts.firaSans(
+                  style: TextStyle(
+                    fontFamily: 'Fira Sans',
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  '$currency ${toCurrency(currentValue)} • ${formatPercent(targetPercent)}%',
-                  style: GoogleFonts.ibmPlexMono(
-                    fontSize: 11,
+                  '${money(context, currency, currentValue)} • ${formatPercent(targetPercent, Localizations.localeOf(context).toString())}%',
+                  style: TextStyle(
+                    fontFamily: 'IBM Plex Mono',
+                    fontSize: 12,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
@@ -402,8 +404,10 @@ class const _AllocationTile({
           Text(
             isHold
                 ? '✓ ${context.l10n.hold}'
-                : '${isBuy ? "↑ +" : "↓ "}$currency ${toCurrency(delta)}',
-            style: GoogleFonts.firaSans(
+                : '${isBuy ? "↑ +" : "↓ "}${money(context, currency, delta)}'
+                      '${units == null ? "" : "\n${formatQuantity(context, units!)}×"}',
+            style: TextStyle(
+              fontFamily: 'Fira Sans',
               fontSize: 13,
               fontWeight: FontWeight.w700,
               color: isHold

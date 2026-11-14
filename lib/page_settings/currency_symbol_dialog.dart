@@ -1,12 +1,17 @@
 import 'package:cash_balancer/util/tailwind_colors.dart';
 import 'package:cash_balancer/widgets/dialog_screen_base.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:rx_shared_preferences/rx_shared_preferences.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../blocs/data_bloc.dart';
 
 import '../l10n/l10n.dart';
 
-class const CurrencySymbolDialog({super.key, required final String initialValue})
-    extends StatefulWidget {
+class const CurrencySymbolDialog({
+  super.key,
+  required final String initialValue,
+  required final int portfolioId,
+}) extends StatefulWidget {
   @override
   State<CurrencySymbolDialog> createState() => _CurrencySymbolDialogState();
 }
@@ -77,8 +82,8 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
                     label: Text(symbol),
                     backgroundColor:
                         currencyEditingController.text.trim() == symbol
-                            ? primaryColor.withValues(alpha: 0.20)
-                            : null,
+                        ? primaryColor.withValues(alpha: 0.20)
+                        : null,
                     onPressed: () {
                       setState(() {
                         currencyEditingController.text = symbol;
@@ -108,8 +113,10 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
 
   Future<void> onSubmit([String? value]) async {
     if (_formKey.currentState!.validate()) {
-      await RxSharedPreferences.getInstance()
-          .setString('currencySymbol', currencyEditingController.text.trim());
+      await context.read<DataCubit>().db.setPortfolioCurrency(
+        widget.portfolioId,
+        currencyEditingController.text.trim(),
+      );
       if (!mounted) return;
       Navigator.of(context).pop();
     }

@@ -57,9 +57,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get optional => 'OPTIONAL';
 
   @override
-  String get totalAmount => 'The total amount you own.';
-
-  @override
   String get value => 'Value';
 
   @override
@@ -78,9 +75,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dialogAssetName => 'Name';
-
-  @override
-  String get dialogAssetValue => 'Value';
 
   @override
   String get dialogAssetTarget => 'Target';
@@ -163,9 +157,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newPortfolio => 'New Portfolio / Goal';
 
   @override
-  String get portfolioName => 'Portfolio name';
-
-  @override
   String get themeAuto => 'Auto';
 
   @override
@@ -184,8 +175,97 @@ class AppLocalizationsEn extends AppLocalizations {
   String get language => 'Language';
 
   @override
-  String get exportBackup => 'Export JSON';
+  String get exportBackup => 'Export all portfolios';
 
   @override
-  String get importBackup => 'Import JSON';
+  String get importBackup => 'Restore backup';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String get unitPrice => 'Unit price';
+
+  @override
+  String get unitPriceHelper =>
+      'Price for one unit. Multiply by quantity to get the total.';
+
+  @override
+  String get defaultPortfolio => 'Portfolio #1';
+
+  @override
+  String get operationFailed => 'Couldn\'t save the change. Please try again.';
+
+  @override
+  String get confirmSales =>
+      'This plan includes sales. Apply the buys and sales to your asset quantities?';
+
+  @override
+  String get targetTotalWarning => 'Targets don\'t add up to 100%.';
+
+  @override
+  String get unallocatedCash => 'Unallocated cash';
+
+  @override
+  String get additionalCash => 'Additional cash needed';
+
+  @override
+  String get tradeRequiresPrice =>
+      'Set a positive unit price before applying these trades.';
+
+  @override
+  String get confirmDeleteContents =>
+      'This also deletes everything it contains.';
+
+  @override
+  String get deleted => 'Deleted';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get pageNotFound => 'Page not found';
+
+  @override
+  String get goHome => 'Back to home';
+
+  @override
+  String get chooseBackupFile => 'Choose JSON file';
+
+  @override
+  String get pasteBackup => 'Paste from clipboard';
+
+  @override
+  String get replace => 'Replace';
+
+  @override
+  String get merge => 'Merge';
+
+  @override
+  String get restoreExplanation =>
+      'Merge keeps existing data and adds missing entries. Replace overwrites all portfolios for a full backup, or the active portfolio for an older backup.';
+
+  @override
+  String get backupRestored => 'Backup restored';
+
+  @override
+  String get invalidBackup => 'This file isn\'t a valid Cash Balancer backup.';
+
+  @override
+  String get sampleStocks => 'Stocks';
+
+  @override
+  String get sampleCrypto => 'Crypto';
+
+  @override
+  String get sampleCash => 'Cash';
+
+  @override
+  String get sampleSavings => 'High-yield savings';
+
+  @override
+  String get quickPrice => 'Update price';
 }

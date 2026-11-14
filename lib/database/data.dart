@@ -13,34 +13,31 @@ class ItemData({
   required final Color color,
 }) extends Item {
   this
-      : super(
-          id: item.id,
-          walletId: item.walletId,
-          userId: item.userId,
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price,
-          targetPercent: item.targetPercent,
-        );
+    : super(
+        id: item.id,
+        walletId: item.walletId,
+        userId: item.userId,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        targetPercent: item.targetPercent,
+      );
 }
 
-class WalletData(
-  Wallet wallet,
-  final double totalValue,
-) extends Wallet {
+class WalletData(Wallet wallet, final double totalValue) extends Wallet {
   this
-      : super(
-          id: wallet.id,
-          userId: wallet.userId,
-          name: wallet.name,
-          colorName: wallet.colorName,
-          targetPercent: wallet.targetPercent,
-        );
+    : super(
+        id: wallet.id,
+        userId: wallet.userId,
+        name: wallet.name,
+        colorName: wallet.colorName,
+        targetPercent: wallet.targetPercent,
+      );
 }
 
 class const FullData({
   required final int userId,
-  final String userName = 'Wallet #1',
+  final String userName = '',
   final List<User> portfolios = const [],
   required final double totalValue,
   required final List<ItemData> allItems,
@@ -48,6 +45,24 @@ class const FullData({
   required final Map<int, WalletData> walletsMap,
   required final SettingsData settings,
 }) {
+  bool get hasIncompleteTargets {
+    bool incomplete(Iterable<double> values) {
+      final targets = values.where((target) => target >= 0);
+      return targets.isNotEmpty &&
+          (targets.fold(0.0, (total, target) => total + target) - 100).abs() >
+              0.000001;
+    }
+
+    return incomplete(
+          walletsMap.values.map((wallet) => wallet.targetPercent),
+        ) ||
+        (settings.relativeTarget
+            ? walletsItems.values.any(
+                (items) => incomplete(items.map((item) => item.targetPercent)),
+              )
+            : incomplete(allItems.map((item) => item.targetPercent)));
+  }
+
   /// Minimum portfolio total required to reach wallet targets without selling.
   double get buyOnlyTotalForWallets {
     double requiredTotal = totalValue;
@@ -99,4 +114,13 @@ class const SettingsData({
   required final int sortBy,
   final int themeMode = 0,
   final String? languageCode,
-});
+}) {
+  SettingsData withCurrency(String? symbol) => SettingsData(
+    relativeTarget: relativeTarget,
+    buyOnly: buyOnly,
+    currencySymbol: symbol ?? currencySymbol,
+    sortBy: sortBy,
+    themeMode: themeMode,
+    languageCode: languageCode,
+  );
+}

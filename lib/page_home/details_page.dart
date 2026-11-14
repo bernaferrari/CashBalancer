@@ -1,9 +1,10 @@
+import '../widgets/quick_price.dart';
+import '../util/numbers.dart';
+
 import 'package:beamer/beamer.dart';
 import 'package:cash_balancer/page_home/pie_chart_section.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_multi_formatter/formatters/formatter_utils.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
@@ -17,13 +18,17 @@ import 'portfolios_dialog.dart';
 class const HomePage({super.key}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DataCubit, FullData?>(builder: (context, state) {
-      if (state == null) {
-        return const SizedBox();
-      } else {
-        return HomePageImpl(state);
-      }
-    });
+    return BlocBuilder<DataCubit, FullData?>(
+      builder: (context, state) {
+        if (state == null) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        } else {
+          return HomePageImpl(state);
+        }
+      },
+    );
   }
 }
 
@@ -49,37 +54,19 @@ class const HomePageImpl(final FullData data, {super.key})
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
-        title: InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: () {
-            showDialog<Object>(
-              context: context,
-              builder: (_) => BlocProvider.value(
-                value: context.read<DataCubit>(),
-                child: const PortfoliosDialog(),
-              ),
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  context.l10n.appTitle,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                ),
-                if (data.portfolios.length > 1)
-                  Text(
-                    data.userName,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                  ),
-              ],
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              data.userName.isEmpty
+                  ? context.l10n.defaultPortfolio
+                  : data.userName,
             ),
-          ),
+            Text(
+              money(context, data.settings.currencySymbol, data.totalValue),
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+          ],
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -112,10 +99,7 @@ class const HomePageImpl(final FullData data, {super.key})
           context.l10n.addWallet,
           style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
         ),
-        icon: Icon(
-          Icons.add,
-          color: Theme.of(context).colorScheme.onSecondary,
-        ),
+        icon: Icon(Icons.add, color: Theme.of(context).colorScheme.onSecondary),
       ),
       body: data.walletsMap.isEmpty
           ? WhenEmptyCard(
@@ -126,16 +110,28 @@ class const HomePageImpl(final FullData data, {super.key})
                 icon: const Icon(Icons.auto_awesome_rounded, size: 18),
                 label: Text(context.l10n.loadSamplePortfolio),
                 onPressed: () {
-                  context
-                      .read<DataCubit>()
-                      .db
-                      .seedSamplePortfolio(data.userId);
+                  context.read<DataCubit>().db.seedSamplePortfolio(
+                    data.userId,
+                    stocks: context.l10n.sampleStocks,
+                    crypto: context.l10n.sampleCrypto,
+                    cash: context.l10n.sampleCash,
+                    savings: context.l10n.sampleSavings,
+                    relative: data.settings.relativeTarget,
+                  );
                 },
               ),
             )
           : PortfolioSplitView(
               data: data,
               children: [
+                if (data.hasIncompleteTargets)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      context.l10n.targetTotalWarning,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 if (data.allItems.isNotEmpty && data.totalValue > 0) ...[
                   Column(
                     mainAxisSize: MainAxisSize.min,
@@ -155,10 +151,7 @@ class const HomePageImpl(final FullData data, {super.key})
                           onPressed: () {
                             Beamer.of(context).beamToNamed("/analysis");
                           },
-                          icon: const Icon(
-                            Icons.bar_chart_rounded,
-                            size: 16,
-                          ),
+                          icon: const Icon(Icons.bar_chart_rounded, size: 16),
                           label: Text(
                             "${context.l10n.allItems} (${data.allItems.length})",
                             style: const TextStyle(fontSize: 12),
@@ -218,9 +211,7 @@ class const PortfolioSplitView({
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
+                color: Theme.of(context).colorScheme.onSurface
                     .withValues(alpha: 0.10),
               ),
               child: VerticalProgressBar(data: data),
@@ -243,52 +234,50 @@ class const PortfolioSplitView({
   }
 }
 
-class const VerticalProgressBar({
-  required final FullData data,
-  super.key,
-}) extends StatelessWidget {
+class const VerticalProgressBar({required final FullData data, super.key})
+    extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final List<ItemData> nonZeroItems =
-            data.allItems.where((element) => element.totalValue > 0).toList();
+        final List<ItemData> nonZeroItems = data.allItems
+            .where((element) => element.totalValue > 0)
+            .toList();
 
-        final List<double> spacedList =
-            retrieveSpacedList(nonZeroItems, constraints.maxHeight);
+        final spacing = nonZeroItems.length > constraints.maxHeight / 2
+            ? 0.0
+            : 2.0;
+        final spacedList = spacing > 0
+            ? retrieveSpacedList(nonZeroItems, constraints.maxHeight)
+            : nonZeroItems
+                  .map(
+                    (item) =>
+                        constraints.maxHeight *
+                        (item.totalValue / data.totalValue),
+                  )
+                  .toList();
 
         return Column(
           mainAxisSize: MainAxisSize.min,
-          spacing: 2,
+          spacing: spacing,
           children: [
             for (int i = 0; i < nonZeroItems.length; i++)
               () {
                 final item = nonZeroItems[i];
                 final percent = data.totalValue > 0
-                    ? (item.totalValue / data.totalValue * 100)
-                        .toStringAsFixed(1)
+                    ? (item.totalValue / data.totalValue).toPercent(
+                        Localizations.localeOf(context).toString(),
+                      )
                     : '0';
                 return Tooltip(
                   key: ValueKey(item.id),
                   message:
-                      '${item.name} • ${data.settings.currencySymbol} ${toCurrency(item.totalValue)} ($percent%)',
+                      '${item.name} • ${money(context, data.settings.currencySymbol, item.totalValue)} ($percent%)',
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 350),
                     curve: Curves.easeOutCubic,
                     height: spacedList[i],
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: item.color,
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        fixedSize: Size(100, spacedList[i]),
-                        shape: const RoundedRectangleBorder(),
-                        elevation: 0,
-                      ),
-                      onPressed: () =>
-                          Beamer.of(context).beamToNamed('/editItem/${item.id}'),
-                      child: const SizedBox.expand(),
-                    ),
+                    color: item.color,
                   ),
                 );
               }(),
@@ -358,8 +347,9 @@ class const GroupCard({
         ),
       );
     } else {
-      final double totalLocalPercent =
-          allTotalValue > 0 ? (group.totalValue / allTotalValue) * 100 : 0;
+      final double totalLocalPercent = allTotalValue > 0
+          ? (group.totalValue / allTotalValue) * 100
+          : 0;
 
       return customContainer(
         context: context,
@@ -371,7 +361,7 @@ class const GroupCard({
             WalletCard(
               title: group.name,
               subtitle:
-                  "Total: ${settings.currencySymbol} ${toCurrency(group.totalValue)}",
+                  "${context.l10n.total}: ${money(context, settings.currencySymbol, group.totalValue)}",
               accentColor: color,
               widget: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -468,18 +458,23 @@ class const AddItem({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        foregroundColor: color.highContrastOnColor,
-        elevation: 0,
-        padding: EdgeInsets.zero,
-        minimumSize: Size.zero,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        fixedSize: const Size(52, 38),
+    return Tooltip(
+      message: context.l10n.addAsset,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          foregroundColor: color.highContrastOnColor,
+          elevation: 0,
+          padding: EdgeInsets.zero,
+          minimumSize: Size.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          fixedSize: const Size(52, 48),
+        ),
+        child: const Icon(Icons.add_rounded, size: 20),
+        onPressed: () => Beamer.of(context).beamToNamed('/addItem/$groupId'),
       ),
-      child: const Icon(Icons.add_rounded, size: 20),
-      onPressed: () => Beamer.of(context).beamToNamed('/addItem/$groupId'),
     );
   }
 }
@@ -491,17 +486,22 @@ class const EditWallet({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: color,
-        side: BorderSide(color: color.withValues(alpha: 0.35)),
-        minimumSize: Size.zero,
-        padding: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        fixedSize: const Size(38, 38),
+    return Tooltip(
+      message: context.l10n.editWallet,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: color,
+          side: BorderSide(color: color.withValues(alpha: 0.35)),
+          minimumSize: Size.zero,
+          padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          fixedSize: const Size(38, 38),
+        ),
+        child: const Icon(Icons.edit_rounded, size: 17),
+        onPressed: () => Beamer.of(context).beamToNamed("/editWallet/$groupId"),
       ),
-      child: const Icon(Icons.edit_rounded, size: 17),
-      onPressed: () => Beamer.of(context).beamToNamed("/editWallet/$groupId"),
     );
   }
 }
@@ -531,19 +531,15 @@ class const CircularProgress({
               percent: (animatedPercent / 100).clamp(0.0, 1.0),
               color: color,
               circleColor: Colors.transparent,
-              backgroundColor: Theme.of(context)
-                  .colorScheme
-                  .onSurface
+              backgroundColor: Theme.of(context).colorScheme.onSurface
                   .withValues(alpha: 0.15),
             ),
             child: hasText
                 ? Center(
                     child: Text(
                       "${animatedPercent.toStringAsFixed(0)}%",
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelSmall!
-                          .copyWith(fontSize: 8),
+                      style: Theme.of(context).textTheme.labelSmall!
+                          .copyWith(fontSize: 12),
                     ),
                   )
                 : null,
@@ -591,9 +587,8 @@ class const WalletCard({
                     Text(
                       subtitle,
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
@@ -608,19 +603,6 @@ class const WalletCard({
   }
 }
 
-extension Percent on double {
-  String toPercent() => isFinite ? formatPercent(this * 100) : '0';
-}
-
-String formatPercent(double percent) {
-  if (!percent.isFinite) return '0';
-  final rounded = (percent * 10).roundToDouble() / 10;
-  if (rounded == rounded.truncateToDouble()) {
-    return rounded.toInt().toString();
-  }
-  return rounded.toStringAsFixed(1);
-}
-
 class const ItemCard(
   final ItemData item,
   final double totalValue,
@@ -633,86 +615,100 @@ class const ItemCard(
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final double itemValue = item.totalValue;
     final double ratio = totalValue > 0 ? itemValue / totalValue : 0;
-    final String qtyPrefix =
-        item.quantity != 1 ? '${formatPercent(item.quantity)}× • ' : '';
+    final String qtyPrefix = item.quantity != 1
+        ? '${formatQuantity(context, item.quantity)}× • '
+        : '';
 
-    return TextButton(
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        backgroundColor: isDark
-            ? item.color.withValues(alpha: 0.12)
-            : item.color.withValues(alpha: 0.12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 0,
-      ),
-      onPressed: () {
-        Beamer.of(context).beamToNamed('/editItem/${item.id}');
-      },
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 4,
-            height: 38,
-            margin: const EdgeInsets.only(right: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(4),
-              color: item.color,
+    return Row(
+      children: [
+        Expanded(
+          child: TextButton(
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              backgroundColor: isDark
+                  ? item.color.withValues(alpha: 0.12)
+                  : item.color.withValues(alpha: 0.12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 0,
             ),
-          ),
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
+            onPressed: () {
+              Beamer.of(context).beamToNamed('/editItem/${item.id}');
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        item.name,
-                        style: GoogleFonts.inter(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (item.targetPercent != -1)
-                      PercentArrow(
-                        itemValue: itemValue,
-                        totalValue: totalValue,
-                        targetPercent: item.targetPercent,
-                      ),
-                  ],
+                Container(
+                  width: 4,
+                  height: 38,
+                  margin: const EdgeInsets.only(right: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    color: item.color,
+                  ),
                 ),
-                const SizedBox(height: 4),
-                UpDownDiffText(
-                  currencySymbol: currencySymbol,
-                  itemValue: itemValue,
-                  targetPercent: item.targetPercent,
-                  totalValue: totalValue,
-                  buyOnlyTotalValue: buyOnlyTotalValue,
-                  leftWidget: Expanded(
-                    child: Text(
-                      "$qtyPrefix$currencySymbol ${toCurrency(itemValue)} (${ratio.toPercent()}%)",
-                      style: GoogleFonts.ibmPlexMono(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              item.name,
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (item.targetPercent != -1)
+                            PercentArrow(
+                              itemValue: itemValue,
+                              totalValue: totalValue,
+                              targetPercent: item.targetPercent,
+                            ),
+                        ],
                       ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                      const SizedBox(height: 4),
+                      UpDownDiffText(
+                        currencySymbol: currencySymbol,
+                        itemValue: itemValue,
+                        targetPercent: item.targetPercent,
+                        totalValue: totalValue,
+                        buyOnlyTotalValue: buyOnlyTotalValue,
+                        leftWidget: Expanded(
+                          child: Text(
+                            "$qtyPrefix${money(context, currencySymbol, itemValue)} (${ratio.toPercent(Localizations.localeOf(context).toString())}%)",
+                            style: TextStyle(
+                              fontFamily: 'IBM Plex Mono',
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+        QuickPriceButton(item),
+      ],
     );
   }
 }
@@ -730,8 +726,9 @@ class const PercentArrow({
     return Row(
       children: [
         Text(
-          "${ratio.toPercent()}%",
-          style: GoogleFonts.ibmPlexMono(
+          "${ratio.toPercent(Localizations.localeOf(context).toString())}%",
+          style: TextStyle(
+            fontFamily: 'IBM Plex Mono',
             color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontSize: 13,
             fontWeight: FontWeight.w500,
@@ -746,8 +743,9 @@ class const PercentArrow({
           ),
         ),
         Text(
-          "${formatPercent(targetPercent)}%",
-          style: GoogleFonts.ibmPlexMono(
+          "${formatPercent(targetPercent, Localizations.localeOf(context).toString())}%",
+          style: TextStyle(
+            fontFamily: 'IBM Plex Mono',
             color: Theme.of(context).colorScheme.onSurface,
             fontSize: 14,
             fontWeight: FontWeight.w700,
@@ -781,8 +779,8 @@ class const UpDownDiffText({
     final double targetRatio = targetPercent / 100;
 
     if (buyOnlyTotalValue != null) {
-      final double buyNeeded =
-          (buyOnlyTotalValue! * targetRatio - itemValue).clamp(0.0, double.infinity);
+      final double buyNeeded = (buyOnlyTotalValue! * targetRatio - itemValue)
+          .clamp(0.0, double.infinity);
       final bool isHold = buyNeeded < 0.005;
 
       return Row(
@@ -792,14 +790,13 @@ class const UpDownDiffText({
           if (targetPercent != -1)
             Text(
               isHold
-                  ? "✓ ${context.l10n.hold} ($currencySymbol 0.00)"
-                  : "↑ $currencySymbol ${toCurrency(buyNeeded)} (+${(targetRatio - currentRatio).abs().toPercent()}%)",
-              style: GoogleFonts.firaSans(
+                  ? "✓ ${context.l10n.hold} (${money(context, currencySymbol, 0)})"
+                  : "↑ ${money(context, currencySymbol, buyNeeded)} (+${(targetRatio - currentRatio).abs().toPercent(Localizations.localeOf(context).toString())}%)",
+              style: TextStyle(
+                fontFamily: 'Fira Sans',
                 color: isHold
-                    ? Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.55)
+                    ? Theme.of(context).colorScheme.onSurface
+                          .withValues(alpha: 0.55)
                     : greenColor,
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
@@ -818,8 +815,9 @@ class const UpDownDiffText({
         ?leftWidget,
         if (targetPercent != -1)
           Text(
-            "${isUnderOrEqual ? "↑" : "↓"} $currencySymbol ${toCurrency(totalValue * targetRatio - itemValue)} (${(targetRatio - currentRatio).toPercent()}%)",
-            style: GoogleFonts.firaSans(
+            "${isUnderOrEqual ? "↑" : "↓"} ${money(context, currencySymbol, totalValue * targetRatio - itemValue)} (${(targetRatio - currentRatio).toPercent(Localizations.localeOf(context).toString())}%)",
+            style: TextStyle(
+              fontFamily: 'Fira Sans',
               color: isUnderOrEqual ? greenColor : redColor,
               fontSize: 12,
               fontWeight: FontWeight.w700,
@@ -830,5 +828,3 @@ class const UpDownDiffText({
     );
   }
 }
-
-String toCurrency(double value) => toCurrencyString(value.toString());

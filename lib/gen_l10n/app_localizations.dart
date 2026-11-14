@@ -1,12 +1,9 @@
 import 'dart:async';
 
-import 'package:cupertino_ui/cupertino_ui.dart' show GlobalCupertinoLocalizations;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_localizations/flutter_localizations.dart'
-    show GlobalWidgetsLocalizations;
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
-import 'package:material_ui/material_ui.dart' show GlobalMaterialLocalizations;
 
 import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
@@ -97,7 +94,7 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static List<LocalizationsDelegate<dynamic>> get localizationsDelegates =>
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
       <LocalizationsDelegate<dynamic>>[
         delegate,
         GlobalMaterialLocalizations.delegate,
@@ -211,12 +208,6 @@ abstract class AppLocalizations {
   /// **'OPTIONAL'**
   String get optional;
 
-  /// No description provided for @totalAmount.
-  ///
-  /// In en, this message translates to:
-  /// **'The total amount you own.'**
-  String get totalAmount;
-
   /// No description provided for @value.
   ///
   /// In en, this message translates to:
@@ -252,12 +243,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Name'**
   String get dialogAssetName;
-
-  /// No description provided for @dialogAssetValue.
-  ///
-  /// In en, this message translates to:
-  /// **'Value'**
-  String get dialogAssetValue;
 
   /// No description provided for @dialogAssetTarget.
   ///
@@ -415,12 +400,6 @@ abstract class AppLocalizations {
   /// **'New Portfolio / Goal'**
   String get newPortfolio;
 
-  /// No description provided for @portfolioName.
-  ///
-  /// In en, this message translates to:
-  /// **'Portfolio name'**
-  String get portfolioName;
-
   /// No description provided for @themeAuto.
   ///
   /// In en, this message translates to:
@@ -460,14 +439,182 @@ abstract class AppLocalizations {
   /// No description provided for @exportBackup.
   ///
   /// In en, this message translates to:
-  /// **'Export JSON'**
+  /// **'Export all portfolios'**
   String get exportBackup;
 
   /// No description provided for @importBackup.
   ///
   /// In en, this message translates to:
-  /// **'Import JSON'**
+  /// **'Restore backup'**
   String get importBackup;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
+
+  /// No description provided for @unitPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit price'**
+  String get unitPrice;
+
+  /// No description provided for @unitPriceHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Price for one unit. Multiply by quantity to get the total.'**
+  String get unitPriceHelper;
+
+  /// No description provided for @defaultPortfolio.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio #1'**
+  String get defaultPortfolio;
+
+  /// No description provided for @operationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save the change. Please try again.'**
+  String get operationFailed;
+
+  /// No description provided for @confirmSales.
+  ///
+  /// In en, this message translates to:
+  /// **'This plan includes sales. Apply the buys and sales to your asset quantities?'**
+  String get confirmSales;
+
+  /// No description provided for @targetTotalWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Targets don\'t add up to 100%.'**
+  String get targetTotalWarning;
+
+  /// No description provided for @unallocatedCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Unallocated cash'**
+  String get unallocatedCash;
+
+  /// No description provided for @additionalCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional cash needed'**
+  String get additionalCash;
+
+  /// No description provided for @tradeRequiresPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a positive unit price before applying these trades.'**
+  String get tradeRequiresPrice;
+
+  /// No description provided for @confirmDeleteContents.
+  ///
+  /// In en, this message translates to:
+  /// **'This also deletes everything it contains.'**
+  String get confirmDeleteContents;
+
+  /// No description provided for @deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted'**
+  String get deleted;
+
+  /// No description provided for @undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @pageNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Page not found'**
+  String get pageNotFound;
+
+  /// No description provided for @goHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to home'**
+  String get goHome;
+
+  /// No description provided for @chooseBackupFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose JSON file'**
+  String get chooseBackupFile;
+
+  /// No description provided for @pasteBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste from clipboard'**
+  String get pasteBackup;
+
+  /// No description provided for @replace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get replace;
+
+  /// No description provided for @merge.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get merge;
+
+  /// No description provided for @restoreExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge keeps existing data and adds missing entries. Replace overwrites all portfolios for a full backup, or the active portfolio for an older backup.'**
+  String get restoreExplanation;
+
+  /// No description provided for @backupRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup restored'**
+  String get backupRestored;
+
+  /// No description provided for @invalidBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'This file isn\'t a valid Cash Balancer backup.'**
+  String get invalidBackup;
+
+  /// No description provided for @sampleStocks.
+  ///
+  /// In en, this message translates to:
+  /// **'Stocks'**
+  String get sampleStocks;
+
+  /// No description provided for @sampleCrypto.
+  ///
+  /// In en, this message translates to:
+  /// **'Crypto'**
+  String get sampleCrypto;
+
+  /// No description provided for @sampleCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash'**
+  String get sampleCash;
+
+  /// No description provided for @sampleSavings.
+  ///
+  /// In en, this message translates to:
+  /// **'High-yield savings'**
+  String get sampleSavings;
+
+  /// No description provided for @quickPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Update price'**
+  String get quickPrice;
 }
 
 class _AppLocalizationsDelegate

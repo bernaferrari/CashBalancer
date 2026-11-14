@@ -58,9 +58,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get optional => 'ОПЦИОНАЛЬНО';
 
   @override
-  String get totalAmount => 'Общая сумма, которой вы владеете.';
-
-  @override
   String get value => 'Сумма';
 
   @override
@@ -79,9 +76,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get dialogAssetName => 'Название';
-
-  @override
-  String get dialogAssetValue => 'Сумма';
 
   @override
   String get dialogAssetTarget => 'Цель';
@@ -164,9 +158,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get newPortfolio => 'Новый портфель / цель';
 
   @override
-  String get portfolioName => 'Название портфеля';
-
-  @override
   String get themeAuto => 'Авто';
 
   @override
@@ -185,8 +176,98 @@ class AppLocalizationsRu extends AppLocalizations {
   String get language => 'Язык';
 
   @override
-  String get exportBackup => 'Экспорт JSON';
+  String get exportBackup => 'Экспортировать все портфели';
 
   @override
-  String get importBackup => 'Импорт JSON';
+  String get importBackup => 'Восстановить копию';
+
+  @override
+  String get total => 'Итого';
+
+  @override
+  String get unitPrice => 'Цена за единицу';
+
+  @override
+  String get unitPriceHelper =>
+      'Умножьте цену за единицу на количество, чтобы получить общую стоимость.';
+
+  @override
+  String get defaultPortfolio => 'Портфель № 1';
+
+  @override
+  String get operationFailed =>
+      'Не удалось сохранить изменения. Попробуйте ещё раз.';
+
+  @override
+  String get confirmSales =>
+      'В плане есть продажи. Применить покупки и продажи к количеству активов?';
+
+  @override
+  String get targetTotalWarning => 'Сумма целевых долей не равна 100 %.';
+
+  @override
+  String get unallocatedCash => 'Нераспределённые средства';
+
+  @override
+  String get additionalCash => 'Нужны дополнительные средства';
+
+  @override
+  String get tradeRequiresPrice =>
+      'Для применения сделок укажите положительную цену за единицу.';
+
+  @override
+  String get confirmDeleteContents => 'Всё содержимое также будет удалено.';
+
+  @override
+  String get deleted => 'Удалено';
+
+  @override
+  String get undo => 'Отменить';
+
+  @override
+  String get edit => 'Изменить';
+
+  @override
+  String get pageNotFound => 'Страница не найдена';
+
+  @override
+  String get goHome => 'На главную';
+
+  @override
+  String get chooseBackupFile => 'Выбрать файл JSON';
+
+  @override
+  String get pasteBackup => 'Вставить из буфера обмена';
+
+  @override
+  String get replace => 'Заменить';
+
+  @override
+  String get merge => 'Объединить';
+
+  @override
+  String get restoreExplanation =>
+      'Объединение сохраняет данные и добавляет недостающие записи. Замена перезаписывает все портфели из полной копии или текущий портфель из старой копии.';
+
+  @override
+  String get backupRestored => 'Копия восстановлена';
+
+  @override
+  String get invalidBackup =>
+      'Это недействительная резервная копия Cash Balancer.';
+
+  @override
+  String get sampleStocks => 'Акции';
+
+  @override
+  String get sampleCrypto => 'Криптовалюта';
+
+  @override
+  String get sampleCash => 'Наличные';
+
+  @override
+  String get sampleSavings => 'Высокодоходные сбережения';
+
+  @override
+  String get quickPrice => 'Обновить цену';
 }

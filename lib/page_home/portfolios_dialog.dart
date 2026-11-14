@@ -1,3 +1,6 @@
+import '../widgets/delete_actions.dart';
+import '../util/error_handler.dart';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -38,6 +41,7 @@ class _PortfoliosDialogState extends State<PortfoliosDialog> {
         final cubit = context.read<DataCubit>();
 
         return AlertDialog(
+          scrollable: true,
           title: Text(context.l10n.portfolios),
           backgroundColor: Theme.of(context).colorScheme.surface,
           content: ConstrainedBox(
@@ -59,24 +63,24 @@ class _PortfoliosDialogState extends State<PortfoliosDialog> {
                             child: TextField(
                               controller: _renameController,
                               autofocus: true,
-                              onSubmitted: (_) =>
-                                  _saveRename(cubit, portfolio),
-                              textCapitalization:
-                                  TextCapitalization.sentences,
+                              onSubmitted: (_) => _saveRename(cubit, portfolio),
+                              textCapitalization: TextCapitalization.sentences,
                               decoration: InputDecoration(
                                 isDense: true,
                                 filled: true,
                                 fillColor: getInputFillColor(context),
-                                border:
-                                    getInputDecorationBorder(primaryColor),
-                                focusedBorder:
-                                    getInputDecorationBorder(primaryColor),
-                                enabledBorder:
-                                    getInputDecorationBorder(primaryColor),
+                                border: getInputDecorationBorder(primaryColor),
+                                focusedBorder: getInputDecorationBorder(
+                                  primaryColor,
+                                ),
+                                enabledBorder: getInputDecorationBorder(
+                                  primaryColor,
+                                ),
                               ),
                             ),
                           ),
                           IconButton(
+                            tooltip: context.l10n.dialogSave,
                             visualDensity: VisualDensity.compact,
                             icon: Icon(
                               Icons.check_rounded,
@@ -86,6 +90,7 @@ class _PortfoliosDialogState extends State<PortfoliosDialog> {
                             onPressed: () => _saveRename(cubit, portfolio),
                           ),
                           IconButton(
+                            tooltip: context.l10n.dialogCancel,
                             visualDensity: VisualDensity.compact,
                             icon: const Icon(Icons.close_rounded, size: 18),
                             onPressed: () =>
@@ -103,10 +108,8 @@ class _PortfoliosDialogState extends State<PortfoliosDialog> {
                         side: BorderSide(
                           color: isCurrent
                               ? primaryColor
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.12),
+                              : Theme.of(context).colorScheme.onSurface
+                                    .withValues(alpha: 0.12),
                           width: isCurrent ? 1.5 : 1,
                         ),
                       ),
@@ -125,13 +128,15 @@ class _PortfoliosDialogState extends State<PortfoliosDialog> {
                             color: isCurrent
                                 ? primaryColor
                                 : Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
+                                      .colorScheme
+                                      .onSurfaceVariant,
                           ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              portfolio.name,
+                              portfolio.name.isEmpty
+                                  ? context.l10n.defaultPortfolio
+                                  : portfolio.name,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface,
@@ -142,30 +147,52 @@ class _PortfoliosDialogState extends State<PortfoliosDialog> {
                             ),
                           ),
                           IconButton(
+                            tooltip: context.l10n.edit,
                             visualDensity: VisualDensity.compact,
-                            icon: const Icon(
-                              Icons.edit_outlined,
-                              size: 18,
-                            ),
+                            icon: const Icon(Icons.edit_outlined, size: 18),
                             onPressed: () {
                               setState(() {
                                 _editingPortfolioId = portfolio.id;
-                                _renameController.text = portfolio.name;
+                                _renameController.text = portfolio.name.isEmpty
+                                    ? context.l10n.defaultPortfolio
+                                    : portfolio.name;
                               });
                             },
                           ),
                           if (state.portfolios.length > 1)
                             IconButton(
+                              tooltip: context.l10n.dialogDelete,
                               visualDensity: VisualDensity.compact,
                               icon: const Icon(
                                 Icons.delete_outline_rounded,
                                 size: 18,
                               ),
                               onPressed: () async {
-                                final nextId = await cubit.db
-                                    .deletePortfolio(portfolio.id);
-                                if (isCurrent) {
-                                  await cubit.switchPortfolio(nextId);
+                                final name = portfolio.name.isEmpty
+                                    ? context.l10n.defaultPortfolio
+                                    : portfolio.name;
+                                if (!await confirmDelete(context, name) ||
+                                    !context.mounted) {
+                                  return;
+                                }
+                                try {
+                                  final result = await cubit.db.deletePortfolio(
+                                    portfolio.id,
+                                  );
+                                  if (isCurrent) {
+                                    await cubit.switchPortfolio(result.nextId);
+                                  }
+                                  if (context.mounted) {
+                                    showDeleted(context, result.undo);
+                                    Navigator.of(context).pop();
+                                  }
+                                } catch (_) {
+                                  if (context.mounted) {
+                                    showErrorSnackbar(
+                                      context,
+                                      context.l10n.operationFailed,
+                                    );
+                                  }
                                 }
                               },
                             ),
@@ -194,6 +221,7 @@ class _PortfoliosDialogState extends State<PortfoliosDialog> {
                       ),
                     ),
                     IconButton.filled(
+                      tooltip: context.l10n.newPortfolio,
                       style: IconButton.styleFrom(
                         backgroundColor: primaryColor,
                         foregroundColor: Theme.of(context).colorScheme.surface,

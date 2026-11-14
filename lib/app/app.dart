@@ -1,3 +1,10 @@
+import 'package:cupertino_ui/cupertino_ui.dart'
+    show GlobalCupertinoLocalizations;
+import 'package:flutter_localizations/flutter_localizations.dart'
+    show GlobalWidgetsLocalizations;
+
+import '../l10n/l10n.dart';
+
 import 'package:animations/animations.dart';
 import 'package:beamer/beamer.dart';
 import 'package:cash_balancer/page_analysis/analysis_page.dart';
@@ -9,191 +16,119 @@ import 'package:cash_balancer/page_rebalance/rebalance_page.dart';
 import 'package:cash_balancer/page_settings/settings_page.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
 import '../database/database.dart';
 import '../util/tailwind_colors.dart';
 import '../widgets/dialog_screen_base.dart';
-import '../gen_l10n/app_localizations.dart';
 
-final simpleBuilder = RoutesLocationBuilder(routes: {
-  '/': (context, state, obj) {
-    return const BeamPage(
-      key: ValueKey('home'),
-      title: 'Cash Balancer',
-      child: HomePage(),
-    );
-  },
-  '/settings': (context, state, obj) => BeamerMaterialTransitionPage(
-        key: const ValueKey('settings'),
-        title: 'Settings',
-        child: const SettingsPage(),
-        popToNamed: '/',
-        fillColor: getScaffoldDialogBackgroundColor(context, 'stone'),
-      ),
-  '/analysis': (context, state, obj) => BeamerMaterialTransitionPage(
-        key: const ValueKey('analysis'),
-        title: 'Analysis',
-        child: const AnalysisPage(),
-        popToNamed: '/',
-        fillColor: getScaffoldDialogBackgroundColor(context, 'stone'),
-      ),
-  '/rebalance': (context, state, obj) => BeamerMaterialTransitionPage(
-        key: const ValueKey('rebalance'),
-        title: 'Rebalance',
-        child: const RebalancePage(),
-        popToNamed: '/',
-        fillColor: getScaffoldDialogBackgroundColor(context, 'emerald'),
-      ),
-  '/addWallet/:userId': (context, state, obj) {
-    final beamState = context.currentBeamLocation.state as BeamState;
-
-    final userId = int.tryParse(beamState.pathParameters['userId'] ?? '');
-    if (userId == null) {
-      return const ErrorPage();
-    }
-
-    final state = context.read<DataCubit>().state;
-    if (state != null) {
-      return BeamerMaterialTransitionPage(
-        key: ValueKey('addWallet-$userId'),
-        title: AppLocalizations.of(context).addWallet,
-        child: CRUDWalletPage(userId: state.userId),
-        popToNamed: '/',
+final simpleBuilder = RoutesLocationBuilder(
+  routes: {
+    '/': (context, state, obj) {
+      return const BeamPage(
+        key: ValueKey('home'),
+        title: 'Cash Balancer',
+        child: HomePage(),
       );
-    } else {
-      return beamerLoadingPage();
-    }
-  },
-  '/editWallet/:walletId': (context, state, obj) {
-    final beamState = context.currentBeamLocation.state as BeamState;
-    final walletId = int.tryParse(beamState.pathParameters['walletId'] ?? '');
-
-    if (walletId == null) {
-      return const ErrorPage();
-    }
-
-    final state = context.read<DataCubit>().state;
-    if (state != null) {
-      final wallet = state.walletsMap[walletId];
-      if (wallet != null) {
-        return BeamerMaterialTransitionPage(
-          key: ValueKey('editWallet-$walletId'),
-          title: AppLocalizations.of(context).editWallet,
-          child: CRUDWalletPage(
-            userId: state.userId,
-            previousWallet: wallet,
-          ),
-          fillColor: getScaffoldDialogBackgroundColor(context, wallet.colorName),
+    },
+    '/settings': (context, state, obj) => BeamerMaterialTransitionPage(
+      key: const ValueKey('settings'),
+      title: context.l10n.settings,
+      child: const SettingsPage(),
+      popToNamed: '/',
+      fillColor: getScaffoldDialogBackgroundColor(context, 'stone'),
+    ),
+    '/analysis': (context, state, obj) => BeamerMaterialTransitionPage(
+      key: const ValueKey('analysis'),
+      title: context.l10n.allItems,
+      child: const AnalysisPage(),
+      popToNamed: '/',
+      fillColor: getScaffoldDialogBackgroundColor(context, 'stone'),
+    ),
+    '/rebalance': (context, state, obj) => BeamerMaterialTransitionPage(
+      key: const ValueKey('rebalance'),
+      title: context.l10n.rebalanceCalculator,
+      child: const RebalancePage(),
+      popToNamed: '/',
+      fillColor: getScaffoldDialogBackgroundColor(context, 'emerald'),
+    ),
+    '/addWallet/:userId': (context, state, obj) => _dataPage(
+      context,
+      'addWallet',
+      state.pathParameters['userId'],
+      context.l10n.addWallet,
+      (context, state, id) {
+        if (!state.portfolios.any((p) => p.id == id)) {
+          return const ErrorPage();
+        }
+        return CRUDWalletPage(userId: id);
+      },
+    ),
+    '/editWallet/:walletId': (context, state, obj) => _dataPage(
+      context,
+      'editWallet',
+      state.pathParameters['walletId'],
+      context.l10n.editWallet,
+      (context, state, id) {
+        if (!state.walletsMap.containsKey(id)) return const ErrorPage();
+        return CRUDWalletPage(
+          userId: state.userId,
+          previousWallet: state.walletsMap[id]!,
         );
-      } else {
-        return const ErrorPage();
-      }
-    } else {
-      return beamerLoadingPage();
-    }
-  },
-  '/addItem/:walletId': (context, state, obj) {
-    final beamState = context.currentBeamLocation.state as BeamState;
-    final walletId = int.tryParse(beamState.pathParameters['walletId'] ?? '');
-
-    if (walletId == null) {
-      return const ErrorPage();
-    }
-
-    final state = context.read<DataCubit>().state;
-    if (state != null) {
-      final wallet = state.walletsMap[walletId];
-      if (wallet != null) {
-        // Widgets and BeamPages can be mixed!
-        return BeamerMaterialTransitionPage(
-          key: ValueKey('addItem-$walletId'),
-          title: 'Add Item',
-          child: CRUDItemPage(
-            userId: state.userId,
-            previousItem: null,
-            colorName: wallet.colorName,
-            walletId: walletId,
-            totalValue: state.totalValue,
-            currency: state.settings.currencySymbol,
-          ),
-          fillColor: getScaffoldDialogBackgroundColor(context, wallet.colorName),
+      },
+    ),
+    '/addItem/:walletId': (context, state, obj) => _dataPage(
+      context,
+      'addItem',
+      state.pathParameters['walletId'],
+      context.l10n.addAsset,
+      (context, state, id) {
+        if (!state.walletsMap.containsKey(id)) return const ErrorPage();
+        return CRUDItemPage(
+          userId: state.userId,
+          walletId: id,
+          colorName: state.walletsMap[id]!.colorName,
+          totalValue: state.totalValue,
+          currency: state.settings.currencySymbol,
         );
-      } else {
-        return const ErrorPage();
-      }
-    } else {
-      return beamerLoadingPage();
-    }
+      },
+    ),
+    '/editItem/:itemId': (context, state, obj) => _dataPage(
+      context,
+      'editItem',
+      state.pathParameters['itemId'],
+      context.l10n.editAsset,
+      (context, state, id) {
+        final item = state.allItems.where((item) => item.id == id).firstOrNull;
+        if (item == null) return const ErrorPage();
+        return CRUDItemPage(
+          userId: state.userId,
+          previousItem: item,
+          walletId: item.walletId,
+          colorName: item.colorName,
+          totalValue: state.totalValue,
+          currency: state.settings.currencySymbol,
+        );
+      },
+    ),
+    '/moveItem/:itemId': (context, state, obj) => _dataPage(
+      context,
+      'moveItem',
+      state.pathParameters['itemId'],
+      context.l10n.move,
+      (context, state, id) {
+        final item = state.allItems.where((item) => item.id == id).firstOrNull;
+        if (item == null) return const ErrorPage();
+        return MoveItemPage(
+          item: item,
+          wallets: state.walletsMap.values.toList(),
+          bloc: context.read<DataCubit>(),
+        );
+      },
+    ),
   },
-  '/editItem/:itemId': (context, state, obj) {
-    final beamState = context.currentBeamLocation.state as BeamState;
-    final itemId = int.tryParse(beamState.pathParameters['itemId'] ?? '');
-
-    if (itemId == null) {
-      return const ErrorPage();
-    }
-
-    final dataState = context.read<DataCubit>().state;
-    if (dataState == null) {
-      return beamerLoadingPage();
-    }
-
-    final previousItem =
-        dataState.allItems.where((element) => element.id == itemId).firstOrNull;
-    if (previousItem == null) {
-      return const ErrorPage();
-    }
-
-    return BeamerMaterialTransitionPage(
-      key: ValueKey('item-$itemId'),
-      title: 'Edit Item',
-      child: CRUDItemPage(
-        userId: dataState.userId,
-        previousItem: previousItem,
-        colorName: previousItem.colorName,
-        walletId: previousItem.walletId,
-        totalValue: dataState.totalValue,
-        currency: dataState.settings.currencySymbol,
-      ),
-      fillColor:
-          getScaffoldDialogBackgroundColor(context, previousItem.colorName),
-    );
-  },
-  '/moveItem/:itemId': (context, state, obj) {
-    final beamState = context.currentBeamLocation.state as BeamState;
-    final itemId = int.tryParse(beamState.pathParameters['itemId'] ?? '');
-
-    if (itemId == null) {
-      return const ErrorPage();
-    }
-
-    final dataState = context.read<DataCubit>().state;
-    if (dataState == null) {
-      return beamerLoadingPage();
-    }
-
-    final item =
-        dataState.allItems.where((element) => element.id == itemId).firstOrNull;
-    if (item == null) {
-      return const ErrorPage();
-    }
-
-    return BeamerMaterialTransitionPage(
-      key: ValueKey('moveItem-$itemId'),
-      title: 'Move Item',
-      popToNamed: '/editItem/$itemId',
-      child: MoveItemPage(
-        item: item,
-        wallets: dataState.walletsMap.values.toList(),
-        bloc: context.read<DataCubit>(),
-      ),
-      fillColor: getScaffoldDialogBackgroundColor(context, item.colorName),
-    );
-  },
-});
+);
 
 class const App({super.key, final Database? db}) extends StatefulWidget {
   @override
@@ -202,34 +137,55 @@ class const App({super.key, final Database? db}) extends StatefulWidget {
 
 class _AppState extends State<App> {
   final _routerDelegate = BeamerDelegate(
-    notFoundPage: const BeamPage(
-      key: ValueKey('home'),
-      title: '404',
-      child: ErrorPage(),
-    ),
+    notFoundPage: const BeamPage(key: ValueKey('home'), child: ErrorPage()),
     locationBuilder: simpleBuilder.call,
   );
 
   @override
   Widget build(BuildContext context) {
     final textTheme = TextTheme(
-      bodyLarge: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400),
-      bodyMedium:
-          GoogleFonts.ibmPlexMono(fontSize: 14, fontWeight: FontWeight.w400),
-      bodySmall: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w400),
-      labelSmall: GoogleFonts.ibmPlexMono(
-        fontSize: 11,
+      bodyLarge: TextStyle(
+        fontFamily: 'Inter',
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+      ),
+      bodyMedium: TextStyle(
+        fontFamily: 'IBM Plex Mono',
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+      ),
+      bodySmall: TextStyle(
+        fontFamily: 'Inter',
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+      ),
+      labelSmall: TextStyle(
+        fontFamily: 'IBM Plex Mono',
+        fontSize: 12,
         fontWeight: FontWeight.w500,
         letterSpacing: 0.6,
       ),
-      headlineSmall: GoogleFonts.rubik(
+      headlineSmall: TextStyle(
+        fontFamily: 'Rubik',
         fontSize: 20,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.3,
       ),
-      titleLarge: GoogleFonts.rubik(fontSize: 20, fontWeight: FontWeight.w600),
-      titleMedium: GoogleFonts.rubik(fontSize: 15, fontWeight: FontWeight.w600),
-      titleSmall: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
+      titleLarge: TextStyle(
+        fontFamily: 'Rubik',
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+      ),
+      titleMedium: TextStyle(
+        fontFamily: 'Rubik',
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
+      titleSmall: TextStyle(
+        fontFamily: 'Inter',
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+      ),
     );
 
     final textButtonTheme = TextButtonThemeData(
@@ -244,20 +200,20 @@ class _AppState extends State<App> {
         minimumSize: const Size(48, 48),
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: GoogleFonts.rubik(fontWeight: FontWeight.w700),
+        textStyle: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w700),
       ),
     );
 
-    OutlinedButtonThemeData buildOutlinedButtonTheme(Color borderColor) =>
-        OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            minimumSize: const Size(48, 48),
-            side: BorderSide(color: borderColor),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            textStyle: GoogleFonts.rubik(fontWeight: FontWeight.w700),
-          ),
-        );
+    OutlinedButtonThemeData buildOutlinedButtonTheme(
+      Color borderColor,
+    ) => OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(48, 48),
+        side: BorderSide(color: borderColor),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        textStyle: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w700),
+      ),
+    );
 
     return RepositoryProvider<Database>(
       create: (context) => widget.db ?? constructDb(),
@@ -296,6 +252,7 @@ class _AppState extends State<App> {
                 onSecondary: Colors.white,
                 surface: Colors.white,
                 onSurface: TailwindColor.slate.palette.s900,
+                surfaceTint: Colors.transparent,
                 onSurfaceVariant: TailwindColor.slate.palette.s600,
               ),
               dialogTheme: DialogThemeData(
@@ -322,7 +279,8 @@ class _AppState extends State<App> {
               applyElevationOverlayColor: false,
               elevatedButtonTheme: elevatedButtonTheme,
               outlinedButtonTheme: buildOutlinedButtonTheme(
-                  TailwindColor.slate.palette.s900.withValues(alpha: 0.14)),
+                TailwindColor.slate.palette.s900.withValues(alpha: 0.14),
+              ),
               textButtonTheme: textButtonTheme,
               textTheme: textTheme,
             ),
@@ -336,6 +294,7 @@ class _AppState extends State<App> {
                 onSecondary: TailwindColor.zinc.palette.s950,
                 surface: TailwindColor.zinc.palette.s900,
                 onSurface: TailwindColor.zinc.palette.s100,
+                surfaceTint: Colors.transparent,
                 onSurfaceVariant: TailwindColor.zinc.palette.s400,
               ),
               dialogTheme: DialogThemeData(
@@ -358,17 +317,24 @@ class _AppState extends State<App> {
               applyElevationOverlayColor: false,
               elevatedButtonTheme: elevatedButtonTheme,
               outlinedButtonTheme: buildOutlinedButtonTheme(
-                  Colors.white.withValues(alpha: 0.14)),
+                Colors.white.withValues(alpha: 0.14),
+              ),
               textButtonTheme: textButtonTheme,
               textTheme: textTheme,
             ),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          title: 'Cash Balancer',
-          routerDelegate: _routerDelegate,
-          routeInformationParser: BeamerParser(),
-          backButtonDispatcher:
-              BeamerBackButtonDispatcher(delegate: _routerDelegate),
+            localizationsDelegates: [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            title: 'Cash Balancer',
+            routerDelegate: _routerDelegate,
+            routeInformationParser: BeamerParser(),
+            backButtonDispatcher: BeamerBackButtonDispatcher(
+              delegate: _routerDelegate,
+            ),
           ),
         ),
       ),
@@ -376,17 +342,28 @@ class _AppState extends State<App> {
   }
 }
 
-BeamPage beamerLoadingPage() {
-  final color = TailwindColor.random().palette.s500;
-
-  return BeamPage(
-    key: const ValueKey("Loading Screen"),
-    title: "Loading...",
-    type: BeamPageType.noTransition,
-    child: Center(
-      child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(color),
-      ),
+BeamPage _dataPage(
+  BuildContext context,
+  String route,
+  String? parameter,
+  String title,
+  Widget Function(BuildContext, FullData, int) build,
+) {
+  final id = int.tryParse(parameter ?? '');
+  return BeamerMaterialTransitionPage(
+    key: ValueKey('$route-$id'),
+    title: title,
+    popToNamed: '/',
+    child: BlocBuilder<DataCubit, FullData?>(
+      builder: (context, state) {
+        if (id == null) return const ErrorPage();
+        if (state == null) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        return build(context, state, id);
+      },
     ),
   );
 }
@@ -416,23 +393,19 @@ class SharedAxisPageRoute({
   Color? fillColor,
 }) extends PageRouteBuilder<Object> {
   this
-      : super(
-          pageBuilder: (context, primaryAnimation, secondaryAnimation) => page,
-          transitionsBuilder: (
-            context,
-            primaryAnimation,
-            secondaryAnimation,
-            child,
-          ) {
-            return SharedAxisTransition(
-              animation: primaryAnimation,
-              secondaryAnimation: secondaryAnimation,
-              transitionType: transitionType,
-              fillColor: fillColor,
-              child: child,
-            );
-          },
-        );
+    : super(
+        pageBuilder: (context, primaryAnimation, secondaryAnimation) => page,
+        transitionsBuilder:
+            (context, primaryAnimation, secondaryAnimation, child) {
+              return SharedAxisTransition(
+                animation: primaryAnimation,
+                secondaryAnimation: secondaryAnimation,
+                transitionType: transitionType,
+                fillColor: fillColor,
+                child: child,
+              );
+            },
+      );
 }
 
 class const ErrorPage({super.key}) extends StatelessWidget {
@@ -445,12 +418,12 @@ class const ErrorPage({super.key}) extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              "404",
-              style: GoogleFonts.ibmPlexMono(fontSize: 44),
+              context.l10n.pageNotFound,
+              style: TextStyle(fontFamily: 'IBM Plex Mono', fontSize: 44),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              child: const Text("Go to /"),
+              child: Text(context.l10n.goHome),
               onPressed: () {
                 Beamer.of(context).beamToNamed('/');
               },

@@ -22,6 +22,6 @@ List<double> retrieveSpacedList(List<Item> data, double maxSize) {
   }
 
   return data
-      .map((d) => math.max(0.0, maxWH * d.totalValue.abs() / totalValue))
+      .map((d) => math.max(0.0, maxWH * (d.totalValue.abs() / totalValue)))
       .toList();
 }

@@ -55,9 +55,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get optional => '可选';
 
   @override
-  String get totalAmount => '您持有的总金额。';
-
-  @override
   String get value => '价值';
 
   @override
@@ -76,9 +73,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dialogAssetName => '名称';
-
-  @override
-  String get dialogAssetValue => '价值';
 
   @override
   String get dialogAssetTarget => '目标';
@@ -159,9 +153,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get newPortfolio => '新建投资组合 / 目标';
 
   @override
-  String get portfolioName => '目标名称';
-
-  @override
   String get themeAuto => '自动';
 
   @override
@@ -180,8 +171,93 @@ class AppLocalizationsZh extends AppLocalizations {
   String get language => '语言';
 
   @override
-  String get exportBackup => '导出 JSON';
+  String get exportBackup => '导出所有投资组合';
 
   @override
-  String get importBackup => '导入 JSON';
+  String get importBackup => '恢复备份';
+
+  @override
+  String get total => '总计';
+
+  @override
+  String get unitPrice => '单价';
+
+  @override
+  String get unitPriceHelper => '每单位的价格。乘以数量即可得到总值。';
+
+  @override
+  String get defaultPortfolio => '投资组合 #1';
+
+  @override
+  String get operationFailed => '无法保存更改，请重试。';
+
+  @override
+  String get confirmSales => '此方案包含卖出。要将买卖应用到资产数量吗？';
+
+  @override
+  String get targetTotalWarning => '目标比例之和不等于 100%。';
+
+  @override
+  String get unallocatedCash => '未分配资金';
+
+  @override
+  String get additionalCash => '还需资金';
+
+  @override
+  String get tradeRequiresPrice => '应用交易前，请设置大于零的单价。';
+
+  @override
+  String get confirmDeleteContents => '其中所有内容也会被删除。';
+
+  @override
+  String get deleted => '已删除';
+
+  @override
+  String get undo => '撤销';
+
+  @override
+  String get edit => '编辑';
+
+  @override
+  String get pageNotFound => '找不到页面';
+
+  @override
+  String get goHome => '返回首页';
+
+  @override
+  String get chooseBackupFile => '选择 JSON 文件';
+
+  @override
+  String get pasteBackup => '从剪贴板粘贴';
+
+  @override
+  String get replace => '替换';
+
+  @override
+  String get merge => '合并';
+
+  @override
+  String get restoreExplanation =>
+      '合并会保留现有数据并补充缺失条目。替换会使用完整备份覆盖所有投资组合，或使用旧版备份覆盖当前投资组合。';
+
+  @override
+  String get backupRestored => '备份已恢复';
+
+  @override
+  String get invalidBackup => '此文件不是有效的 Cash Balancer 备份。';
+
+  @override
+  String get sampleStocks => '股票';
+
+  @override
+  String get sampleCrypto => '加密货币';
+
+  @override
+  String get sampleCash => '现金';
+
+  @override
+  String get sampleSavings => '高收益储蓄';
+
+  @override
+  String get quickPrice => '更新价格';
 }

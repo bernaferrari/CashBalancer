@@ -1,8 +1,9 @@
+import '../util/numbers.dart';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
 import '../l10n/l10n.dart';
-import '../page_home/details_page.dart';
 import 'dialog_screen_base.dart';
 
 class const TargetPercentageCard({
@@ -18,7 +19,10 @@ class const TargetPercentageCard({
   @override
   Widget build(BuildContext context) {
     final double remaining = (100.0 - allocatedOtherPercent).clamp(0.0, 100.0);
-    final String remainingStr = formatPercent(remaining);
+    final String remainingStr = formatPercent(
+      remaining,
+      Localizations.localeOf(context).toString(),
+    );
     final double currentTarget = double.tryParse(controller.text) ?? 0;
     final double totalTarget = allocatedOtherPercent + currentTarget;
 
@@ -42,9 +46,7 @@ class const TargetPercentageCard({
                   children: [
                     Text(
                       context.l10n.optional,
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelSmall!
+                      style: Theme.of(context).textTheme.labelSmall!
                           .copyWith(color: primaryColor),
                     ),
                     const SizedBox(height: 8),
@@ -79,8 +81,9 @@ class const TargetPercentageCard({
                         return null;
                       },
                       textAlign: TextAlign.right,
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       onChanged: (_) => onChanged(),
                       inputFormatters: const <TextInputFormatter>[
                         DecimalTextInputFormatter(),
@@ -93,10 +96,12 @@ class const TargetPercentageCard({
                         suffixText: " %",
                         labelStyle: TextStyle(color: primaryColorWeaker),
                         border: getInputDecorationBorder(primaryColorWeaker),
-                        focusedBorder:
-                            getInputDecorationBorder(primaryColorWeaker),
-                        enabledBorder:
-                            getInputDecorationBorder(primaryColorWeaker),
+                        focusedBorder: getInputDecorationBorder(
+                          primaryColorWeaker,
+                        ),
+                        enabledBorder: getInputDecorationBorder(
+                          primaryColorWeaker,
+                        ),
                       ),
                     ),
                   ],
@@ -121,11 +126,15 @@ class const TargetPercentageCard({
                     color: primaryColor,
                   ),
                   label: Text('$remainingStr%'),
-                  backgroundColor: controller.text.trim() == remainingStr
+                  backgroundColor:
+                      double.tryParse(controller.text) ==
+                          double.parse(remaining.toStringAsFixed(1))
                       ? primaryColor.withValues(alpha: 0.25)
                       : null,
                   onPressed: () {
-                    controller.text = remainingStr;
+                    controller.text = editableNumber(
+                      double.parse(remaining.toStringAsFixed(1)),
+                    );
                     onChanged();
                   },
                 ),
@@ -145,12 +154,12 @@ class const TargetPercentageCard({
           ),
           if (allocatedOtherPercent > 0 || currentTarget > 0)
             Text(
-              '${formatPercent(totalTarget)}% / 100%',
+              '${formatPercent(totalTarget, Localizations.localeOf(context).toString())}% / 100%',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: totalTarget > 100.01
-                        ? Theme.of(context).colorScheme.error
-                        : primaryColorWeaker,
-                  ),
+                color: totalTarget > 100.01
+                    ? Theme.of(context).colorScheme.error
+                    : primaryColorWeaker,
+              ),
             ),
           ?footer,
         ],

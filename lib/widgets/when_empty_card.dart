@@ -1,5 +1,4 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class const WhenEmptyCard({
   required final String title,
@@ -35,7 +34,8 @@ class const WhenEmptyCard({
               const SizedBox(height: 8),
               Text(
                 title,
-                style: GoogleFonts.rubik(
+                style: TextStyle(
+                  fontFamily: 'Rubik',
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -43,15 +43,10 @@ class const WhenEmptyCard({
               const SizedBox(height: 8),
               Text(
                 subtitle,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge!
+                style: Theme.of(context).textTheme.bodyLarge!
                     .copyWith(fontSize: 14),
               ),
-              if (action != null) ...[
-                const SizedBox(height: 16),
-                ?action,
-              ],
+              if (action != null) ...[const SizedBox(height: 16), ?action],
             ],
           ),
         ),

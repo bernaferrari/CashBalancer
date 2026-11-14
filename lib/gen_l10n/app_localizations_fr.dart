@@ -57,9 +57,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get optional => 'OPTIONNEL';
 
   @override
-  String get totalAmount => 'Le montant total que vous possédez.';
-
-  @override
   String get value => 'Valeur';
 
   @override
@@ -78,9 +75,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dialogAssetName => 'Nom';
-
-  @override
-  String get dialogAssetValue => 'Valeur';
 
   @override
   String get dialogAssetTarget => 'Cible';
@@ -164,9 +158,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get newPortfolio => 'Nouveau Portefeuille / Objectif';
 
   @override
-  String get portfolioName => 'Nom de l\'objectif';
-
-  @override
   String get themeAuto => 'Auto';
 
   @override
@@ -185,8 +176,100 @@ class AppLocalizationsFr extends AppLocalizations {
   String get language => 'Langue';
 
   @override
-  String get exportBackup => 'Exporter JSON';
+  String get exportBackup => 'Exporter tous les portefeuilles';
 
   @override
-  String get importBackup => 'Importer JSON';
+  String get importBackup => 'Restaurer une sauvegarde';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String get unitPrice => 'Prix unitaire';
+
+  @override
+  String get unitPriceHelper =>
+      'Prix d’une unité. Multipliez-le par la quantité pour obtenir le total.';
+
+  @override
+  String get defaultPortfolio => 'Portefeuille n° 1';
+
+  @override
+  String get operationFailed =>
+      'Impossible d’enregistrer la modification. Réessayez.';
+
+  @override
+  String get confirmSales =>
+      'Ce plan comprend des ventes. Appliquer les achats et ventes aux quantités d’actifs ?';
+
+  @override
+  String get targetTotalWarning =>
+      'La somme des objectifs n’est pas égale à 100 %.';
+
+  @override
+  String get unallocatedCash => 'Liquidités non affectées';
+
+  @override
+  String get additionalCash => 'Liquidités supplémentaires nécessaires';
+
+  @override
+  String get tradeRequiresPrice =>
+      'Saisissez un prix unitaire positif avant d’appliquer ces opérations.';
+
+  @override
+  String get confirmDeleteContents =>
+      'Tout son contenu sera également supprimé.';
+
+  @override
+  String get deleted => 'Supprimé';
+
+  @override
+  String get undo => 'Annuler';
+
+  @override
+  String get edit => 'Modifier';
+
+  @override
+  String get pageNotFound => 'Page introuvable';
+
+  @override
+  String get goHome => 'Retour à l’accueil';
+
+  @override
+  String get chooseBackupFile => 'Choisir un fichier JSON';
+
+  @override
+  String get pasteBackup => 'Coller depuis le presse-papiers';
+
+  @override
+  String get replace => 'Remplacer';
+
+  @override
+  String get merge => 'Fusionner';
+
+  @override
+  String get restoreExplanation =>
+      'Fusionner conserve les données et ajoute les entrées manquantes. Remplacer écrase tous les portefeuilles lors d’une restauration complète, ou le portefeuille actif pour une ancienne sauvegarde.';
+
+  @override
+  String get backupRestored => 'Sauvegarde restaurée';
+
+  @override
+  String get invalidBackup =>
+      'Ce fichier n’est pas une sauvegarde Cash Balancer valide.';
+
+  @override
+  String get sampleStocks => 'Actions';
+
+  @override
+  String get sampleCrypto => 'Cryptomonnaies';
+
+  @override
+  String get sampleCash => 'Liquidités';
+
+  @override
+  String get sampleSavings => 'Épargne à haut rendement';
+
+  @override
+  String get quickPrice => 'Mettre à jour le prix';
 }

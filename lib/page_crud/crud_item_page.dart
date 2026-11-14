@@ -1,14 +1,16 @@
+import '../widgets/delete_actions.dart';
+import '../util/numbers.dart';
+
 import 'package:beamer/beamer.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
 import '../database/database.dart';
 import '../l10n/l10n.dart';
-import '../utils/error_handler.dart';
+import '../util/error_handler.dart';
 import '../widgets/dialog_screen_base.dart';
 import '../widgets/target_percentage_card.dart';
 
@@ -26,25 +28,21 @@ class const CRUDItemPage({
 }
 
 class _CRUDItemPageState extends State<CRUDItemPage> {
-  static String _formatInitialNumber(double? value) {
-    if (value == null || value < 0) return '';
-    return value == value.truncateToDouble()
-        ? value.toInt().toString()
-        : value.toString();
-  }
+  bool _saving = false;
 
   late final TextEditingController nameEditingController =
       TextEditingController(text: widget.previousItem?.name);
   late final TextEditingController moneyEditingController =
-      TextEditingController(
-          text: _formatInitialNumber(widget.previousItem?.price));
+      TextEditingController(text: editableNumber(widget.previousItem?.price));
   late final TextEditingController quantityEditingController =
       TextEditingController(
-          text: _formatInitialNumber(widget.previousItem?.quantity ?? 1));
+        text: editableNumber(widget.previousItem?.quantity ?? 1),
+      );
 
   late final TextEditingController targetEditingController =
       TextEditingController(
-          text: _formatInitialNumber(widget.previousItem?.targetPercent));
+        text: editableNumber(widget.previousItem?.targetPercent),
+      );
 
   String relativePercentage = '';
 
@@ -78,15 +76,17 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
   Widget build(BuildContext context) {
     final primaryColor = getPrimaryColor(context, widget.colorName);
     final primaryColorWeaker = getPrimaryColorWeaker(context, widget.colorName);
-    final backgroundDialogColor =
-        getBackgroundDialogColor(context, widget.colorName);
+    final backgroundDialogColor = getBackgroundDialogColor(
+      context,
+      widget.colorName,
+    );
 
     final dataState = context.watch<DataCubit>().state;
     final siblingItems = dataState == null
         ? const <ItemData>[]
         : (dataState.settings.relativeTarget
-            ? (dataState.walletsItems[widget.walletId] ?? const <ItemData>[])
-            : dataState.allItems);
+              ? (dataState.walletsItems[widget.walletId] ?? const <ItemData>[])
+              : dataState.allItems);
     final allocatedOtherPercent = siblingItems
         .where((i) => i.id != widget.previousItem?.id && i.targetPercent > 0)
         .fold<double>(0, (sum, i) => sum + i.targetPercent);
@@ -171,7 +171,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                           return context.l10n.mainDialogValidator;
                         }
                         final num = double.tryParse(value);
-                        if (num == null) {
+                        if (num == null || !num.isFinite) {
                           return context.l10n.invalidValue;
                         }
                         if (num < 0) {
@@ -180,15 +180,16 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                         return null;
                       },
                       inputFormatters: const <TextInputFormatter>[
-                        DecimalTextInputFormatter(),
+                        DecimalTextInputFormatter(decimalRange: 324),
                       ],
                       textAlign: TextAlign.right,
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: getInputFillColor(context),
-                        labelText: context.l10n.value,
+                        labelText: context.l10n.unitPrice,
                         hintText: '0.00',
                         prefixText: widget.currency,
                         labelStyle: TextStyle(color: primaryColor),
@@ -199,7 +200,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      context.l10n.totalAmount,
+                      context.l10n.unitPriceHelper,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
@@ -212,10 +213,23 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
             controller: quantityEditingController,
             onFieldSubmitted: onSubmit,
             onChanged: onChanged,
+            validator: (value) {
+              if (value == null || value.isEmpty) return null;
+              final quantity = double.tryParse(value);
+              return quantity != null &&
+                      quantity.isFinite &&
+                      quantity >= 0 &&
+                      (quantity *
+                              (double.tryParse(moneyEditingController.text) ??
+                                  0))
+                          .isFinite
+                  ? null
+                  : context.l10n.invalidValue;
+            },
             textAlign: TextAlign.right,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             inputFormatters: const <TextInputFormatter>[
-              DecimalTextInputFormatter(decimalRange: 4),
+              DecimalTextInputFormatter(decimalRange: 324),
             ],
             decoration: InputDecoration(
               isDense: true,
@@ -251,7 +265,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
             ),
             icon: const Icon(Icons.check_rounded),
             label: Text(context.l10n.dialogSave),
-            onPressed: onSubmit,
+            onPressed: _saving ? null : onSubmit,
           ),
           const SizedBox(height: 8),
           if (widget.previousItem == null)
@@ -259,14 +273,14 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
               style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
               icon: const Icon(Icons.checklist_outlined),
               label: Text(context.l10n.dialogSaveAddMore),
-              onPressed: onSaveAddMore,
+              onPressed: _saving ? null : onSaveAddMore,
             )
           else
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
               icon: const Icon(Icons.delete_outline_outlined),
               label: Text(context.l10n.dialogDelete),
-              onPressed: onDelete,
+              onPressed: _saving ? null : onDelete,
             ),
           const SizedBox(height: 8),
           TextButton.icon(
@@ -281,34 +295,36 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
   }
 
   Future<void> onSubmit([String? value]) async {
-    if (_formKey.currentState!.validate()) {
+    if (!_saving && _formKey.currentState!.validate()) {
+      setState(() => _saving = true);
       final isCreating = widget.previousItem == null;
       final trimmedName = nameEditingController.text.trim();
 
       final result = isCreating
           ? await safeDbOperation(
               () => context.read<DataCubit>().db.createItem(
-                    walletId: widget.walletId,
-                    userId: widget.userId,
-                    name: trimmedName,
-                    value: moneyEditingController.text,
-                    quantity: quantityEditingController.text,
-                    target: targetEditingController.text,
-                  ),
-              errorMessage: 'Failed to create item',
+                walletId: widget.walletId,
+                userId: widget.userId,
+                name: trimmedName,
+                value: moneyEditingController.text,
+                quantity: quantityEditingController.text,
+                target: targetEditingController.text,
+              ),
+              errorMessage: context.l10n.operationFailed,
             )
           : await safeDbOperation(
               () => context.read<DataCubit>().db.updateItem(
-                    item: widget.previousItem!,
-                    name: trimmedName,
-                    price: moneyEditingController.text,
-                    quantity: quantityEditingController.text,
-                    target: targetEditingController.text,
-                  ),
-              errorMessage: 'Failed to update item',
+                item: widget.previousItem!,
+                name: trimmedName,
+                price: moneyEditingController.text,
+                quantity: quantityEditingController.text,
+                target: targetEditingController.text,
+              ),
+              errorMessage: context.l10n.operationFailed,
             );
 
       if (mounted) {
+        setState(() => _saving = false);
         result.when(
           success: (_) => Navigator.of(context).pop(),
           error: (error) => showErrorSnackbar(context, error),
@@ -319,10 +335,13 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
 
   void onChanged([String? value]) {
     final unitPrice = double.tryParse(moneyEditingController.text) ?? 0;
-    final qty = double.tryParse(quantityEditingController.text) ?? 1;
-    final moneyValue = unitPrice * (qty > 0 ? qty : 1);
-    final currentTotal =
-        context.read<DataCubit>().state?.totalValue ?? widget.totalValue;
+    if (!mounted) return;
+    final qty = double.tryParse(quantityEditingController.text) ?? 0;
+    final moneyValue = unitPrice * qty;
+    final data = context.read<DataCubit>().state;
+    final currentTotal = data?.settings.relativeTarget == true
+        ? data!.walletsMap[widget.walletId]?.totalValue ?? 0
+        : data?.totalValue ?? widget.totalValue;
 
     final double newTotal = widget.previousItem == null
         ? currentTotal + moneyValue
@@ -330,29 +349,34 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
 
     final String finalPercent = newTotal <= 0
         ? '0'
-        : (moneyValue / newTotal * 100).toStringAsFixed(2);
+        : formatPercent(
+            moneyValue / newTotal * 100,
+            Localizations.localeOf(context).toString(),
+          );
 
     setState(() {
       relativePercentage =
-          '${widget.currency}${toCurrencyString(moneyValue.toStringAsFixed(2))} ${context.l10n.isGoingToBe} $finalPercent%';
+          '${money(context, widget.currency, moneyValue)} ${context.l10n.isGoingToBe} $finalPercent%';
     });
   }
 
   Future<void> onSaveAddMore([String? value]) async {
-    if (_formKey.currentState!.validate()) {
+    if (!_saving && _formKey.currentState!.validate()) {
+      setState(() => _saving = true);
       final result = await safeDbOperation(
         () => context.read<DataCubit>().db.createItem(
-              walletId: widget.walletId,
-              userId: widget.userId,
-              name: nameEditingController.text.trim(),
-              value: moneyEditingController.text,
-              quantity: quantityEditingController.text,
-              target: targetEditingController.text,
-            ),
-        errorMessage: 'Failed to create item',
+          walletId: widget.walletId,
+          userId: widget.userId,
+          name: nameEditingController.text.trim(),
+          value: moneyEditingController.text,
+          quantity: quantityEditingController.text,
+          target: targetEditingController.text,
+        ),
+        errorMessage: context.l10n.operationFailed,
       );
 
       if (mounted) {
+        setState(() => _saving = false);
         result.when(
           success: (_) {
             nameFocusNode.requestFocus();
@@ -370,16 +394,10 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
   }
 
   Future<void> onDelete() async {
-    final result = await safeDbOperation(
-      () => context.read<DataCubit>().db.deleteItem(widget.previousItem!),
-      errorMessage: 'Failed to delete item',
-    );
-
-    if (mounted) {
-      result.when(
-        success: (_) => Navigator.of(context).pop(),
-        error: (error) => showErrorSnackbar(context, error),
-      );
-    }
+    final db = context.read<DataCubit>().db;
+    if (_saving) return;
+    setState(() => _saving = true);
+    await deleteAndClose(context, () => db.deleteItem(widget.previousItem!));
+    if (mounted) setState(() => _saving = false);
   }
 }

@@ -8,6 +8,17 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $UsersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _currencySymbolMeta = const VerificationMeta(
+    'currencySymbol',
+  );
+  @override
+  late final GeneratedColumn<String> currencySymbol = GeneratedColumn<String>(
+    'currency_symbol',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -31,7 +42,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, name];
+  List<GeneratedColumn> get $columns => [currencySymbol, id, name];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -44,6 +55,15 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('currency_symbol')) {
+      context.handle(
+        _currencySymbolMeta,
+        currencySymbol.isAcceptableOrUnknown(
+          data['currency_symbol']!,
+          _currencySymbolMeta,
+        ),
+      );
+    }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
@@ -64,6 +84,10 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   User map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return User(
+      currencySymbol: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}currency_symbol'],
+      ),
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
@@ -82,19 +106,29 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
 }
 
 class User extends DataClass implements Insertable<User> {
+  final String? currencySymbol;
   final int id;
   final String name;
-  const User({required this.id, required this.name});
+  const User({this.currencySymbol, required this.id, required this.name});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (!nullToAbsent || currencySymbol != null) {
+      map['currency_symbol'] = Variable<String>(currencySymbol);
+    }
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
     return map;
   }
 
   UsersCompanion toCompanion(bool nullToAbsent) {
-    return UsersCompanion(id: Value(id), name: Value(name));
+    return UsersCompanion(
+      currencySymbol: currencySymbol == null && nullToAbsent
+          ? const Value.absent()
+          : Value(currencySymbol),
+      id: Value(id),
+      name: Value(name),
+    );
   }
 
   factory User.fromJson(
@@ -103,6 +137,7 @@ class User extends DataClass implements Insertable<User> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return User(
+      currencySymbol: serializer.fromJson<String?>(json['currencySymbol']),
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
     );
@@ -111,15 +146,28 @@ class User extends DataClass implements Insertable<User> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
+      'currencySymbol': serializer.toJson<String?>(currencySymbol),
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
     };
   }
 
-  User copyWith({int? id, String? name}) =>
-      User(id: id ?? this.id, name: name ?? this.name);
+  User copyWith({
+    Value<String?> currencySymbol = const Value.absent(),
+    int? id,
+    String? name,
+  }) => User(
+    currencySymbol: currencySymbol.present
+        ? currencySymbol.value
+        : this.currencySymbol,
+    id: id ?? this.id,
+    name: name ?? this.name,
+  );
   User copyWithCompanion(UsersCompanion data) {
     return User(
+      currencySymbol: data.currencySymbol.present
+          ? data.currencySymbol.value
+          : this.currencySymbol,
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
     );
@@ -128,6 +176,7 @@ class User extends DataClass implements Insertable<User> {
   @override
   String toString() {
     return (StringBuffer('User(')
+          ..write('currencySymbol: $currencySymbol, ')
           ..write('id: $id, ')
           ..write('name: $name')
           ..write(')'))
@@ -135,39 +184,60 @@ class User extends DataClass implements Insertable<User> {
   }
 
   @override
-  int get hashCode => Object.hash(id, name);
+  int get hashCode => Object.hash(currencySymbol, id, name);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is User && other.id == this.id && other.name == this.name);
+      (other is User &&
+          other.currencySymbol == this.currencySymbol &&
+          other.id == this.id &&
+          other.name == this.name);
 }
 
 class UsersCompanion extends UpdateCompanion<User> {
+  final Value<String?> currencySymbol;
   final Value<int> id;
   final Value<String> name;
   const UsersCompanion({
+    this.currencySymbol = const Value.absent(),
     this.id = const Value.absent(),
     this.name = const Value.absent(),
   });
-  UsersCompanion.insert({this.id = const Value.absent(), required String name})
-    : name = Value(name);
+  UsersCompanion.insert({
+    this.currencySymbol = const Value.absent(),
+    this.id = const Value.absent(),
+    required String name,
+  }) : name = Value(name);
   static Insertable<User> custom({
+    Expression<String>? currencySymbol,
     Expression<int>? id,
     Expression<String>? name,
   }) {
     return RawValuesInsertable({
+      if (currencySymbol != null) 'currency_symbol': currencySymbol,
       if (id != null) 'id': id,
       if (name != null) 'name': name,
     });
   }
 
-  UsersCompanion copyWith({Value<int>? id, Value<String>? name}) {
-    return UsersCompanion(id: id ?? this.id, name: name ?? this.name);
+  UsersCompanion copyWith({
+    Value<String?>? currencySymbol,
+    Value<int>? id,
+    Value<String>? name,
+  }) {
+    return UsersCompanion(
+      currencySymbol: currencySymbol ?? this.currencySymbol,
+      id: id ?? this.id,
+      name: name ?? this.name,
+    );
   }
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (currencySymbol.present) {
+      map['currency_symbol'] = Variable<String>(currencySymbol.value);
+    }
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
@@ -180,6 +250,7 @@ class UsersCompanion extends UpdateCompanion<User> {
   @override
   String toString() {
     return (StringBuffer('UsersCompanion(')
+          ..write('currencySymbol: $currencySymbol, ')
           ..write('id: $id, ')
           ..write('name: $name')
           ..write(')'))
@@ -1006,10 +1077,12 @@ abstract class _$Database extends GeneratedDatabase {
 }
 
 typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
+  Value<String?> currencySymbol,
   Value<int> id,
   required String name,
 });
 typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
+  Value<String?> currencySymbol,
   Value<int> id,
   Value<String> name,
 });
@@ -1022,6 +1095,11 @@ class $$UsersTableFilterComposer extends Composer<_$Database, $UsersTable> {
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnFilters<String> get currencySymbol => $composableBuilder(
+    column: $table.currencySymbol,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
@@ -1041,6 +1119,11 @@ class $$UsersTableOrderingComposer extends Composer<_$Database, $UsersTable> {
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnOrderings<String> get currencySymbol => $composableBuilder(
+    column: $table.currencySymbol,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
@@ -1060,6 +1143,11 @@ class $$UsersTableAnnotationComposer extends Composer<_$Database, $UsersTable> {
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  GeneratedColumn<String> get currencySymbol => $composableBuilder(
+    column: $table.currencySymbol,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
@@ -1093,14 +1181,26 @@ class $$UsersTableTableManager
               $$UsersTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$UsersTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> name = const Value.absent(),
-          }) => UsersCompanion(id: id, name: name),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required String name,
-          }) => UsersCompanion.insert(id: id, name: name),
+          updateCompanionCallback:
+              ({
+                Value<String?> currencySymbol = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+              }) => UsersCompanion(
+                currencySymbol: currencySymbol,
+                id: id,
+                name: name,
+              ),
+          createCompanionCallback:
+              ({
+                Value<String?> currencySymbol = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                required String name,
+              }) => UsersCompanion.insert(
+                currencySymbol: currencySymbol,
+                id: id,
+                name: name,
+              ),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (

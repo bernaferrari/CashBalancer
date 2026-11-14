@@ -1,3 +1,5 @@
+import '../widgets/delete_actions.dart';
+
 import 'package:cash_balancer/l10n/l10n.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
 import '../util/tailwind_colors.dart';
-import '../utils/error_handler.dart';
+import '../util/error_handler.dart';
 import '../widgets/color_picker.dart';
 import '../widgets/dialog_screen_base.dart';
 import '../widgets/target_percentage_card.dart';
@@ -31,14 +33,15 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
 
   late final TextEditingController targetEditingController =
       TextEditingController(
-    text: (widget.previousWallet != null &&
-            widget.previousWallet!.targetPercent >= 0)
-        ? (widget.previousWallet!.targetPercent ==
-                widget.previousWallet!.targetPercent.truncateToDouble()
-            ? widget.previousWallet!.targetPercent.toInt().toString()
-            : widget.previousWallet!.targetPercent.toString())
-        : '',
-  );
+        text:
+            (widget.previousWallet != null &&
+                widget.previousWallet!.targetPercent >= 0)
+            ? (widget.previousWallet!.targetPercent ==
+                      widget.previousWallet!.targetPercent.truncateToDouble()
+                  ? widget.previousWallet!.targetPercent.toInt().toString()
+                  : widget.previousWallet!.targetPercent.toString())
+            : '',
+      );
 
   @override
   void dispose() {
@@ -56,9 +59,10 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
     final allocatedOtherPercent = dataState == null
         ? 0.0
         : dataState.walletsMap.values
-            .where((w) =>
-                w.id != widget.previousWallet?.id && w.targetPercent > 0)
-            .fold<double>(0, (sum, w) => sum + w.targetPercent);
+              .where(
+                (w) => w.id != widget.previousWallet?.id && w.targetPercent > 0,
+              )
+              .fold<double>(0, (sum, w) => sum + w.targetPercent);
 
     return Form(
       key: _formKey,
@@ -147,24 +151,24 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
       final result = isCreating
           ? await safeDbOperation(
               () => context.read<DataCubit>().db.createGroup(
-                    id: widget.userId,
-                    name: trimmedName,
-                    colorName: colorName,
-                    targetPercent:
-                        double.tryParse(targetEditingController.text) ?? -1,
-                  ),
-              errorMessage: 'Failed to create wallet',
+                id: widget.userId,
+                name: trimmedName,
+                colorName: colorName,
+                targetPercent:
+                    double.tryParse(targetEditingController.text) ?? -1,
+              ),
+              errorMessage: context.l10n.operationFailed,
             )
           : await safeDbOperation(
               () => context.read<DataCubit>().db.editWallet(
-                    widget.previousWallet!.copyWith(
-                      name: trimmedName,
-                      colorName: colorName,
-                      targetPercent:
-                          double.tryParse(targetEditingController.text) ?? -1,
-                    ),
-                  ),
-              errorMessage: 'Failed to update wallet',
+                widget.previousWallet!.copyWith(
+                  name: trimmedName,
+                  colorName: colorName,
+                  targetPercent:
+                      double.tryParse(targetEditingController.text) ?? -1,
+                ),
+              ),
+              errorMessage: context.l10n.operationFailed,
             );
 
       if (mounted) {
@@ -177,16 +181,9 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
   }
 
   Future<void> onDelete() async {
-    final result = await safeDbOperation(
-      () => context.read<DataCubit>().db.deleteWallet(widget.previousWallet!.id),
-      errorMessage: 'Failed to delete wallet',
-    );
-
-    if (mounted) {
-      result.when(
-        success: (_) => Navigator.of(context).pop(),
-        error: (error) => showErrorSnackbar(context, error),
-      );
-    }
+    final db = context.read<DataCubit>().db;
+    final wallet = widget.previousWallet!;
+    if (!await confirmDelete(context, wallet.name) || !mounted) return;
+    await deleteAndClose(context, () => db.deleteWallet(wallet.id));
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:ui' show ColorSpace;
+
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
@@ -39,7 +41,7 @@ Color getBackgroundDialogColor(BuildContext context, String colorName) {
         )
       : Color.alphaBlend(
           palette.s50.withValues(alpha: 0.85),
-          Colors.white,
+          Colors.white.withValues(colorSpace: ColorSpace.displayP3),
         );
 }
 
@@ -125,19 +127,20 @@ class const DialogScreenBase({
                           : palette.s300.withValues(alpha: 0.85),
                       width: 1.5,
                     ),
-                    color: backgroundDialogColor ??
+                    color:
+                        backgroundDialogColor ??
                         getBackgroundDialogColor(context, colorName),
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       AppBar(
+                        surfaceTintColor: Colors.transparent,
+
                         foregroundColor: primaryColor,
                         title: Text(
                           appBarTitle,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
+                          style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(color: primaryColor),
                         ),
                         centerTitle: true,

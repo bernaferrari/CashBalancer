@@ -1,8 +1,9 @@
+import '../util/numbers.dart';
+
 import 'dart:math';
 
 import 'package:beamer/beamer.dart';
 import 'package:cash_balancer/database/data.dart';
-import 'package:cash_balancer/page_home/details_page.dart';
 import 'package:material_ui/material_ui.dart';
 
 class const BarChartSection(final FullData data, {super.key})
@@ -17,11 +18,14 @@ class const BarChartSection(final FullData data, {super.key})
     if (data.settings.sortBy == 0) {
       sortedItems.sort((a, b) => b.totalValue.compareTo(a.totalValue));
     } else {
-      sortedItems.sort((a, b) => a.name.compareTo(b.name));
+      sortedItems.sort(
+        (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+      );
     }
 
-    final double maximumPrice =
-        sortedItems.map((e) => e.totalValue).reduce(max);
+    final double maximumPrice = sortedItems
+        .map((e) => e.totalValue)
+        .reduce(max);
 
     return SizedBox(
       height: 224,
@@ -36,13 +40,16 @@ class const BarChartSection(final FullData data, {super.key})
               for (final item in sortedItems)
                 () {
                   final percent = data.totalValue > 0
-                      ? (item.totalValue / data.totalValue * 100)
-                          .toStringAsFixed(0)
+                      ? formatPercent(
+                          (item.totalValue / data.totalValue * 100)
+                              .roundToDouble(),
+                          Localizations.localeOf(context).toString(),
+                        )
                       : '0';
                   return Tooltip(
                     key: ValueKey(item.id),
                     message:
-                        '${item.name} • ${data.settings.currencySymbol} ${toCurrency(item.totalValue)} ($percent%)',
+                        '${item.name} • ${money(context, data.settings.currencySymbol, item.totalValue)} ($percent%)',
                     child: SizedBox(
                       width: 52,
                       child: Column(
@@ -70,21 +77,17 @@ class const BarChartSection(final FullData data, {super.key})
                             item.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
+                            style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
-                                  fontSize: 11,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                 ),
                           ),
                           Text(
                             '$percent%',
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelSmall
+                            style: Theme.of(context).textTheme.labelSmall
                                 ?.copyWith(
-                                  fontSize: 10,
+                                  fontSize: 12,
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onSurfaceVariant,
@@ -177,10 +180,7 @@ class _RectangularPercentageWidgetState
         ),
         border: widget.borderWidth == 0
             ? null
-            : Border.all(
-                color: widget.borderColor,
-                width: widget.borderWidth,
-              ),
+            : Border.all(color: widget.borderColor, width: widget.borderWidth),
       ),
       child: TextButton(
         style: TextButton.styleFrom(
@@ -193,8 +193,8 @@ class _RectangularPercentageWidgetState
         child: ListenableBuilder(
           listenable: _controller,
           builder: (context, _) {
-            final int filledFlex =
-                (_controller.value.clamp(0.0, 1.0) * 1000).round();
+            final int filledFlex = (_controller.value.clamp(0.0, 1.0) * 1000)
+                .round();
             final int emptyFlex = 1000 - filledFlex;
 
             return Flex(
@@ -202,15 +202,9 @@ class _RectangularPercentageWidgetState
               verticalDirection: widget.verticalDirection,
               children: <Widget>[
                 if (filledFlex > 0)
-                  Expanded(
-                    flex: filledFlex,
-                    child: progressWidget,
-                  ),
+                  Expanded(flex: filledFlex, child: progressWidget),
                 if (emptyFlex > 0)
-                  Expanded(
-                    flex: emptyFlex,
-                    child: const SizedBox.expand(),
-                  ),
+                  Expanded(flex: emptyFlex, child: const SizedBox.expand()),
               ],
             );
           },
