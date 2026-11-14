@@ -69,7 +69,7 @@
   "unitPriceHelper": "Price for one unit. Multiply by quantity to get the total.",
   "defaultPortfolio": "Portfolio #1",
   "operationFailed": "Couldn't save the change. Please try again.",
-  "confirmSales": "This plan includes sales. Apply the buys and sales to your asset quantities?",
+  "confirmSales": "This plan includes sales. Apply the plan to update your balances and quantities? This records changes in Cash Balancer.",
   "targetTotalWarning": "Targets don't add up to 100%.",
   "unallocatedCash": "Unallocated cash",
   "additionalCash": "Additional cash needed",
@@ -93,5 +93,19 @@
   "sampleSavings": "High-yield savings",
   "quickPrice": "Update price",
   "walletsLabel": "Wallets",
-  "enterAmountToApply": "Enter an amount to apply trades. Enter 0 to rebalance without adding cash."
+  "enterAmountToApply": "Enter an amount to apply trades. Enter 0 to rebalance without adding cash.",
+  "balanceOnly": "Track as a cash balance",
+  "balance": "Balance",
+  "updateBalance": "Update balance",
+  "mergePreview": "Merge adds {added} records and keeps {kept} existing records. When records match, your current values are kept. Older backups match by name within each portfolio and wallet.",
+  "@mergePreview": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "kept": {
+        "type": "int"
+      }
+    }
+  }
 }

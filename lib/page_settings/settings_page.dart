@@ -388,11 +388,17 @@ Future<void> _import(BuildContext context, int userId) async {
     }
     if (!context.mounted) return;
     if (backup == null || backup.trim().isEmpty) throw const FormatException();
+    final preview = await cubit.db.previewBackupMerge(userId, backup);
+    if (!context.mounted) return;
     final replace = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(context.l10n.importBackup),
-        content: Text(context.l10n.restoreExplanation),
+        scrollable: true,
+        content: Text(
+          '${context.l10n.restoreExplanation}\n\n'
+          '${context.l10n.mergePreview(preview.added, preview.kept)}',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

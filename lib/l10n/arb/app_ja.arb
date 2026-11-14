@@ -60,7 +60,7 @@
   "unitPriceHelper": "1単位あたりの価格です。数量を掛けると合計額になります。",
   "defaultPortfolio": "ポートフォリオ #1",
   "operationFailed": "変更を保存できませんでした。もう一度お試しください。",
-  "confirmSales": "このプランには売却が含まれます。購入と売却を資産の数量に反映しますか？",
+  "confirmSales": "このプランには売却が含まれます。Cash Balancerの残高と数量を更新しますか？",
   "targetTotalWarning": "目標の合計が100%ではありません。",
   "unallocatedCash": "未配分の資金",
   "additionalCash": "追加で必要な資金",
@@ -84,5 +84,9 @@
   "sampleSavings": "高金利預金",
   "quickPrice": "価格を更新",
   "walletsLabel": "ウォレット",
-  "enterAmountToApply": "取引を適用するには金額を入力してください。資金を追加せずにリバランスするには 0 を入力してください。"
+  "enterAmountToApply": "取引を適用するには金額を入力してください。資金を追加せずにリバランスするには 0 を入力してください。",
+  "balanceOnly": "現金残高として管理",
+  "balance": "残高",
+  "updateBalance": "残高を更新",
+  "mergePreview": "統合すると{added}件を追加し、既存の{kept}件を保持します。一致するデータは現在の値を維持します。旧形式ではポートフォリオとウォレット内の名前を照合します。"
 }

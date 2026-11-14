@@ -196,21 +196,23 @@ class const PortfolioSplitView({
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: double.infinity,
-              margin: const EdgeInsets.all(margin),
-              width: longWidth ? 30 : 20,
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Theme.of(context).colorScheme.onSurface
-                    .withValues(alpha: 0.10),
+            if (longWidth)
+              Container(
+                height: double.infinity,
+                margin: const EdgeInsets.all(margin),
+                width: 30,
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Theme.of(context).colorScheme.onSurface
+                      .withValues(alpha: 0.10),
+                ),
+                child: VerticalProgressBar(data: data),
               ),
-              child: VerticalProgressBar(data: data),
-            ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.only(
+                padding: EdgeInsets.only(
+                  left: longWidth ? 0 : margin,
                   right: margin,
                   top: margin,
                   // On Android the FAB may get on top of it.
@@ -552,6 +554,7 @@ class const WalletCard({
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
@@ -607,7 +610,7 @@ class const ItemCard(
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final double itemValue = item.totalValue;
     final double ratio = totalValue > 0 ? itemValue / totalValue : 0;
-    final String qtyPrefix = item.quantity != 1
+    final String qtyPrefix = !item.isBalance
         ? '${formatQuantity(context, item.quantity)}× • '
         : '';
 
@@ -648,49 +651,48 @@ class const ItemCard(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      Text(
+                        item.name,
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$qtyPrefix${money(context, currencySymbol, itemValue)}',
+                        style: TextStyle(
+                          fontFamily: 'IBM Plex Mono',
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                          Expanded(
-                            child: Text(
-                              item.name,
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          if (item.targetPercent != -1)
+                          if (item.targetPercent >= 0) ...[
                             PercentArrow(
                               itemValue: itemValue,
                               totalValue: totalValue,
                               targetPercent: item.targetPercent,
                             ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      UpDownDiffText(
-                        currencySymbol: currencySymbol,
-                        itemValue: itemValue,
-                        targetPercent: item.targetPercent,
-                        totalValue: totalValue,
-                        buyOnlyTotalValue: buyOnlyTotalValue,
-                        leftWidget: Expanded(
-                          child: Text(
-                            "$qtyPrefix${money(context, currencySymbol, itemValue)} (${ratio.toPercent(Localizations.localeOf(context).toString())}%)",
-                            style: TextStyle(
-                              fontFamily: 'IBM Plex Mono',
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                            UpDownDiffText(
+                              currencySymbol: currencySymbol,
+                              itemValue: itemValue,
+                              targetPercent: item.targetPercent,
+                              totalValue: totalValue,
+                              buyOnlyTotalValue: buyOnlyTotalValue,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
+                          ] else
+                            Text(
+                              '${ratio.toPercent(Localizations.localeOf(context).toString())}%',
+                            ),
+                        ],
                       ),
                     ],
                   ),
@@ -716,6 +718,7 @@ class const PercentArrow({
     final double ratio = totalValue > 0 ? itemValue / totalValue : 0;
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           "${ratio.toPercent(Localizations.localeOf(context).toString())}%",
@@ -776,6 +779,7 @@ class const UpDownDiffText({
       final bool isHold = buyNeeded < 0.005;
 
       return Row(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           ?leftWidget,
@@ -799,15 +803,19 @@ class const UpDownDiffText({
       );
     }
 
-    final bool isUnderOrEqual = targetRatio >= currentRatio;
+    final difference = totalValue * targetRatio - itemValue;
+    final bool isUnderOrEqual = difference >= 0;
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         ?leftWidget,
         if (targetPercent != -1)
           Text(
-            "${isUnderOrEqual ? "↑" : "↓"} ${money(context, currencySymbol, totalValue * targetRatio - itemValue)} (${(targetRatio - currentRatio).toPercent(Localizations.localeOf(context).toString())}%)",
+            difference.abs() < 0.005
+                ? '✓ ${context.l10n.hold}'
+                : "${isUnderOrEqual ? "↑" : "↓"} ${money(context, currencySymbol, difference)} (${(targetRatio - currentRatio).toPercent(Localizations.localeOf(context).toString())}%)",
             style: TextStyle(
               fontFamily: 'Fira Sans',
               color: isUnderOrEqual ? greenColor : redColor,

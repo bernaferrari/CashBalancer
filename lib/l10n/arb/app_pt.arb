@@ -69,7 +69,7 @@
   "unitPriceHelper": "Preço de uma unidade. Multiplique pela quantidade para obter o total.",
   "defaultPortfolio": "Portfólio #1",
   "operationFailed": "Não foi possível salvar. Tente novamente.",
-  "confirmSales": "Este plano inclui vendas. Aplicar as compras e vendas às quantidades dos ativos?",
+  "confirmSales": "Este plano inclui vendas. Aplicar o plano para atualizar saldos e quantidades no Cash Balancer?",
   "targetTotalWarning": "As metas não somam 100%.",
   "unallocatedCash": "Saldo não alocado",
   "additionalCash": "Saldo adicional necessário",
@@ -93,5 +93,9 @@
   "sampleSavings": "Poupança de alto rendimento",
   "quickPrice": "Atualizar preço",
   "walletsLabel": "Carteiras",
-  "enterAmountToApply": "Digite um valor para aplicar as operações. Digite 0 para rebalancear sem adicionar dinheiro."
+  "enterAmountToApply": "Digite um valor para aplicar as operações. Digite 0 para rebalancear sem adicionar dinheiro.",
+  "balanceOnly": "Controlar como saldo em dinheiro",
+  "balance": "Saldo",
+  "updateBalance": "Atualizar saldo",
+  "mergePreview": "Mesclar adiciona {added} registros e mantém {kept} existentes. Seus valores atuais são mantidos quando os registros coincidem. Backups antigos usam os nomes de cada portfólio e carteira."
 }

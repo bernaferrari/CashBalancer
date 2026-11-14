@@ -60,7 +60,7 @@
   "unitPriceHelper": "Prix d’une unité. Multipliez-le par la quantité pour obtenir le total.",
   "defaultPortfolio": "Portefeuille n° 1",
   "operationFailed": "Impossible d’enregistrer la modification. Réessayez.",
-  "confirmSales": "Ce plan comprend des ventes. Appliquer les achats et ventes aux quantités d’actifs ?",
+  "confirmSales": "Ce plan comprend des ventes. Appliquer le plan pour mettre à jour vos soldes et vos quantités dans Cash Balancer ?",
   "targetTotalWarning": "La somme des objectifs n’est pas égale à 100 %.",
   "unallocatedCash": "Liquidités non affectées",
   "additionalCash": "Liquidités supplémentaires nécessaires",
@@ -84,5 +84,9 @@
   "sampleSavings": "Épargne à haut rendement",
   "quickPrice": "Mettre à jour le prix",
   "walletsLabel": "Portefeuilles",
-  "enterAmountToApply": "Saisissez un montant pour appliquer les opérations. Saisissez 0 pour rééquilibrer sans ajouter de fonds."
+  "enterAmountToApply": "Saisissez un montant pour appliquer les opérations. Saisissez 0 pour rééquilibrer sans ajouter de fonds.",
+  "balanceOnly": "Suivre comme solde en espèces",
+  "balance": "Solde",
+  "updateBalance": "Mettre à jour le solde",
+  "mergePreview": "La fusion ajoute {added} enregistrements et en conserve {kept}. Les valeurs actuelles des entrées correspondantes sont conservées. Les anciennes sauvegardes utilisent les noms dans chaque portefeuille."
 }

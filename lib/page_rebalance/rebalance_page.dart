@@ -113,7 +113,7 @@ class _RebalancePageState extends State<RebalancePage> {
             .toList();
         final invalidTrade = trades.any(
           (item) =>
-              item.quantity != 1 &&
+              !item.isBalance &&
               !(quantityAfterTrade(
                     item.price,
                     item.totalValue,
@@ -258,7 +258,7 @@ class _RebalancePageState extends State<RebalancePage> {
                     color: item.color,
                     currentValue: item.totalValue,
                     delta: activeDeltas[item.id] ?? 0,
-                    units: item.quantity == 1
+                    units: item.isBalance
                         ? null
                         : quantityAfterTrade(
                             item.price,
@@ -425,7 +425,7 @@ class const _AllocationTile({
             isHold
                 ? '✓ ${context.l10n.hold}'
                 : '${isBuy ? "↑ +" : "↓ "}${money(context, currency, delta)}'
-                      '${units == null ? "" : "\n${formatQuantity(context, units!)}×"}',
+                      '${units == null ? "" : "\n${formatQuantity(context, units!, digits: 6)}×"}',
             style: TextStyle(
               fontFamily: 'Fira Sans',
               fontSize: 13,

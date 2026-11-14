@@ -363,7 +363,7 @@ BeamPage _dataPage(
     title: title,
     popToNamed: '/',
     child: _DataRouteContent(id, build, walletColor),
-    routeBuilder: (context, settings, child) => PageRouteBuilder<Object>(
+    routeBuilder: (context, settings, child) => PageRouteBuilder<Object?>(
       settings: settings,
       pageBuilder: (context, animation, secondaryAnimation) => child,
     ),
@@ -439,7 +439,7 @@ class SharedAxisPageRoute({
   required SharedAxisTransitionType transitionType,
   required super.settings,
   Color? fillColor,
-}) extends PageRouteBuilder<Object> {
+}) extends PageRouteBuilder<Object?> {
   this
     : super(
         pageBuilder: (context, primaryAnimation, secondaryAnimation) => page,

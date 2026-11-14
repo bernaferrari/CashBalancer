@@ -481,7 +481,7 @@ abstract class AppLocalizations {
   /// No description provided for @confirmSales.
   ///
   /// In en, this message translates to:
-  /// **'This plan includes sales. Apply the buys and sales to your asset quantities?'**
+  /// **'This plan includes sales. Apply the plan to update your balances and quantities? This records changes in Cash Balancer.'**
   String get confirmSales;
 
   /// No description provided for @targetTotalWarning.
@@ -627,6 +627,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter an amount to apply trades. Enter 0 to rebalance without adding cash.'**
   String get enterAmountToApply;
+
+  /// No description provided for @balanceOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Track as a cash balance'**
+  String get balanceOnly;
+
+  /// No description provided for @balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance'**
+  String get balance;
+
+  /// No description provided for @updateBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Update balance'**
+  String get updateBalance;
+
+  /// No description provided for @mergePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge adds {added} records and keeps {kept} existing records. When records match, your current values are kept. Older backups match by name within each portfolio and wallet.'**
+  String mergePreview(int added, int kept);
 }
 
 class _AppLocalizationsDelegate

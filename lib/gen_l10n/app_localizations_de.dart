@@ -201,7 +201,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get confirmSales =>
-      'Dieser Plan enthält Verkäufe. Käufe und Verkäufe auf die Bestände anwenden?';
+      'Dieser Plan enthält Verkäufe. Möchtest du Guthaben und Mengen in Cash Balancer aktualisieren?';
 
   @override
   String get targetTotalWarning =>
@@ -280,4 +280,18 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get enterAmountToApply =>
       'Gib einen Betrag ein, um die Trades anzuwenden. Gib 0 ein, um ohne Einzahlung umzuschichten.';
+
+  @override
+  String get balanceOnly => 'Als Barguthaben erfassen';
+
+  @override
+  String get balance => 'Guthaben';
+
+  @override
+  String get updateBalance => 'Guthaben aktualisieren';
+
+  @override
+  String mergePreview(int added, int kept) {
+    return 'Die Zusammenführung fügt $added Einträge hinzu und behält $kept bestehende Einträge. Bei Übereinstimmungen bleiben die aktuellen Werte erhalten. Ältere Sicherungen verwenden die Namen innerhalb von Portfolios und Wallets.';
+  }
 }

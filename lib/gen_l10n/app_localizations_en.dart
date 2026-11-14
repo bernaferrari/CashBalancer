@@ -198,7 +198,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmSales =>
-      'This plan includes sales. Apply the buys and sales to your asset quantities?';
+      'This plan includes sales. Apply the plan to update your balances and quantities? This records changes in Cash Balancer.';
 
   @override
   String get targetTotalWarning => 'Targets don\'t add up to 100%.';
@@ -275,4 +275,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get enterAmountToApply =>
       'Enter an amount to apply trades. Enter 0 to rebalance without adding cash.';
+
+  @override
+  String get balanceOnly => 'Track as a cash balance';
+
+  @override
+  String get balance => 'Balance';
+
+  @override
+  String get updateBalance => 'Update balance';
+
+  @override
+  String mergePreview(int added, int kept) {
+    return 'Merge adds $added records and keeps $kept existing records. When records match, your current values are kept. Older backups match by name within each portfolio and wallet.';
+  }
 }

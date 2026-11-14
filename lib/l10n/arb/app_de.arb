@@ -60,7 +60,7 @@
   "unitPriceHelper": "Preis pro Stück. Mit der Menge multipliziert ergibt er den Gesamtwert.",
   "defaultPortfolio": "Portfolio Nr. 1",
   "operationFailed": "Änderung konnte nicht gespeichert werden. Bitte erneut versuchen.",
-  "confirmSales": "Dieser Plan enthält Verkäufe. Käufe und Verkäufe auf die Bestände anwenden?",
+  "confirmSales": "Dieser Plan enthält Verkäufe. Möchtest du Guthaben und Mengen in Cash Balancer aktualisieren?",
   "targetTotalWarning": "Die Zielwerte ergeben zusammen keine 100 %.",
   "unallocatedCash": "Nicht zugewiesenes Guthaben",
   "additionalCash": "Zusätzliches Guthaben erforderlich",
@@ -84,5 +84,9 @@
   "sampleSavings": "Hochverzinstes Sparkonto",
   "quickPrice": "Preis aktualisieren",
   "walletsLabel": "Wallets",
-  "enterAmountToApply": "Gib einen Betrag ein, um die Trades anzuwenden. Gib 0 ein, um ohne Einzahlung umzuschichten."
+  "enterAmountToApply": "Gib einen Betrag ein, um die Trades anzuwenden. Gib 0 ein, um ohne Einzahlung umzuschichten.",
+  "balanceOnly": "Als Barguthaben erfassen",
+  "balance": "Guthaben",
+  "updateBalance": "Guthaben aktualisieren",
+  "mergePreview": "Die Zusammenführung fügt {added} Einträge hinzu und behält {kept} bestehende Einträge. Bei Übereinstimmungen bleiben die aktuellen Werte erhalten. Ältere Sicherungen verwenden die Namen innerhalb von Portfolios und Wallets."
 }

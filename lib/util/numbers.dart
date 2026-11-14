@@ -26,16 +26,16 @@ extension Percent on double {
   String toPercent([String? locale]) => formatPercent(this * 100, locale);
 }
 
-String formatQuantity(BuildContext context, double value) {
+String formatQuantity(BuildContext context, double value, {int digits = 6}) {
   final locale = Localizations.localeOf(context).toString();
   final formatter = NumberFormat.decimalPatternDigits(
     locale: locale,
-    decimalDigits: 12,
+    decimalDigits: digits,
   )..minimumFractionDigits = 0;
   if (value.isFinite && value.abs() >= 1e15) {
     return _largeNumber(formatter, value);
   }
-  return value != 0 && value.abs() < 1e-12
+  return value != 0 && value.abs() < double.parse('1e-$digits')
       ? NumberFormat('0.#####E0', locale).format(value)
       : formatter.format(value);
 }

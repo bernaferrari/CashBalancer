@@ -79,6 +79,7 @@ void main() {
       2: WalletData(w2, 50),
     };
     const item1 = Item(
+      isBalance: false,
       id: 1,
       name: 'AAPL',
       quantity: 1,
@@ -88,6 +89,7 @@ void main() {
       userId: 1,
     );
     const item2 = Item(
+      isBalance: false,
       id: 2,
       name: 'MSFT',
       quantity: 1,
@@ -97,6 +99,7 @@ void main() {
       userId: 1,
     );
     const item3 = Item(
+      isBalance: false,
       id: 3,
       name: 'BTC',
       quantity: 1,
@@ -128,6 +131,7 @@ void main() {
     expect(retrieveSpacedList([], 200), isEmpty);
 
     const zeroItem = Item(
+      isBalance: false,
       id: 1,
       name: 'Zero',
       quantity: 1,
@@ -140,6 +144,7 @@ void main() {
     expect(zeroResult, [0.0]);
 
     const i1 = Item(
+      isBalance: false,
       id: 1,
       name: 'I1',
       quantity: 1,
@@ -149,6 +154,7 @@ void main() {
       userId: 1,
     );
     const i2 = Item(
+      isBalance: false,
       id: 2,
       name: 'I2',
       quantity: 1,
@@ -209,6 +215,7 @@ void main() {
       allItems: [
         ItemData(
           item: const Item(
+            isBalance: false,
             id: 1,
             walletId: 1,
             userId: 1,
@@ -222,6 +229,7 @@ void main() {
         ),
         ItemData(
           item: const Item(
+            isBalance: false,
             id: 2,
             walletId: 2,
             userId: 1,

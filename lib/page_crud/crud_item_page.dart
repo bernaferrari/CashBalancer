@@ -29,6 +29,7 @@ class const CRUDItemPage({
 
 class _CRUDItemPageState extends State<CRUDItemPage> {
   bool _saving = false;
+  late bool _isBalance = widget.previousItem?.isBalance ?? false;
 
   late final TextEditingController nameEditingController =
       TextEditingController(text: widget.previousItem?.name);
@@ -111,6 +112,15 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
             ),
         ],
         children: [
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(context.l10n.balanceOnly),
+            value: _isBalance,
+            onChanged: (value) {
+              setState(() => _isBalance = value);
+              onChanged();
+            },
+          ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -189,7 +199,9 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: getInputFillColor(context),
-                        labelText: context.l10n.unitPrice,
+                        labelText: _isBalance
+                            ? context.l10n.balance
+                            : context.l10n.unitPrice,
                         hintText: '0.00',
                         prefixText: widget.currency,
                         labelStyle: TextStyle(color: primaryColor),
@@ -199,51 +211,55 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      context.l10n.unitPriceHelper,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
+                    if (!_isBalance)
+                      Text(
+                        context.l10n.unitPriceHelper,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          TextFormField(
-            controller: quantityEditingController,
-            onFieldSubmitted: onSubmit,
-            onChanged: onChanged,
-            validator: (value) {
-              if (value == null || value.isEmpty) return null;
-              final quantity = double.tryParse(value);
-              return quantity != null &&
-                      quantity.isFinite &&
-                      quantity >= 0 &&
-                      (quantity *
-                              (double.tryParse(moneyEditingController.text) ??
-                                  0))
-                          .isFinite
-                  ? null
-                  : context.l10n.invalidValue;
-            },
-            textAlign: TextAlign.right,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: const <TextInputFormatter>[
-              DecimalTextInputFormatter(decimalRange: 324),
-            ],
-            decoration: InputDecoration(
-              isDense: true,
-              filled: true,
-              fillColor: getInputFillColor(context),
-              labelText: context.l10n.quantity,
-              hintText: '1',
-              prefixText: '× ',
-              labelStyle: TextStyle(color: primaryColorWeaker),
-              border: getInputDecorationBorder(primaryColorWeaker),
-              focusedBorder: getInputDecorationBorder(primaryColorWeaker),
-              enabledBorder: getInputDecorationBorder(primaryColorWeaker),
+          if (!_isBalance)
+            TextFormField(
+              controller: quantityEditingController,
+              onFieldSubmitted: onSubmit,
+              onChanged: onChanged,
+              validator: (value) {
+                if (value == null || value.isEmpty) return null;
+                final quantity = double.tryParse(value);
+                return quantity != null &&
+                        quantity.isFinite &&
+                        quantity >= 0 &&
+                        (quantity *
+                                (double.tryParse(moneyEditingController.text) ??
+                                    0))
+                            .isFinite
+                    ? null
+                    : context.l10n.invalidValue;
+              },
+              textAlign: TextAlign.right,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              inputFormatters: const <TextInputFormatter>[
+                DecimalTextInputFormatter(decimalRange: 324),
+              ],
+              decoration: InputDecoration(
+                isDense: true,
+                filled: true,
+                fillColor: getInputFillColor(context),
+                labelText: context.l10n.quantity,
+                hintText: '1',
+                prefixText: '× ',
+                labelStyle: TextStyle(color: primaryColorWeaker),
+                border: getInputDecorationBorder(primaryColorWeaker),
+                focusedBorder: getInputDecorationBorder(primaryColorWeaker),
+                enabledBorder: getInputDecorationBorder(primaryColorWeaker),
+              ),
             ),
-          ),
           const SizedBox(height: 16),
           TargetPercentageCard(
             controller: targetEditingController,
@@ -308,6 +324,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                 name: trimmedName,
                 value: moneyEditingController.text,
                 quantity: quantityEditingController.text,
+                isBalance: _isBalance,
                 target: targetEditingController.text,
               ),
               errorMessage: context.l10n.operationFailed,
@@ -318,6 +335,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                 name: trimmedName,
                 price: moneyEditingController.text,
                 quantity: quantityEditingController.text,
+                isBalance: _isBalance,
                 target: targetEditingController.text,
               ),
               errorMessage: context.l10n.operationFailed,
@@ -336,7 +354,9 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
   void onChanged([String? value]) {
     final unitPrice = double.tryParse(moneyEditingController.text) ?? 0;
     if (!mounted) return;
-    final qty = double.tryParse(quantityEditingController.text) ?? 1;
+    final qty = _isBalance
+        ? 1.0
+        : double.tryParse(quantityEditingController.text) ?? 1;
     final moneyValue = unitPrice * qty;
     final data = context.read<DataCubit>().state;
     final currentTotal = data?.settings.relativeTarget == true
@@ -370,6 +390,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
           name: nameEditingController.text.trim(),
           value: moneyEditingController.text,
           quantity: quantityEditingController.text,
+          isBalance: _isBalance,
           target: targetEditingController.text,
         ),
         errorMessage: context.l10n.operationFailed,

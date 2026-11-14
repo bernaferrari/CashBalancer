@@ -192,7 +192,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get operationFailed => '変更を保存できませんでした。もう一度お試しください。';
 
   @override
-  String get confirmSales => 'このプランには売却が含まれます。購入と売却を資産の数量に反映しますか？';
+  String get confirmSales => 'このプランには売却が含まれます。Cash Balancerの残高と数量を更新しますか？';
 
   @override
   String get targetTotalWarning => '目標の合計が100%ではありません。';
@@ -267,4 +267,18 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get enterAmountToApply =>
       '取引を適用するには金額を入力してください。資金を追加せずにリバランスするには 0 を入力してください。';
+
+  @override
+  String get balanceOnly => '現金残高として管理';
+
+  @override
+  String get balance => '残高';
+
+  @override
+  String get updateBalance => '残高を更新';
+
+  @override
+  String mergePreview(int added, int kept) {
+    return '統合すると$added件を追加し、既存の$kept件を保持します。一致するデータは現在の値を維持します。旧形式ではポートフォリオとウォレット内の名前を照合します。';
+  }
 }

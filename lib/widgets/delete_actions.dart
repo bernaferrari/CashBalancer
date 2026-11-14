@@ -1,3 +1,4 @@
+import 'package:beamer/beamer.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../l10n/l10n.dart';
@@ -61,12 +62,9 @@ Future<bool> deleteAndClose(
 ) async {
   final route = ModalRoute.of(context);
   if (route != null) _deletingRoutes[route] = true;
+  final Future<void> Function() undo;
   try {
-    final undo = await delete();
-    if (!context.mounted) return true;
-    showDeleted(context, undo);
-    if (route?.isCurrent == true) Navigator.of(context).pop();
-    return true;
+    undo = await delete();
   } catch (_) {
     if (route != null) _deletingRoutes[route] = null;
     if (context.mounted) {
@@ -74,4 +72,12 @@ Future<bool> deleteAndClose(
     }
     return false;
   }
+
+  if (context.mounted) {
+    showDeleted(context, undo);
+    if (route?.isCurrent == true) {
+      Beamer.of(context).beamToReplacementNamed('/');
+    }
+  }
+  return true;
 }

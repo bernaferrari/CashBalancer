@@ -60,7 +60,7 @@
   "unitPriceHelper": "每单位的价格。乘以数量即可得到总值。",
   "defaultPortfolio": "投资组合 #1",
   "operationFailed": "无法保存更改，请重试。",
-  "confirmSales": "此方案包含卖出。要将买卖应用到资产数量吗？",
+  "confirmSales": "此方案包含卖出。要应用方案并更新 Cash Balancer 中的余额和数量吗？",
   "targetTotalWarning": "目标比例之和不等于 100%。",
   "unallocatedCash": "未分配资金",
   "additionalCash": "还需资金",
@@ -84,5 +84,9 @@
   "sampleSavings": "高收益储蓄",
   "quickPrice": "更新价格",
   "walletsLabel": "钱包",
-  "enterAmountToApply": "输入金额以应用交易。若要在不增加资金的情况下再平衡，请输入 0。"
+  "enterAmountToApply": "输入金额以应用交易。若要在不增加资金的情况下再平衡，请输入 0。",
+  "balanceOnly": "按现金余额记录",
+  "balance": "余额",
+  "updateBalance": "更新余额",
+  "mergePreview": "合并会新增 {added} 条记录并保留 {kept} 条现有记录。匹配记录保留当前数值。旧版备份按投资组合和钱包中的名称匹配。"
 }

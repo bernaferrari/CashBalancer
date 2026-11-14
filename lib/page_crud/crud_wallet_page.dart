@@ -190,8 +190,11 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
     final db = context.read<DataCubit>().db;
     final wallet = widget.previousWallet!;
     if (await confirmDelete(context, wallet.name) && mounted) {
-      if (await deleteAndClose(context, () => db.deleteWallet(wallet.id)))
-        return;
+      final deleted = await deleteAndClose(
+        context,
+        () => db.deleteWallet(wallet.id),
+      );
+      if (deleted) return;
     }
     if (mounted) setState(() => _saving = false);
   }

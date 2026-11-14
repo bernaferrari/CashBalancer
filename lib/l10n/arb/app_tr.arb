@@ -60,7 +60,7 @@
   "unitPriceHelper": "Bir birimin fiyatı. Toplamı bulmak için miktarla çarpın.",
   "defaultPortfolio": "Portföy #1",
   "operationFailed": "Değişiklik kaydedilemedi. Tekrar deneyin.",
-  "confirmSales": "Bu plan satış içeriyor. Alış ve satışlar varlık miktarlarına uygulansın mı?",
+  "confirmSales": "Bu plan satış içeriyor. Cash Balancer içindeki bakiyeler ve miktarlar güncellensin mi?",
   "targetTotalWarning": "Hedeflerin toplamı %100 değil.",
   "unallocatedCash": "Ayrılmamış nakit",
   "additionalCash": "Gereken ek nakit",
@@ -84,5 +84,9 @@
   "sampleSavings": "Yüksek getirili tasarruf",
   "quickPrice": "Fiyatı güncelle",
   "walletsLabel": "Cüzdanlar",
-  "enterAmountToApply": "İşlemleri uygulamak için bir tutar girin. Nakit eklemeden dengelemek için 0 girin."
+  "enterAmountToApply": "İşlemleri uygulamak için bir tutar girin. Nakit eklemeden dengelemek için 0 girin.",
+  "balanceOnly": "Nakit bakiye olarak kaydet",
+  "balance": "Bakiye",
+  "updateBalance": "Bakiyeyi güncelle",
+  "mergePreview": "Birleştirme {added} kayıt ekler ve {kept} mevcut kaydı korur. Eşleşen kayıtların güncel değerleri korunur. Eski yedekler portföy ve cüzdan içindeki adlara göre eşleştirilir."
 }

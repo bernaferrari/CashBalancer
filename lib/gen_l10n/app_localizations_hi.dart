@@ -199,7 +199,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get confirmSales =>
-      'इस योजना में बिक्री शामिल है। क्या खरीद और बिक्री के अनुसार संपत्ति की मात्रा बदलें?';
+      'इस योजना में बिक्री शामिल है। क्या Cash Balancer में शेष और मात्रा अपडेट करें?';
 
   @override
   String get targetTotalWarning => 'लक्ष्यों का योग 100% नहीं है।';
@@ -275,4 +275,18 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get enterAmountToApply =>
       'लेन-देन लागू करने के लिए राशि दर्ज करें। बिना नकदी जोड़े पुनर्संतुलन के लिए 0 दर्ज करें।';
+
+  @override
+  String get balanceOnly => 'नकद शेष के रूप में दर्ज करें';
+
+  @override
+  String get balance => 'शेष';
+
+  @override
+  String get updateBalance => 'शेष अपडेट करें';
+
+  @override
+  String mergePreview(int added, int kept) {
+    return 'मिलाने पर $added रिकॉर्ड जुड़ेंगे और $kept मौजूदा रिकॉर्ड रहेंगे। मेल खाने वाले रिकॉर्ड के वर्तमान मान बने रहेंगे। पुराने बैकअप में पोर्टफ़ोलियो और वॉलेट के भीतर नाम से मिलान होता है।';
+  }
 }

@@ -60,7 +60,7 @@
   "unitPriceHelper": "Precio de una unidad. Multiplícalo por la cantidad para obtener el total.",
   "defaultPortfolio": "Cartera #1",
   "operationFailed": "No se pudo guardar el cambio. Inténtalo de nuevo.",
-  "confirmSales": "Este plan incluye ventas. ¿Aplicar las compras y ventas a las cantidades de los activos?",
+  "confirmSales": "Este plan incluye ventas. ¿Aplicar el plan para actualizar los saldos y las cantidades en Cash Balancer?",
   "targetTotalWarning": "Los objetivos no suman el 100 %.",
   "unallocatedCash": "Efectivo sin asignar",
   "additionalCash": "Efectivo adicional necesario",
@@ -84,5 +84,9 @@
   "sampleSavings": "Ahorro de alto rendimiento",
   "quickPrice": "Actualizar precio",
   "walletsLabel": "Carteras",
-  "enterAmountToApply": "Introduce un importe para aplicar las operaciones. Introduce 0 para rebalancear sin añadir dinero."
+  "enterAmountToApply": "Introduce un importe para aplicar las operaciones. Introduce 0 para rebalancear sin añadir dinero.",
+  "balanceOnly": "Registrar como saldo en efectivo",
+  "balance": "Saldo",
+  "updateBalance": "Actualizar saldo",
+  "mergePreview": "Combinar añade {added} registros y conserva {kept} existentes. Se conservan los valores actuales de los registros coincidentes. Las copias antiguas comparan nombres dentro de cada cartera y monedero."
 }

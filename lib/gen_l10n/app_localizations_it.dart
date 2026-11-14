@@ -200,7 +200,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get confirmSales =>
-      'Il piano include vendite. Applicare acquisti e vendite alle quantità degli asset?';
+      'Questo piano include vendite. Applicare il piano per aggiornare saldi e quantità in Cash Balancer?';
 
   @override
   String get targetTotalWarning => 'Gli obiettivi non sommano al 100%.';
@@ -278,4 +278,18 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get enterAmountToApply =>
       'Inserisci un importo per applicare le operazioni. Inserisci 0 per ribilanciare senza aggiungere denaro.';
+
+  @override
+  String get balanceOnly => 'Registra come saldo in contanti';
+
+  @override
+  String get balance => 'Saldo';
+
+  @override
+  String get updateBalance => 'Aggiorna saldo';
+
+  @override
+  String mergePreview(int added, int kept) {
+    return 'Unisci aggiunge $added voci e ne mantiene $kept. I valori correnti delle voci corrispondenti vengono conservati. I backup meno recenti usano i nomi nei portafogli.';
+  }
 }

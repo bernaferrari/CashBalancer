@@ -18,7 +18,11 @@ void main() {
         setup: (raw) {
           raw.execute('''
         CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL);
+        CREATE TABLE wallets (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, name TEXT NOT NULL, color_name TEXT NOT NULL, target_percent REAL NOT NULL);
+        CREATE TABLE items (id INTEGER PRIMARY KEY AUTOINCREMENT, wallet_id INTEGER NOT NULL, user_id INTEGER NOT NULL, name TEXT NOT NULL, quantity REAL NOT NULL, price REAL NOT NULL, target_percent REAL NOT NULL);
         INSERT INTO users (id, name) VALUES (12, 'Retirement');
+        INSERT INTO wallets VALUES (1, 12, 'Savings', 'sky', 100);
+        INSERT INTO items VALUES (1, 1, 12, 'Cash', 1, 1200, 100);
         PRAGMA user_version = 1;
       ''');
         },
@@ -28,6 +32,10 @@ void main() {
     expect(user.id, 12);
     expect(user.name, 'Retirement');
     expect(user.currencySymbol, isNull);
+    expect(user.backupId, hasLength(32));
+    final item = (await db.getItemFromId(1))!;
+    expect(item.isBalance, isTrue);
+    expect(item.backupId, hasLength(32));
   });
 
   test(
@@ -56,20 +64,36 @@ void main() {
         quantity: '0',
         target: '',
       );
+      final oneShare = await db.createItem(
+        walletId: wallet,
+        userId: user,
+        name: 'One share',
+        value: '220',
+        target: '',
+      );
       final savings = await db.createItem(
         walletId: wallet,
         userId: user,
         name: 'Savings',
+        isBalance: true,
         value: '1200',
         quantity: '',
         target: '',
       );
       expect((await db.getItemFromId(savings))!.quantity, 1);
       final rows = await db.select(db.items).get();
-      await db.applyTrades(rows, {id: 200, tiny: 40, savings: 300});
+      await db.applyTrades(rows, {
+        id: 200,
+        tiny: 40,
+        savings: 300,
+        oneShare: 110,
+      });
       final updated = (await db.getItemFromId(id))!;
       expect(updated.quantity, closeTo(8 + 200 / 220, 0.0000001));
       expect(updated.price, 220);
+      final shareUpdated = (await db.getItemFromId(oneShare))!;
+      expect(shareUpdated.quantity, 1.5);
+      expect(shareUpdated.price, 220);
       final savingsUpdated = (await db.getItemFromId(savings))!;
       expect(savingsUpdated.quantity, 1);
       expect(savingsUpdated.price, 1500);
@@ -132,6 +156,37 @@ void main() {
       );
       expect(restored, isNot(user));
       expect(await db.exportBackup(), backup);
+    },
+  );
+  test('merge preserves a renamed wallet and current asset prices', () async {
+    final user = await db.getDefaultUser();
+    await db.seedSamplePortfolio(user);
+    final backup = await db.exportBackup();
+    final wallet = (await db.select(db.wallets).get()).first;
+    final asset = (await db.select(db.items).get()).first;
+    await db.editWallet(wallet.copyWith(name: 'Renamed'));
+    await db.updatePrice(asset.id, 42);
+    final preview = await db.previewBackupMerge(user, backup);
+    expect(preview, (added: 0, kept: 9));
+    await db.importPortfolioJson(user, backup);
+    expect(await db.select(db.wallets).get(), hasLength(3));
+    expect(await db.select(db.items).get(), hasLength(5));
+    expect((await db.getItemFromId(asset.id))!.price, 42);
+  });
+
+  test(
+    'legacy merge matches existing wallet and asset names after a price edit',
+    () async {
+      final user = await db.getDefaultUser();
+      await db.seedSamplePortfolio(user);
+      final backup = await db.exportPortfolioJson(user);
+      final asset = (await db.select(db.items).get()).first;
+      await db.updatePrice(asset.id, 42);
+      expect(await db.previewBackupMerge(user, backup), (added: 0, kept: 8));
+      await db.importPortfolioJson(user, backup);
+      expect(await db.select(db.wallets).get(), hasLength(3));
+      expect(await db.select(db.items).get(), hasLength(5));
+      expect((await db.getItemFromId(asset.id))!.price, 42);
     },
   );
 }

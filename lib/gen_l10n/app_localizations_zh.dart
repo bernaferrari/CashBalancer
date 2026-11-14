@@ -192,7 +192,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get operationFailed => '无法保存更改，请重试。';
 
   @override
-  String get confirmSales => '此方案包含卖出。要将买卖应用到资产数量吗？';
+  String get confirmSales => '此方案包含卖出。要应用方案并更新 Cash Balancer 中的余额和数量吗？';
 
   @override
   String get targetTotalWarning => '目标比例之和不等于 100%。';
@@ -266,4 +266,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enterAmountToApply => '输入金额以应用交易。若要在不增加资金的情况下再平衡，请输入 0。';
+
+  @override
+  String get balanceOnly => '按现金余额记录';
+
+  @override
+  String get balance => '余额';
+
+  @override
+  String get updateBalance => '更新余额';
+
+  @override
+  String mergePreview(int added, int kept) {
+    return '合并会新增 $added 条记录并保留 $kept 条现有记录。匹配记录保留当前数值。旧版备份按投资组合和钱包中的名称匹配。';
+  }
 }

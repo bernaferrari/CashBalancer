@@ -199,7 +199,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get confirmSales =>
-      'Bu plan satış içeriyor. Alış ve satışlar varlık miktarlarına uygulansın mı?';
+      'Bu plan satış içeriyor. Cash Balancer içindeki bakiyeler ve miktarlar güncellensin mi?';
 
   @override
   String get targetTotalWarning => 'Hedeflerin toplamı %100 değil.';
@@ -276,4 +276,18 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get enterAmountToApply =>
       'İşlemleri uygulamak için bir tutar girin. Nakit eklemeden dengelemek için 0 girin.';
+
+  @override
+  String get balanceOnly => 'Nakit bakiye olarak kaydet';
+
+  @override
+  String get balance => 'Bakiye';
+
+  @override
+  String get updateBalance => 'Bakiyeyi güncelle';
+
+  @override
+  String mergePreview(int added, int kept) {
+    return 'Birleştirme $added kayıt ekler ve $kept mevcut kaydı korur. Eşleşen kayıtların güncel değerleri korunur. Eski yedekler portföy ve cüzdan içindeki adlara göre eşleştirilir.';
+  }
 }

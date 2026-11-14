@@ -32,6 +32,18 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
       'PRIMARY KEY AUTOINCREMENT',
     ),
   );
+  static const VerificationMeta _backupIdMeta = const VerificationMeta(
+    'backupId',
+  );
+  @override
+  late final GeneratedColumn<String> backupId = GeneratedColumn<String>(
+    'backup_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: newBackupId,
+  );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -42,7 +54,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [currencySymbol, id, name];
+  List<GeneratedColumn> get $columns => [currencySymbol, id, backupId, name];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -66,6 +78,12 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('backup_id')) {
+      context.handle(
+        _backupIdMeta,
+        backupId.isAcceptableOrUnknown(data['backup_id']!, _backupIdMeta),
+      );
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -92,6 +110,10 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
+      backupId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}backup_id'],
+      ),
       name: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}name'],
@@ -108,8 +130,14 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
 class User extends DataClass implements Insertable<User> {
   final String? currencySymbol;
   final int id;
+  final String? backupId;
   final String name;
-  const User({this.currencySymbol, required this.id, required this.name});
+  const User({
+    this.currencySymbol,
+    required this.id,
+    this.backupId,
+    required this.name,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -117,6 +145,9 @@ class User extends DataClass implements Insertable<User> {
       map['currency_symbol'] = Variable<String>(currencySymbol);
     }
     map['id'] = Variable<int>(id);
+    if (!nullToAbsent || backupId != null) {
+      map['backup_id'] = Variable<String>(backupId);
+    }
     map['name'] = Variable<String>(name);
     return map;
   }
@@ -127,6 +158,9 @@ class User extends DataClass implements Insertable<User> {
           ? const Value.absent()
           : Value(currencySymbol),
       id: Value(id),
+      backupId: backupId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(backupId),
       name: Value(name),
     );
   }
@@ -139,6 +173,7 @@ class User extends DataClass implements Insertable<User> {
     return User(
       currencySymbol: serializer.fromJson<String?>(json['currencySymbol']),
       id: serializer.fromJson<int>(json['id']),
+      backupId: serializer.fromJson<String?>(json['backupId']),
       name: serializer.fromJson<String>(json['name']),
     );
   }
@@ -148,6 +183,7 @@ class User extends DataClass implements Insertable<User> {
     return <String, dynamic>{
       'currencySymbol': serializer.toJson<String?>(currencySymbol),
       'id': serializer.toJson<int>(id),
+      'backupId': serializer.toJson<String?>(backupId),
       'name': serializer.toJson<String>(name),
     };
   }
@@ -155,12 +191,14 @@ class User extends DataClass implements Insertable<User> {
   User copyWith({
     Value<String?> currencySymbol = const Value.absent(),
     int? id,
+    Value<String?> backupId = const Value.absent(),
     String? name,
   }) => User(
     currencySymbol: currencySymbol.present
         ? currencySymbol.value
         : this.currencySymbol,
     id: id ?? this.id,
+    backupId: backupId.present ? backupId.value : this.backupId,
     name: name ?? this.name,
   );
   User copyWithCompanion(UsersCompanion data) {
@@ -169,6 +207,7 @@ class User extends DataClass implements Insertable<User> {
           ? data.currencySymbol.value
           : this.currencySymbol,
       id: data.id.present ? data.id.value : this.id,
+      backupId: data.backupId.present ? data.backupId.value : this.backupId,
       name: data.name.present ? data.name.value : this.name,
     );
   }
@@ -178,44 +217,51 @@ class User extends DataClass implements Insertable<User> {
     return (StringBuffer('User(')
           ..write('currencySymbol: $currencySymbol, ')
           ..write('id: $id, ')
+          ..write('backupId: $backupId, ')
           ..write('name: $name')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(currencySymbol, id, name);
+  int get hashCode => Object.hash(currencySymbol, id, backupId, name);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is User &&
           other.currencySymbol == this.currencySymbol &&
           other.id == this.id &&
+          other.backupId == this.backupId &&
           other.name == this.name);
 }
 
 class UsersCompanion extends UpdateCompanion<User> {
   final Value<String?> currencySymbol;
   final Value<int> id;
+  final Value<String?> backupId;
   final Value<String> name;
   const UsersCompanion({
     this.currencySymbol = const Value.absent(),
     this.id = const Value.absent(),
+    this.backupId = const Value.absent(),
     this.name = const Value.absent(),
   });
   UsersCompanion.insert({
     this.currencySymbol = const Value.absent(),
     this.id = const Value.absent(),
+    this.backupId = const Value.absent(),
     required String name,
   }) : name = Value(name);
   static Insertable<User> custom({
     Expression<String>? currencySymbol,
     Expression<int>? id,
+    Expression<String>? backupId,
     Expression<String>? name,
   }) {
     return RawValuesInsertable({
       if (currencySymbol != null) 'currency_symbol': currencySymbol,
       if (id != null) 'id': id,
+      if (backupId != null) 'backup_id': backupId,
       if (name != null) 'name': name,
     });
   }
@@ -223,11 +269,13 @@ class UsersCompanion extends UpdateCompanion<User> {
   UsersCompanion copyWith({
     Value<String?>? currencySymbol,
     Value<int>? id,
+    Value<String?>? backupId,
     Value<String>? name,
   }) {
     return UsersCompanion(
       currencySymbol: currencySymbol ?? this.currencySymbol,
       id: id ?? this.id,
+      backupId: backupId ?? this.backupId,
       name: name ?? this.name,
     );
   }
@@ -241,6 +289,9 @@ class UsersCompanion extends UpdateCompanion<User> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
+    if (backupId.present) {
+      map['backup_id'] = Variable<String>(backupId.value);
+    }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
@@ -252,6 +303,7 @@ class UsersCompanion extends UpdateCompanion<User> {
     return (StringBuffer('UsersCompanion(')
           ..write('currencySymbol: $currencySymbol, ')
           ..write('id: $id, ')
+          ..write('backupId: $backupId, ')
           ..write('name: $name')
           ..write(')'))
         .toString();
@@ -275,6 +327,18 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'PRIMARY KEY AUTOINCREMENT',
     ),
+  );
+  static const VerificationMeta _backupIdMeta = const VerificationMeta(
+    'backupId',
+  );
+  @override
+  late final GeneratedColumn<String> backupId = GeneratedColumn<String>(
+    'backup_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: newBackupId,
   );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
@@ -319,6 +383,7 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
   @override
   List<GeneratedColumn> get $columns => [
     id,
+    backupId,
     userId,
     name,
     colorName,
@@ -338,6 +403,12 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('backup_id')) {
+      context.handle(
+        _backupIdMeta,
+        backupId.isAcceptableOrUnknown(data['backup_id']!, _backupIdMeta),
+      );
     }
     if (data.containsKey('user_id')) {
       context.handle(
@@ -387,6 +458,10 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
+      backupId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}backup_id'],
+      ),
       userId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}user_id'],
@@ -414,12 +489,14 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
 
 class Wallet extends DataClass implements Insertable<Wallet> {
   final int id;
+  final String? backupId;
   final int userId;
   final String name;
   final String colorName;
   final double targetPercent;
   const Wallet({
     required this.id,
+    this.backupId,
     required this.userId,
     required this.name,
     required this.colorName,
@@ -429,6 +506,9 @@ class Wallet extends DataClass implements Insertable<Wallet> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
+    if (!nullToAbsent || backupId != null) {
+      map['backup_id'] = Variable<String>(backupId);
+    }
     map['user_id'] = Variable<int>(userId);
     map['name'] = Variable<String>(name);
     map['color_name'] = Variable<String>(colorName);
@@ -439,6 +519,9 @@ class Wallet extends DataClass implements Insertable<Wallet> {
   WalletsCompanion toCompanion(bool nullToAbsent) {
     return WalletsCompanion(
       id: Value(id),
+      backupId: backupId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(backupId),
       userId: Value(userId),
       name: Value(name),
       colorName: Value(colorName),
@@ -453,6 +536,7 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Wallet(
       id: serializer.fromJson<int>(json['id']),
+      backupId: serializer.fromJson<String?>(json['backupId']),
       userId: serializer.fromJson<int>(json['userId']),
       name: serializer.fromJson<String>(json['name']),
       colorName: serializer.fromJson<String>(json['colorName']),
@@ -464,6 +548,7 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'backupId': serializer.toJson<String?>(backupId),
       'userId': serializer.toJson<int>(userId),
       'name': serializer.toJson<String>(name),
       'colorName': serializer.toJson<String>(colorName),
@@ -473,12 +558,14 @@ class Wallet extends DataClass implements Insertable<Wallet> {
 
   Wallet copyWith({
     int? id,
+    Value<String?> backupId = const Value.absent(),
     int? userId,
     String? name,
     String? colorName,
     double? targetPercent,
   }) => Wallet(
     id: id ?? this.id,
+    backupId: backupId.present ? backupId.value : this.backupId,
     userId: userId ?? this.userId,
     name: name ?? this.name,
     colorName: colorName ?? this.colorName,
@@ -487,6 +574,7 @@ class Wallet extends DataClass implements Insertable<Wallet> {
   Wallet copyWithCompanion(WalletsCompanion data) {
     return Wallet(
       id: data.id.present ? data.id.value : this.id,
+      backupId: data.backupId.present ? data.backupId.value : this.backupId,
       userId: data.userId.present ? data.userId.value : this.userId,
       name: data.name.present ? data.name.value : this.name,
       colorName: data.colorName.present ? data.colorName.value : this.colorName,
@@ -500,6 +588,7 @@ class Wallet extends DataClass implements Insertable<Wallet> {
   String toString() {
     return (StringBuffer('Wallet(')
           ..write('id: $id, ')
+          ..write('backupId: $backupId, ')
           ..write('userId: $userId, ')
           ..write('name: $name, ')
           ..write('colorName: $colorName, ')
@@ -509,12 +598,14 @@ class Wallet extends DataClass implements Insertable<Wallet> {
   }
 
   @override
-  int get hashCode => Object.hash(id, userId, name, colorName, targetPercent);
+  int get hashCode =>
+      Object.hash(id, backupId, userId, name, colorName, targetPercent);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Wallet &&
           other.id == this.id &&
+          other.backupId == this.backupId &&
           other.userId == this.userId &&
           other.name == this.name &&
           other.colorName == this.colorName &&
@@ -523,12 +614,14 @@ class Wallet extends DataClass implements Insertable<Wallet> {
 
 class WalletsCompanion extends UpdateCompanion<Wallet> {
   final Value<int> id;
+  final Value<String?> backupId;
   final Value<int> userId;
   final Value<String> name;
   final Value<String> colorName;
   final Value<double> targetPercent;
   const WalletsCompanion({
     this.id = const Value.absent(),
+    this.backupId = const Value.absent(),
     this.userId = const Value.absent(),
     this.name = const Value.absent(),
     this.colorName = const Value.absent(),
@@ -536,6 +629,7 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
   });
   WalletsCompanion.insert({
     this.id = const Value.absent(),
+    this.backupId = const Value.absent(),
     required int userId,
     required String name,
     required String colorName,
@@ -546,6 +640,7 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
        targetPercent = Value(targetPercent);
   static Insertable<Wallet> custom({
     Expression<int>? id,
+    Expression<String>? backupId,
     Expression<int>? userId,
     Expression<String>? name,
     Expression<String>? colorName,
@@ -553,6 +648,7 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (backupId != null) 'backup_id': backupId,
       if (userId != null) 'user_id': userId,
       if (name != null) 'name': name,
       if (colorName != null) 'color_name': colorName,
@@ -562,6 +658,7 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
 
   WalletsCompanion copyWith({
     Value<int>? id,
+    Value<String?>? backupId,
     Value<int>? userId,
     Value<String>? name,
     Value<String>? colorName,
@@ -569,6 +666,7 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
   }) {
     return WalletsCompanion(
       id: id ?? this.id,
+      backupId: backupId ?? this.backupId,
       userId: userId ?? this.userId,
       name: name ?? this.name,
       colorName: colorName ?? this.colorName,
@@ -581,6 +679,9 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<int>(id.value);
+    }
+    if (backupId.present) {
+      map['backup_id'] = Variable<String>(backupId.value);
     }
     if (userId.present) {
       map['user_id'] = Variable<int>(userId.value);
@@ -601,6 +702,7 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
   String toString() {
     return (StringBuffer('WalletsCompanion(')
           ..write('id: $id, ')
+          ..write('backupId: $backupId, ')
           ..write('userId: $userId, ')
           ..write('name: $name, ')
           ..write('colorName: $colorName, ')
@@ -615,6 +717,21 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $ItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _isBalanceMeta = const VerificationMeta(
+    'isBalance',
+  );
+  @override
+  late final GeneratedColumn<bool> isBalance = GeneratedColumn<bool>(
+    'is_balance',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_balance" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -627,6 +744,18 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'PRIMARY KEY AUTOINCREMENT',
     ),
+  );
+  static const VerificationMeta _backupIdMeta = const VerificationMeta(
+    'backupId',
+  );
+  @override
+  late final GeneratedColumn<String> backupId = GeneratedColumn<String>(
+    'backup_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: newBackupId,
   );
   static const VerificationMeta _walletIdMeta = const VerificationMeta(
     'walletId',
@@ -690,7 +819,9 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   );
   @override
   List<GeneratedColumn> get $columns => [
+    isBalance,
     id,
+    backupId,
     walletId,
     userId,
     name,
@@ -710,8 +841,20 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('is_balance')) {
+      context.handle(
+        _isBalanceMeta,
+        isBalance.isAcceptableOrUnknown(data['is_balance']!, _isBalanceMeta),
+      );
+    }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('backup_id')) {
+      context.handle(
+        _backupIdMeta,
+        backupId.isAcceptableOrUnknown(data['backup_id']!, _backupIdMeta),
+      );
     }
     if (data.containsKey('wallet_id')) {
       context.handle(
@@ -773,10 +916,18 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   Item map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Item(
+      isBalance: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_balance'],
+      )!,
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
+      backupId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}backup_id'],
+      ),
       walletId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}wallet_id'],
@@ -811,7 +962,9 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
 }
 
 class Item extends DataClass implements Insertable<Item> {
+  final bool isBalance;
   final int id;
+  final String? backupId;
   final int walletId;
   final int userId;
   final String name;
@@ -819,7 +972,9 @@ class Item extends DataClass implements Insertable<Item> {
   final double price;
   final double targetPercent;
   const Item({
+    required this.isBalance,
     required this.id,
+    this.backupId,
     required this.walletId,
     required this.userId,
     required this.name,
@@ -830,7 +985,11 @@ class Item extends DataClass implements Insertable<Item> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    map['is_balance'] = Variable<bool>(isBalance);
     map['id'] = Variable<int>(id);
+    if (!nullToAbsent || backupId != null) {
+      map['backup_id'] = Variable<String>(backupId);
+    }
     map['wallet_id'] = Variable<int>(walletId);
     map['user_id'] = Variable<int>(userId);
     map['name'] = Variable<String>(name);
@@ -842,7 +1001,11 @@ class Item extends DataClass implements Insertable<Item> {
 
   ItemsCompanion toCompanion(bool nullToAbsent) {
     return ItemsCompanion(
+      isBalance: Value(isBalance),
       id: Value(id),
+      backupId: backupId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(backupId),
       walletId: Value(walletId),
       userId: Value(userId),
       name: Value(name),
@@ -858,7 +1021,9 @@ class Item extends DataClass implements Insertable<Item> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Item(
+      isBalance: serializer.fromJson<bool>(json['isBalance']),
       id: serializer.fromJson<int>(json['id']),
+      backupId: serializer.fromJson<String?>(json['backupId']),
       walletId: serializer.fromJson<int>(json['walletId']),
       userId: serializer.fromJson<int>(json['userId']),
       name: serializer.fromJson<String>(json['name']),
@@ -871,7 +1036,9 @@ class Item extends DataClass implements Insertable<Item> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
+      'isBalance': serializer.toJson<bool>(isBalance),
       'id': serializer.toJson<int>(id),
+      'backupId': serializer.toJson<String?>(backupId),
       'walletId': serializer.toJson<int>(walletId),
       'userId': serializer.toJson<int>(userId),
       'name': serializer.toJson<String>(name),
@@ -882,7 +1049,9 @@ class Item extends DataClass implements Insertable<Item> {
   }
 
   Item copyWith({
+    bool? isBalance,
     int? id,
+    Value<String?> backupId = const Value.absent(),
     int? walletId,
     int? userId,
     String? name,
@@ -890,7 +1059,9 @@ class Item extends DataClass implements Insertable<Item> {
     double? price,
     double? targetPercent,
   }) => Item(
+    isBalance: isBalance ?? this.isBalance,
     id: id ?? this.id,
+    backupId: backupId.present ? backupId.value : this.backupId,
     walletId: walletId ?? this.walletId,
     userId: userId ?? this.userId,
     name: name ?? this.name,
@@ -900,7 +1071,9 @@ class Item extends DataClass implements Insertable<Item> {
   );
   Item copyWithCompanion(ItemsCompanion data) {
     return Item(
+      isBalance: data.isBalance.present ? data.isBalance.value : this.isBalance,
       id: data.id.present ? data.id.value : this.id,
+      backupId: data.backupId.present ? data.backupId.value : this.backupId,
       walletId: data.walletId.present ? data.walletId.value : this.walletId,
       userId: data.userId.present ? data.userId.value : this.userId,
       name: data.name.present ? data.name.value : this.name,
@@ -915,7 +1088,9 @@ class Item extends DataClass implements Insertable<Item> {
   @override
   String toString() {
     return (StringBuffer('Item(')
+          ..write('isBalance: $isBalance, ')
           ..write('id: $id, ')
+          ..write('backupId: $backupId, ')
           ..write('walletId: $walletId, ')
           ..write('userId: $userId, ')
           ..write('name: $name, ')
@@ -927,13 +1102,24 @@ class Item extends DataClass implements Insertable<Item> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, walletId, userId, name, quantity, price, targetPercent);
+  int get hashCode => Object.hash(
+    isBalance,
+    id,
+    backupId,
+    walletId,
+    userId,
+    name,
+    quantity,
+    price,
+    targetPercent,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Item &&
+          other.isBalance == this.isBalance &&
           other.id == this.id &&
+          other.backupId == this.backupId &&
           other.walletId == this.walletId &&
           other.userId == this.userId &&
           other.name == this.name &&
@@ -943,7 +1129,9 @@ class Item extends DataClass implements Insertable<Item> {
 }
 
 class ItemsCompanion extends UpdateCompanion<Item> {
+  final Value<bool> isBalance;
   final Value<int> id;
+  final Value<String?> backupId;
   final Value<int> walletId;
   final Value<int> userId;
   final Value<String> name;
@@ -951,7 +1139,9 @@ class ItemsCompanion extends UpdateCompanion<Item> {
   final Value<double> price;
   final Value<double> targetPercent;
   const ItemsCompanion({
+    this.isBalance = const Value.absent(),
     this.id = const Value.absent(),
+    this.backupId = const Value.absent(),
     this.walletId = const Value.absent(),
     this.userId = const Value.absent(),
     this.name = const Value.absent(),
@@ -960,7 +1150,9 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     this.targetPercent = const Value.absent(),
   });
   ItemsCompanion.insert({
+    this.isBalance = const Value.absent(),
     this.id = const Value.absent(),
+    this.backupId = const Value.absent(),
     required int walletId,
     required int userId,
     required String name,
@@ -974,7 +1166,9 @@ class ItemsCompanion extends UpdateCompanion<Item> {
        price = Value(price),
        targetPercent = Value(targetPercent);
   static Insertable<Item> custom({
+    Expression<bool>? isBalance,
     Expression<int>? id,
+    Expression<String>? backupId,
     Expression<int>? walletId,
     Expression<int>? userId,
     Expression<String>? name,
@@ -983,7 +1177,9 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     Expression<double>? targetPercent,
   }) {
     return RawValuesInsertable({
+      if (isBalance != null) 'is_balance': isBalance,
       if (id != null) 'id': id,
+      if (backupId != null) 'backup_id': backupId,
       if (walletId != null) 'wallet_id': walletId,
       if (userId != null) 'user_id': userId,
       if (name != null) 'name': name,
@@ -994,7 +1190,9 @@ class ItemsCompanion extends UpdateCompanion<Item> {
   }
 
   ItemsCompanion copyWith({
+    Value<bool>? isBalance,
     Value<int>? id,
+    Value<String?>? backupId,
     Value<int>? walletId,
     Value<int>? userId,
     Value<String>? name,
@@ -1003,7 +1201,9 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     Value<double>? targetPercent,
   }) {
     return ItemsCompanion(
+      isBalance: isBalance ?? this.isBalance,
       id: id ?? this.id,
+      backupId: backupId ?? this.backupId,
       walletId: walletId ?? this.walletId,
       userId: userId ?? this.userId,
       name: name ?? this.name,
@@ -1016,8 +1216,14 @@ class ItemsCompanion extends UpdateCompanion<Item> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (isBalance.present) {
+      map['is_balance'] = Variable<bool>(isBalance.value);
+    }
     if (id.present) {
       map['id'] = Variable<int>(id.value);
+    }
+    if (backupId.present) {
+      map['backup_id'] = Variable<String>(backupId.value);
     }
     if (walletId.present) {
       map['wallet_id'] = Variable<int>(walletId.value);
@@ -1043,7 +1249,9 @@ class ItemsCompanion extends UpdateCompanion<Item> {
   @override
   String toString() {
     return (StringBuffer('ItemsCompanion(')
+          ..write('isBalance: $isBalance, ')
           ..write('id: $id, ')
+          ..write('backupId: $backupId, ')
           ..write('walletId: $walletId, ')
           ..write('userId: $userId, ')
           ..write('name: $name, ')
@@ -1079,11 +1287,13 @@ abstract class _$Database extends GeneratedDatabase {
 typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
   Value<String?> currencySymbol,
   Value<int> id,
+  Value<String?> backupId,
   required String name,
 });
 typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
   Value<String?> currencySymbol,
   Value<int> id,
+  Value<String?> backupId,
   Value<String> name,
 });
 
@@ -1102,6 +1312,11 @@ class $$UsersTableFilterComposer extends Composer<_$Database, $UsersTable> {
 
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get backupId => $composableBuilder(
+    column: $table.backupId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1129,6 +1344,11 @@ class $$UsersTableOrderingComposer extends Composer<_$Database, $UsersTable> {
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get backupId => $composableBuilder(
+    column: $table.backupId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get name => $composableBuilder(
     column: $table.name,
     builder: (column) => ColumnOrderings(column),
@@ -1150,6 +1370,9 @@ class $$UsersTableAnnotationComposer extends Composer<_$Database, $UsersTable> {
 
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get backupId =>
+      $composableBuilder(column: $table.backupId, builder: (column) => column);
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
@@ -1185,20 +1408,24 @@ class $$UsersTableTableManager
               ({
                 Value<String?> currencySymbol = const Value.absent(),
                 Value<int> id = const Value.absent(),
+                Value<String?> backupId = const Value.absent(),
                 Value<String> name = const Value.absent(),
               }) => UsersCompanion(
                 currencySymbol: currencySymbol,
                 id: id,
+                backupId: backupId,
                 name: name,
               ),
           createCompanionCallback:
               ({
                 Value<String?> currencySymbol = const Value.absent(),
                 Value<int> id = const Value.absent(),
+                Value<String?> backupId = const Value.absent(),
                 required String name,
               }) => UsersCompanion.insert(
                 currencySymbol: currencySymbol,
                 id: id,
+                backupId: backupId,
                 name: name,
               ),
           withReferenceMapper: (p0) => p0
@@ -1230,6 +1457,7 @@ typedef $$UsersTableProcessedTableManager =
     >;
 typedef $$WalletsTableCreateCompanionBuilder = WalletsCompanion Function({
   Value<int> id,
+  Value<String?> backupId,
   required int userId,
   required String name,
   required String colorName,
@@ -1237,6 +1465,7 @@ typedef $$WalletsTableCreateCompanionBuilder = WalletsCompanion Function({
 });
 typedef $$WalletsTableUpdateCompanionBuilder = WalletsCompanion Function({
   Value<int> id,
+  Value<String?> backupId,
   Value<int> userId,
   Value<String> name,
   Value<String> colorName,
@@ -1253,6 +1482,11 @@ class $$WalletsTableFilterComposer extends Composer<_$Database, $WalletsTable> {
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get backupId => $composableBuilder(
+    column: $table.backupId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1291,6 +1525,11 @@ class $$WalletsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get backupId => $composableBuilder(
+    column: $table.backupId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get userId => $composableBuilder(
     column: $table.userId,
     builder: (column) => ColumnOrderings(column),
@@ -1323,6 +1562,9 @@ class $$WalletsTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get backupId =>
+      $composableBuilder(column: $table.backupId, builder: (column) => column);
 
   GeneratedColumn<int> get userId =>
       $composableBuilder(column: $table.userId, builder: (column) => column);
@@ -1368,12 +1610,14 @@ class $$WalletsTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<String?> backupId = const Value.absent(),
                 Value<int> userId = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String> colorName = const Value.absent(),
                 Value<double> targetPercent = const Value.absent(),
               }) => WalletsCompanion(
                 id: id,
+                backupId: backupId,
                 userId: userId,
                 name: name,
                 colorName: colorName,
@@ -1382,12 +1626,14 @@ class $$WalletsTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<String?> backupId = const Value.absent(),
                 required int userId,
                 required String name,
                 required String colorName,
                 required double targetPercent,
               }) => WalletsCompanion.insert(
                 id: id,
+                backupId: backupId,
                 userId: userId,
                 name: name,
                 colorName: colorName,
@@ -1425,7 +1671,9 @@ typedef $$WalletsTableProcessedTableManager =
       PrefetchHooks Function()
     >;
 typedef $$ItemsTableCreateCompanionBuilder = ItemsCompanion Function({
+  Value<bool> isBalance,
   Value<int> id,
+  Value<String?> backupId,
   required int walletId,
   required int userId,
   required String name,
@@ -1434,7 +1682,9 @@ typedef $$ItemsTableCreateCompanionBuilder = ItemsCompanion Function({
   required double targetPercent,
 });
 typedef $$ItemsTableUpdateCompanionBuilder = ItemsCompanion Function({
+  Value<bool> isBalance,
   Value<int> id,
+  Value<String?> backupId,
   Value<int> walletId,
   Value<int> userId,
   Value<String> name,
@@ -1451,8 +1701,18 @@ class $$ItemsTableFilterComposer extends Composer<_$Database, $ItemsTable> {
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnFilters<bool> get isBalance => $composableBuilder(
+    column: $table.isBalance,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get backupId => $composableBuilder(
+    column: $table.backupId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1495,8 +1755,18 @@ class $$ItemsTableOrderingComposer extends Composer<_$Database, $ItemsTable> {
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnOrderings<bool> get isBalance => $composableBuilder(
+    column: $table.isBalance,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get backupId => $composableBuilder(
+    column: $table.backupId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -1539,8 +1809,14 @@ class $$ItemsTableAnnotationComposer extends Composer<_$Database, $ItemsTable> {
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  GeneratedColumn<bool> get isBalance =>
+      $composableBuilder(column: $table.isBalance, builder: (column) => column);
+
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get backupId =>
+      $composableBuilder(column: $table.backupId, builder: (column) => column);
 
   GeneratedColumn<int> get walletId =>
       $composableBuilder(column: $table.walletId, builder: (column) => column);
@@ -1591,7 +1867,9 @@ class $$ItemsTableTableManager
               $$ItemsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
+                Value<bool> isBalance = const Value.absent(),
                 Value<int> id = const Value.absent(),
+                Value<String?> backupId = const Value.absent(),
                 Value<int> walletId = const Value.absent(),
                 Value<int> userId = const Value.absent(),
                 Value<String> name = const Value.absent(),
@@ -1599,7 +1877,9 @@ class $$ItemsTableTableManager
                 Value<double> price = const Value.absent(),
                 Value<double> targetPercent = const Value.absent(),
               }) => ItemsCompanion(
+                isBalance: isBalance,
                 id: id,
+                backupId: backupId,
                 walletId: walletId,
                 userId: userId,
                 name: name,
@@ -1609,7 +1889,9 @@ class $$ItemsTableTableManager
               ),
           createCompanionCallback:
               ({
+                Value<bool> isBalance = const Value.absent(),
                 Value<int> id = const Value.absent(),
+                Value<String?> backupId = const Value.absent(),
                 required int walletId,
                 required int userId,
                 required String name,
@@ -1617,7 +1899,9 @@ class $$ItemsTableTableManager
                 required double price,
                 required double targetPercent,
               }) => ItemsCompanion.insert(
+                isBalance: isBalance,
                 id: id,
+                backupId: backupId,
                 walletId: walletId,
                 userId: userId,
                 name: name,

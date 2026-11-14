@@ -19,6 +19,8 @@ part 'database.g.dart';
 class Wallets extends Table {
   IntColumn get id => integer().autoIncrement()();
 
+  TextColumn get backupId => text().nullable().clientDefault(newBackupId)();
+
   IntColumn get userId => integer()();
 
   TextColumn get name => text()();
@@ -32,11 +34,16 @@ class Users extends Table {
   TextColumn get currencySymbol => text().nullable()();
   IntColumn get id => integer().autoIncrement()();
 
+  TextColumn get backupId => text().nullable().clientDefault(newBackupId)();
+
   TextColumn get name => text()();
 }
 
 class Items extends Table {
+  BoolColumn get isBalance => boolean().withDefault(const Constant(false))();
   IntColumn get id => integer().autoIncrement()();
+
+  TextColumn get backupId => text().nullable().clientDefault(newBackupId)();
 
   IntColumn get walletId => integer()();
 
@@ -59,7 +66,7 @@ class Items extends Table {
 )
 class Database(super.e) extends _$Database {
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -68,7 +75,24 @@ class Database(super.e) extends _$Database {
         return m.createAll();
       },
       onUpgrade: (m, from, to) async {
-        if (from < 2) await m.addColumn(users, users.currencySymbol);
+        await transaction(() async {
+          if (from < 2) await m.addColumn(users, users.currencySymbol);
+          if (from < 3) {
+            await m.addColumn(users, users.backupId);
+            await m.addColumn(wallets, wallets.backupId);
+            await m.addColumn(items, items.backupId);
+            await m.addColumn(items, items.isBalance);
+            // Keep the previous behavior for existing quantity-one entries.
+            await customStatement(
+              'UPDATE items SET is_balance = 1 WHERE quantity = 1',
+            );
+            for (final table in <TableInfo>[users, wallets, items]) {
+              await customStatement(
+                'UPDATE ${table.actualTableName} SET backup_id = lower(hex(randomblob(16)))',
+              );
+            }
+          }
+        });
       },
       beforeOpen: (details) async {
         if (details.wasCreated) {
@@ -260,6 +284,7 @@ class Database(super.e) extends _$Database {
     required String value,
     required String target,
     String quantity = '1',
+    bool isBalance = false,
   }) {
     final parsedQty = quantity.trim().isEmpty ? 1.0 : double.parse(quantity);
     return into(items).insert(
@@ -267,7 +292,8 @@ class Database(super.e) extends _$Database {
         walletId: walletId,
         userId: userId,
         name: name,
-        quantity: parsedQty,
+        quantity: isBalance ? 1 : parsedQty,
+        isBalance: Value(isBalance),
         price: double.parse(value),
         targetPercent: double.tryParse(target) ?? -1,
       ),
@@ -280,6 +306,7 @@ class Database(super.e) extends _$Database {
     required String price,
     required String target,
     String? quantity,
+    bool? isBalance,
   }) {
     final parsedQty = quantity == null
         ? item.quantity
@@ -289,7 +316,8 @@ class Database(super.e) extends _$Database {
     return update(items).replace(
       item.copyWith(
         name: name,
-        quantity: parsedQty,
+        quantity: (isBalance ?? item.isBalance) ? 1 : parsedQty,
+        isBalance: isBalance ?? item.isBalance,
         price: double.parse(price),
         targetPercent: double.tryParse(target) ?? -1,
       ),
@@ -301,7 +329,7 @@ class Database(super.e) extends _$Database {
         for (final item in holdings) {
           final delta = deltas[item.id] ?? 0;
           if (delta.abs() < 0.005) continue;
-          final amountOnly = item.quantity == 1;
+          final amountOnly = item.isBalance;
           final price = amountOnly
               ? (item.totalValue + delta).clamp(0.0, double.infinity)
               : item.price;
@@ -315,6 +343,7 @@ class Database(super.e) extends _$Database {
               current == null ||
               current.price != item.price ||
               current.quantity != item.quantity ||
+              current.isBalance != item.isBalance ||
               current.walletId != item.walletId ||
               current.targetPercent != item.targetPercent) {
             throw StateError('Holdings changed or trade has no valid price');
@@ -367,8 +396,9 @@ class Database(super.e) extends _$Database {
                   ))
                   .getSingleOrNull();
           if (parent == null) throw StateError('Wallet no longer exists');
-          if (await getItemFromId(item.id) != item)
+          if (await getItemFromId(item.id) != item) {
             await into(items).insert(item);
+          }
         }
       });
 
@@ -508,13 +538,17 @@ class Database(super.e) extends _$Database {
         walletId: cashId,
         userId: userId,
         name: savings,
+        isBalance: true,
         value: '1200',
         target: relative ? '100' : '15',
       );
     });
   }
 
-  Future<List<Map<String, Object?>>> _walletPayload(int userId) async {
+  Future<List<Map<String, Object?>>> _walletPayload(
+    int userId, {
+    bool includeIds = false,
+  }) async {
     final userWallets = await (select(
       wallets,
     )..where((w) => w.userId.equals(userId))).get();
@@ -524,12 +558,15 @@ class Database(super.e) extends _$Database {
     return [
       for (final w in userWallets)
         {
+          if (includeIds) 'id': w.backupId,
           'name': w.name,
           'colorName': w.colorName,
           'targetPercent': w.targetPercent,
           'items': [
             for (final i in userItems.where((x) => x.walletId == w.id))
               {
+                if (includeIds) 'id': i.backupId,
+                'isBalance': i.isBalance,
                 'name': i.name,
                 'quantity': i.quantity,
                 'price': i.price,
@@ -551,13 +588,14 @@ class Database(super.e) extends _$Database {
         await RxSharedPreferences.getInstance().getString('currencySymbol') ??
         r'$';
     return const JsonEncoder.withIndent('  ').convert({
-      'version': 2,
+      'version': 3,
       'portfolios': [
         for (final portfolio in await select(users).get())
           {
+            'id': portfolio.backupId,
             'name': portfolio.name,
             'currencySymbol': portfolio.currencySymbol ?? currency,
-            'wallets': await _walletPayload(portfolio.id),
+            'wallets': await _walletPayload(portfolio.id, includeIds: true),
           },
       ],
     });
@@ -568,75 +606,136 @@ class Database(super.e) extends _$Database {
     String jsonString, {
     bool replace = false,
   }) async {
-    final decoded = jsonDecode(jsonString);
-    if (decoded is! Map<String, dynamic>) throw const FormatException();
-    final payloads = switch (decoded['version']) {
-      1 => [
-        decodeBackupPortfolio({'name': '', 'wallets': decoded['wallets']}),
-      ],
-      2 when decoded['portfolios'] is List<dynamic> =>
-        (decoded['portfolios'] as List<dynamic>)
-            .map(decodeBackupPortfolio)
-            .toList(),
-      _ => throw const FormatException(),
-    };
-    if (payloads.isEmpty) throw const FormatException();
-    final isLegacy = decoded['version'] == 1;
-    return transaction(() async {
-      if (replace && !isLegacy) {
-        await delete(items).go();
-        await delete(wallets).go();
-        await delete(users).go();
-      }
-      if (replace && isLegacy) await _clearPortfolio(userId);
-      int? firstId;
-      final existing = await select(users).get();
-      final matchedIds = <int>{};
-      for (final payload in payloads) {
-        final name = payload['name'] as String;
-        final currency = payload['currencySymbol'] as String?;
-        final existingPortfolio = existing
-            .where(
-              (u) =>
-                  u.name == name &&
-                  !matchedIds.contains(u.id) &&
-                  (u.currencySymbol == currency || u.currencySymbol == null),
-            )
-            .firstOrNull;
-        final id = isLegacy
-            ? userId
-            : existingPortfolio?.id ?? await createUser(name);
-        matchedIds.add(id);
-        firstId ??= id;
-        if (!isLegacy && currency != null) {
-          await setPortfolioCurrency(id, currency);
-        }
-        final knownWallets = (await _walletPayload(id))
-            .map(jsonEncode)
-            .toList();
-        for (final wallet in payload['wallets'] as List<Map<String, Object?>>) {
-          if (knownWallets.remove(jsonEncode(wallet))) continue;
-          final walletId = await createGroup(
-            id: id,
-            name: wallet['name'] as String,
-            colorName: wallet['colorName'] as String,
-            targetPercent: wallet['targetPercent'] as double,
+    final backup = decodeBackup(jsonString);
+    return transaction(
+      () async =>
+          (await _restoreBackup(userId, backup, replace: replace)).firstId!,
+    );
+  }
+
+  Future<({int added, int kept})> previewBackupMerge(
+    int userId,
+    String jsonString,
+  ) async {
+    final backup = decodeBackup(jsonString);
+    final result = await transaction(
+      () => _restoreBackup(userId, backup, preview: true),
+    );
+    return (added: result.added, kept: result.kept);
+  }
+
+  Future<({int? firstId, int added, int kept})> _restoreBackup(
+    int userId,
+    Backup backup, {
+    bool preview = false,
+    bool replace = false,
+  }) async {
+    if (replace && !backup.singlePortfolio) {
+      await delete(items).go();
+      await delete(wallets).go();
+      await delete(users).go();
+    }
+    if (replace && backup.singlePortfolio) await _clearPortfolio(userId);
+
+    final localUsers = await select(users).get();
+    final localWallets = await select(wallets).get();
+    final localItems = await select(items).get();
+    final usedUsers = <int>{};
+    final usedWallets = <int>{};
+    final usedItems = <int>{};
+    int? firstId;
+    var added = 0;
+    var kept = 0;
+
+    for (final portfolio in backup.portfolios) {
+      final user = backup.singlePortfolio
+          ? localUsers.where((user) => user.id == userId).firstOrNull
+          : matchBackupRow(
+              localUsers,
+              usedUsers,
+              portfolio.id,
+              portfolio.name,
+              (user) => (user.id, user.backupId, user.name),
+            );
+      int? id = user?.id;
+      if (id == null) {
+        added++;
+        if (!preview) {
+          id = await into(users).insert(
+            UsersCompanion.insert(
+              name: portfolio.name,
+              currencySymbol: Value(portfolio.currency),
+              backupId: Value(portfolio.id ?? newBackupId()),
+            ),
           );
-          for (final item in wallet['items'] as List<Map<String, Object?>>) {
+        }
+      } else if (!backup.singlePortfolio) {
+        kept++;
+      }
+      firstId ??= id;
+
+      for (final wallet in portfolio.wallets) {
+        final localWallet = matchBackupRow(
+          wallet.id == null
+              ? localWallets.where((row) => row.userId == user?.id)
+              : localWallets,
+          usedWallets,
+          wallet.id,
+          wallet.name,
+          (row) => (row.id, row.backupId, row.name),
+        );
+        int? walletId = localWallet?.id;
+        if (walletId == null) {
+          added++;
+          if (!preview) {
+            walletId = await into(wallets).insert(
+              WalletsCompanion.insert(
+                userId: id!,
+                name: wallet.name,
+                colorName: wallet.colorName,
+                targetPercent: wallet.target,
+                backupId: Value(wallet.id ?? newBackupId()),
+              ),
+            );
+          }
+        } else {
+          kept++;
+        }
+
+        for (final item in wallet.items) {
+          // An asset can move between wallets after the backup was created.
+          final candidates = item.id == null
+              ? localItems.where((row) => row.walletId == localWallet?.id)
+              : localItems;
+          final existing = matchBackupRow(
+            candidates,
+            usedItems,
+            item.id,
+            item.name,
+            (row) => (row.id, row.backupId, row.name),
+          );
+          if (existing != null) {
+            kept++;
+            continue;
+          }
+          added++;
+          if (!preview) {
             await into(items).insert(
               ItemsCompanion.insert(
-                walletId: walletId,
-                userId: id,
-                name: item['name'] as String,
-                quantity: item['quantity'] as double,
-                price: item['price'] as double,
-                targetPercent: item['targetPercent'] as double,
+                walletId: walletId!,
+                userId: id!,
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price,
+                targetPercent: item.target,
+                isBalance: Value(item.isBalance),
+                backupId: Value(item.id ?? newBackupId()),
               ),
             );
           }
         }
       }
-      return firstId!;
-    });
+    }
+    return (firstId: firstId, added: added, kept: kept);
   }
 }

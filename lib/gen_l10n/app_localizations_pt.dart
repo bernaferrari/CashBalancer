@@ -199,7 +199,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get confirmSales =>
-      'Este plano inclui vendas. Aplicar as compras e vendas às quantidades dos ativos?';
+      'Este plano inclui vendas. Aplicar o plano para atualizar saldos e quantidades no Cash Balancer?';
 
   @override
   String get targetTotalWarning => 'As metas não somam 100%.';
@@ -276,4 +276,18 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get enterAmountToApply =>
       'Digite um valor para aplicar as operações. Digite 0 para rebalancear sem adicionar dinheiro.';
+
+  @override
+  String get balanceOnly => 'Controlar como saldo em dinheiro';
+
+  @override
+  String get balance => 'Saldo';
+
+  @override
+  String get updateBalance => 'Atualizar saldo';
+
+  @override
+  String mergePreview(int added, int kept) {
+    return 'Mesclar adiciona $added registros e mantém $kept existentes. Seus valores atuais são mantidos quando os registros coincidem. Backups antigos usam os nomes de cada portfólio e carteira.';
+  }
 }

@@ -200,7 +200,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get confirmSales =>
-      'В плане есть продажи. Применить покупки и продажи к количеству активов?';
+      'В плане есть продажи. Обновить остатки и количество активов в Cash Balancer?';
 
   @override
   String get targetTotalWarning => 'Сумма целевых долей не равна 100 %.';
@@ -277,4 +277,18 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get enterAmountToApply =>
       'Введите сумму для применения сделок. Введите 0 для ребалансировки без пополнения.';
+
+  @override
+  String get balanceOnly => 'Учитывать как денежный остаток';
+
+  @override
+  String get balance => 'Остаток';
+
+  @override
+  String get updateBalance => 'Обновить остаток';
+
+  @override
+  String mergePreview(int added, int kept) {
+    return 'При объединении добавится $added записей и сохранится $kept. Для совпадающих записей сохраняются текущие значения. Старые копии сопоставляются по именам внутри портфелей и кошельков.';
+  }
 }

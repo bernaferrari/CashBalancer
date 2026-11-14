@@ -15,6 +15,8 @@ class ItemData({
   this
     : super(
         id: item.id,
+        backupId: item.backupId,
+        isBalance: item.isBalance,
         walletId: item.walletId,
         userId: item.userId,
         name: item.name,
@@ -28,6 +30,7 @@ class WalletData(Wallet wallet, final double totalValue) extends Wallet {
   this
     : super(
         id: wallet.id,
+        backupId: wallet.backupId,
         userId: wallet.userId,
         name: wallet.name,
         colorName: wallet.colorName,

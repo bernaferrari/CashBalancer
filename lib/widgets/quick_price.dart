@@ -13,7 +13,9 @@ class const QuickPriceButton(final Item item, {super.key})
     extends StatelessWidget {
   @override
   Widget build(BuildContext context) => IconButton(
-    tooltip: context.l10n.quickPrice,
+    tooltip: item.isBalance
+        ? context.l10n.updateBalance
+        : context.l10n.quickPrice,
     icon: const Icon(Icons.price_change_outlined),
     onPressed: () => showDialog<void>(
       context: context,
@@ -69,7 +71,11 @@ class _QuickPriceDialogState extends State<_QuickPriceDialog> {
         inputFormatters: const <TextInputFormatter>[
           DecimalTextInputFormatter(decimalRange: 324),
         ],
-        decoration: InputDecoration(labelText: context.l10n.unitPrice),
+        decoration: InputDecoration(
+          labelText: widget.item.isBalance
+              ? context.l10n.balance
+              : context.l10n.unitPrice,
+        ),
         validator: (value) {
           final price = double.tryParse(value ?? '');
           return price == null ||

@@ -200,7 +200,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get confirmSales =>
-      'Este plan incluye ventas. ¿Aplicar las compras y ventas a las cantidades de los activos?';
+      'Este plan incluye ventas. ¿Aplicar el plan para actualizar los saldos y las cantidades en Cash Balancer?';
 
   @override
   String get targetTotalWarning => 'Los objetivos no suman el 100 %.';
@@ -277,4 +277,18 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get enterAmountToApply =>
       'Introduce un importe para aplicar las operaciones. Introduce 0 para rebalancear sin añadir dinero.';
+
+  @override
+  String get balanceOnly => 'Registrar como saldo en efectivo';
+
+  @override
+  String get balance => 'Saldo';
+
+  @override
+  String get updateBalance => 'Actualizar saldo';
+
+  @override
+  String mergePreview(int added, int kept) {
+    return 'Combinar añade $added registros y conserva $kept existentes. Se conservan los valores actuales de los registros coincidentes. Las copias antiguas comparan nombres dentro de cada cartera y monedero.';
+  }
 }

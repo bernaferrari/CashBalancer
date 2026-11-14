@@ -60,7 +60,7 @@
   "unitPriceHelper": "Prezzo di una unità. Moltiplicalo per la quantità per ottenere il totale.",
   "defaultPortfolio": "Portafoglio n. 1",
   "operationFailed": "Impossibile salvare la modifica. Riprova.",
-  "confirmSales": "Il piano include vendite. Applicare acquisti e vendite alle quantità degli asset?",
+  "confirmSales": "Questo piano include vendite. Applicare il piano per aggiornare saldi e quantità in Cash Balancer?",
   "targetTotalWarning": "Gli obiettivi non sommano al 100%.",
   "unallocatedCash": "Liquidità non assegnata",
   "additionalCash": "Liquidità aggiuntiva necessaria",
@@ -84,5 +84,9 @@
   "sampleSavings": "Risparmio ad alto rendimento",
   "quickPrice": "Aggiorna il prezzo",
   "walletsLabel": "Portafogli",
-  "enterAmountToApply": "Inserisci un importo per applicare le operazioni. Inserisci 0 per ribilanciare senza aggiungere denaro."
+  "enterAmountToApply": "Inserisci un importo per applicare le operazioni. Inserisci 0 per ribilanciare senza aggiungere denaro.",
+  "balanceOnly": "Registra come saldo in contanti",
+  "balance": "Saldo",
+  "updateBalance": "Aggiorna saldo",
+  "mergePreview": "Unisci aggiunge {added} voci e ne mantiene {kept}. I valori correnti delle voci corrispondenti vengono conservati. I backup meno recenti usano i nomi nei portafogli."
 }

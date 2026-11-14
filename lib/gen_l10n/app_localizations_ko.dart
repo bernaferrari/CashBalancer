@@ -192,7 +192,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get operationFailed => '변경사항을 저장하지 못했습니다. 다시 시도해 주세요.';
 
   @override
-  String get confirmSales => '이 계획에는 매도가 포함됩니다. 매수와 매도를 자산 수량에 반영할까요?';
+  String get confirmSales =>
+      '이 계획에는 매도가 포함됩니다. Cash Balancer의 잔액과 수량을 업데이트할까요?';
 
   @override
   String get targetTotalWarning => '목표의 합계가 100%가 아닙니다.';
@@ -267,4 +268,18 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get enterAmountToApply =>
       '거래를 적용하려면 금액을 입력하세요. 자금을 추가하지 않고 리밸런싱하려면 0을 입력하세요.';
+
+  @override
+  String get balanceOnly => '현금 잔액으로 관리';
+
+  @override
+  String get balance => '잔액';
+
+  @override
+  String get updateBalance => '잔액 업데이트';
+
+  @override
+  String mergePreview(int added, int kept) {
+    return '병합하면 $added개 항목을 추가하고 기존 항목 $kept개를 유지합니다. 일치하는 항목의 현재 값은 유지됩니다. 이전 백업은 포트폴리오와 지갑 안에서 이름으로 비교합니다.';
+  }
 }

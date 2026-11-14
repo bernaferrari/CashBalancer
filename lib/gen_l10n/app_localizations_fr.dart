@@ -200,7 +200,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get confirmSales =>
-      'Ce plan comprend des ventes. Appliquer les achats et ventes aux quantités d’actifs ?';
+      'Ce plan comprend des ventes. Appliquer le plan pour mettre à jour vos soldes et vos quantités dans Cash Balancer ?';
 
   @override
   String get targetTotalWarning =>
@@ -279,4 +279,18 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get enterAmountToApply =>
       'Saisissez un montant pour appliquer les opérations. Saisissez 0 pour rééquilibrer sans ajouter de fonds.';
+
+  @override
+  String get balanceOnly => 'Suivre comme solde en espèces';
+
+  @override
+  String get balance => 'Solde';
+
+  @override
+  String get updateBalance => 'Mettre à jour le solde';
+
+  @override
+  String mergePreview(int added, int kept) {
+    return 'La fusion ajoute $added enregistrements et en conserve $kept. Les valeurs actuelles des entrées correspondantes sont conservées. Les anciennes sauvegardes utilisent les noms dans chaque portefeuille.';
+  }
 }
