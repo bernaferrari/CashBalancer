@@ -267,11 +267,9 @@ class const VerticalProgressBar({required final FullData data, super.key})
                   key: ValueKey(item.id),
                   message:
                       '${item.name} • ${money(context, data.settings.currencySymbol, item.totalValue)} ($percent%)',
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 350),
-                    curve: Curves.easeOutCubic,
+                  child: SizedBox(
                     height: spacedList[i],
-                    color: item.color,
+                    child: ColoredBox(color: item.color),
                   ),
                 );
               }(),

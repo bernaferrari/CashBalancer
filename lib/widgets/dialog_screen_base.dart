@@ -152,10 +152,13 @@ class const DialogScreenBase({
                         actions: appBarActions,
                       ),
                       Flexible(
-                        child: ListView(
-                          padding: const EdgeInsets.all(24),
-                          shrinkWrap: true,
-                          children: children,
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: ListView(
+                            padding: const EdgeInsets.all(24),
+                            shrinkWrap: true,
+                            children: children,
+                          ),
                         ),
                       ),
                     ],

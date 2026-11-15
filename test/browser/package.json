@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "scripts": {"test": "node --test app_flows.test.cjs"},
+  "devDependencies": {"playwright-core": "1.65.1"}
+}
