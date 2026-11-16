@@ -10,9 +10,7 @@ import 'tailwind_colors.dart';
 ///
 /// This class represents the result of a database operation that may succeed or fail.
 /// It provides type-safe handling of both success and error cases.
-sealed class DbResult<T> {
-  const DbResult();
-
+sealed class const DbResult<T>() {
   /// Execute different code based on success or failure
   R when<R>({
     required R Function(T data) success,

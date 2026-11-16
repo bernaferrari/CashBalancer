@@ -19,3 +19,7 @@ analyzer:
 linter:
   rules:
     avoid_print: false
+    use_declaring_parameters: true
+    unnecessary_primary_constructor_body: true
+    unnecessary_type_name_in_constructor: true
+    unnecessary_const_in_enum_constructor: true

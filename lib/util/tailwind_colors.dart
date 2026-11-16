@@ -3,13 +3,13 @@ import 'dart:ui';
 
 class const _P3(double red, double green, double blue) extends Color {
   this
-      : super.from(
-          alpha: 1.0,
-          red: red,
-          green: green,
-          blue: blue,
-          colorSpace: ColorSpace.displayP3,
-        );
+    : super.from(
+        alpha: 1.0,
+        red: red,
+        green: green,
+        blue: blue,
+        colorSpace: ColorSpace.displayP3,
+      );
 }
 
 /// A complete 11-shade Tailwind v3/v4 color scale in the Display P3 color space.
@@ -27,23 +27,23 @@ class const TailwindPalette({
   required final Color s950,
 }) {
   Color operator [](int shade) => switch (shade) {
-        50 => s50,
-        100 => s100,
-        200 => s200,
-        300 => s300,
-        400 => s400,
-        500 => s500,
-        600 => s600,
-        700 => s700,
-        800 => s800,
-        900 => s900,
-        950 => s950,
-        _ => s500,
-      };
+    50 => s50,
+    100 => s100,
+    200 => s200,
+    300 => s300,
+    400 => s400,
+    500 => s500,
+    600 => s600,
+    700 => s700,
+    800 => s800,
+    900 => s900,
+    950 => s950,
+    _ => s500,
+  };
 }
 
 /// Type-safe Tailwind v3/v4 wide-gamut Display P3 color palettes.
-enum TailwindColor {
+enum TailwindColor(final TailwindPalette palette) {
   rose(
     TailwindPalette(
       s50: _P3(0.996, 0.946, 0.949),
@@ -374,10 +374,6 @@ enum TailwindColor {
       s950: _P3(0.008, 0.024, 0.090),
     ),
   );
-
-  const TailwindColor(this.palette);
-
-  final TailwindPalette palette;
 
   static final Map<String, TailwindColor> _byName = values.asNameMap();
 
