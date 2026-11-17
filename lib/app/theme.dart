@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/services.dart';
 
 import '../util/wallet_colors.dart';
 
@@ -172,6 +173,9 @@ ThemeData _buildTheme(Brightness brightness, WalletColor? wallet) {
     dividerTheme: DividerThemeData(color: l.hairline, thickness: 1, space: 1),
     iconTheme: IconThemeData(color: l.ink, size: 22),
     appBarTheme: AppBarTheme(
+      systemOverlayStyle: brightness == Brightness.dark
+          ? SystemUiOverlayStyle.light
+          : SystemUiOverlayStyle.dark,
       backgroundColor: Colors.transparent,
       foregroundColor: l.ink,
       elevation: 0,

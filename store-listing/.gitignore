@@ -1,0 +1,15 @@
+# Screenshot Studio outputs can be regenerated with the capture tour.
+node_modules/
+__pycache__/
+.fixture-apps/
+/*/phone/
+/*/tablet7/
+/*/tablet10/
+/*/contact-*.jpg
+/*/assets.json
+/export-report.json
+/*/raw/*
+!/en-US/raw/desktop/
+/en-US/raw/desktop/*
+!/en-US/raw/desktop/01-portfolio.png
+!/en-US/raw/desktop/02-rebalance.png

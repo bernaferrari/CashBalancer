@@ -1,0 +1,34 @@
+{
+  "portfolio": {
+    "title": "See your\n*whole portfolio*",
+    "body": "Know where your money is today."
+  },
+  "rebalance": {
+    "title": "Know what\n*to buy or sell*",
+    "body": "Turn your targets into a clear plan."
+  },
+  "buy-only": {
+    "title": "Rebalance\n*as you invest*",
+    "body": "Add money without selling holdings."
+  },
+  "assets": {
+    "title": "All your assets\n*in one view*",
+    "body": "See each holding and its target."
+  },
+  "wallet": {
+    "title": "Set a target\n*for each wallet*",
+    "body": "Organize your money your way."
+  },
+  "asset": {
+    "title": "Keep holdings\n*up to date*",
+    "body": "Adjust quantities, prices and targets."
+  },
+  "portfolios": {
+    "title": "Make room for\n*every goal*",
+    "body": "Keep separate portfolios together."
+  },
+  "settings": {
+    "title": "Make it\n*your own*",
+    "body": "Choose your currency and preferences."
+  }
+}

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg" cx="0.3" cy="0.2" r="1">
+      <stop offset="0" stop-color="#FFF8EF"/>
+      <stop offset="1" stop-color="#F3E8D8"/>
+    </radialGradient>
+    <pattern id="hatch" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="40" height="40" fill="#F59E0B" fill-opacity="0.3"/>
+      <rect width="19" height="40" fill="#F59E0B"/>
+    </pattern>
+    <mask id="knock">
+      <rect width="1024" height="1024" fill="#fff"/>
+      <path d="M660,336 C628,278 572,250 510,250 C428,250 370,298 370,370 C370,444 430,474 512,504 C596,534 654,568 654,644 C654,720 592,774 510,774 C444,774 390,744 362,690" transform="translate(512 512) scale(0.9) translate(-512 -512)" fill="none" stroke="#000" stroke-width="142.44444444444446" stroke-linecap="round"/>
+    </mask>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect x="489.0" y="128" width="46" height="768" rx="23.0" fill="#1F1D1A" mask="url(#knock)"/>
+  <g transform="translate(512 512) scale(0.9) translate(-512 -512)">
+  <g fill="none" stroke-width="98">
+  <path d="M660,336 C628,278 572,250 510,250 C428,250 370,298 370,370 C370,444 430,474 512,504 C596,534 654,568 654,644 C654,720 592,774 510,774 C444,774 390,744 362,690" pathLength="1000" stroke="#10B981" stroke-dasharray="430.91 2000" stroke-dashoffset="0.00"/>
+  <path d="M660,336 C628,278 572,250 510,250 C428,250 370,298 370,370 C370,444 430,474 512,504 C596,534 654,568 654,644 C654,720 592,774 510,774 C444,774 390,744 362,690" pathLength="1000" stroke="#F59E0B" stroke-dasharray="242.32 2000" stroke-dashoffset="-449.09"/>
+  <path d="M660,336 C628,278 572,250 510,250 C428,250 370,298 370,370 C370,444 430,474 512,504 C596,534 654,568 654,644 C654,720 592,774 510,774 C444,774 390,744 362,690" pathLength="1000" stroke="url(#hatch)" stroke-dasharray="100.00 2000" stroke-dashoffset="-690.91"/>
+  <path d="M660,336 C628,278 572,250 510,250 C428,250 370,298 370,370 C370,444 430,474 512,504 C596,534 654,568 654,644 C654,720 592,774 510,774 C444,774 390,744 362,690" pathLength="1000" stroke="#6366F1" stroke-dasharray="190.91 2000" stroke-dashoffset="-809.09"/>
+  </g>
+  <circle cx="660" cy="336" r="49.0" fill="#10B981"/>
+  <circle cx="362" cy="690" r="49.0" fill="#6366F1"/>
+  </g>
+</svg>

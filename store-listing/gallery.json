@@ -1,0 +1,129 @@
+{
+  "$schema": "https://unpkg.com/screenshot-studio/studio/schemas/gallery.schema.json",
+  "phone": [
+    {
+      "feature": "portfolio",
+      "raw": "phone/01-portfolio.png",
+      "layout": "big"
+    },
+    {
+      "feature": "rebalance",
+      "raw": "phone/02-rebalance.png",
+      "layout": "big"
+    },
+    {
+      "feature": "buy-only",
+      "raw": "phone/03-buy-only.png",
+      "layout": "big"
+    },
+    {
+      "feature": "assets",
+      "raw": "phone/04-assets.png",
+      "layout": "big"
+    },
+    {
+      "feature": "wallet",
+      "raw": "phone/05-wallet.png",
+      "layout": "big"
+    },
+    {
+      "feature": "asset",
+      "raw": "phone/06-asset.png",
+      "layout": "big"
+    },
+    {
+      "feature": "portfolios",
+      "raw": "phone/07-portfolios.png",
+      "layout": "hang"
+    },
+    {
+      "feature": "settings",
+      "raw": "phone/08-settings.png",
+      "layout": "big"
+    }
+  ],
+  "tablet7": [
+    {
+      "feature": "portfolio",
+      "raw": "tablet7/01-portfolio.png",
+      "layout": "big"
+    },
+    {
+      "feature": "rebalance",
+      "raw": "tablet7/02-rebalance.png",
+      "layout": "big"
+    },
+    {
+      "feature": "buy-only",
+      "raw": "tablet7/03-buy-only.png",
+      "layout": "big"
+    },
+    {
+      "feature": "assets",
+      "raw": "tablet7/04-assets.png",
+      "layout": "big"
+    },
+    {
+      "feature": "wallet",
+      "raw": "tablet7/05-wallet.png",
+      "layout": "big"
+    },
+    {
+      "feature": "asset",
+      "raw": "tablet7/06-asset.png",
+      "layout": "big"
+    },
+    {
+      "feature": "portfolios",
+      "raw": "tablet7/07-portfolios.png",
+      "layout": "hang"
+    },
+    {
+      "feature": "settings",
+      "raw": "tablet7/08-settings.png",
+      "layout": "big"
+    }
+  ],
+  "tablet10": [
+    {
+      "feature": "portfolio",
+      "raw": "tablet10/01-portfolio.png",
+      "layout": "big"
+    },
+    {
+      "feature": "rebalance",
+      "raw": "tablet10/02-rebalance.png",
+      "layout": "big"
+    },
+    {
+      "feature": "buy-only",
+      "raw": "tablet10/03-buy-only.png",
+      "layout": "big"
+    },
+    {
+      "feature": "assets",
+      "raw": "tablet10/04-assets.png",
+      "layout": "big"
+    },
+    {
+      "feature": "wallet",
+      "raw": "tablet10/05-wallet.png",
+      "layout": "big"
+    },
+    {
+      "feature": "asset",
+      "raw": "tablet10/06-asset.png",
+      "layout": "big"
+    },
+    {
+      "feature": "portfolios",
+      "raw": "tablet10/07-portfolios.png",
+      "layout": "big"
+    },
+    {
+      "feature": "settings",
+      "raw": "tablet10/08-settings.png",
+      "layout": "big"
+    }
+  ]
+}

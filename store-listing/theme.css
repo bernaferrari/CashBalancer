@@ -1,0 +1,50 @@
+/* Cash Balancer: a warm cream and soft mint wash with navy type and white frames. */
+@import "studio/layouts.css";
+:root{
+  --paper:#f5f2f3;
+  --ink:#161b26;
+  --accent:#3a52d6;
+  --warm:oklch(.95 .025 75);
+  --cool:oklch(.94 .025 165);
+  --muted:color-mix(in oklab,var(--ink) 66%,var(--paper));
+  --shadow:color-mix(in oklab,var(--ink) 24%,transparent);
+}
+@font-face{font-family:Porcelain;src:url(assets/PlusJakartaSans-latin.woff2) format('woff2');font-weight:200 800;font-display:block;
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Porcelain;src:url(assets/PlusJakartaSans-latin-ext.woff2) format('woff2');font-weight:200 800;font-display:block;
+  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+
+body,.campaign{background:var(--paper);color:var(--ink);font-family:Porcelain,var(--script-font),sans-serif}
+
+/* Copy centred at the top, the highlight in the accent. */
+header{text-align:center;z-index:5}
+h1{font-size:102px;line-height:1.06;letter-spacing:-.035em;font-weight:800}
+h1 em,h1 ins{font-style:normal;text-decoration:none;color:var(--accent)}
+h1 del{opacity:.45}
+header p{margin:30px auto 0;font-size:40px;line-height:1.32;font-weight:500;letter-spacing:-.01em;color:var(--muted);max-width:860px;text-wrap:balance}
+
+/* Frames: white porcelain with a soft, wide shadow. */
+.device{background:linear-gradient(170deg,#ffffff,#eef0f5);
+  box-shadow:inset 0 0 0 2px #ffffff,inset 0 -3px 0 #00000010,0 0 0 1px #00000012,0 40px 80px -30px var(--shadow),0 12px 24px -12px var(--shadow)}
+.device-label{color:var(--ink)}
+.device-label em{font-style:normal;color:var(--accent)}
+
+/* Placement: studio/layouts.css lays out big, hang and duo from these variables, per gallery.
+   Phone (1080 x 1920): big, one phone centred under the copy, running off the bottom; hang, the phone hanging from
+   the top with the copy underneath; duo, two phones side by side, the second stepping in front. */
+.phone{--inset:72px;--copy-top:150px;--copy-bottom:140px;--device-left:150px;--device-top:590px;--hang-top:-560px;
+  --duo-left:70px;--duo-width:530px;--duo-top:610px;--duo-step:130px}
+
+/* 7-inch portrait (1200 x 1920). */
+.tablet7{--inset:96px;--copy-top:160px;--copy-bottom:150px;--device-left:130px;--device-top:620px;--hang-top:-370px;
+  --duo-left:80px;--duo-right:60px;--duo-width:860px;--duo-second-width:400px;--duo-top:640px;--duo-step:260px}
+.tablet7 h1{font-size:112px}
+.tablet7 header p{font-size:42px}
+
+/* 10-inch landscape (1920 x 1200): copy on the left, the tablet on the right. */
+.tablet10{--inset:96px;--copy-width:540px;--copy-bottom:120px;--device-left:680px;--device-right:40px;--device-top:200px;--hang-top:70px;
+  --duo-width:1040px;--duo-second-width:300px;--duo-right:60px;--duo-top:130px;--duo-step:290px}
+.tablet10 header{text-align:left}
+.tablet10 h1{font-size:86px}
+.tablet10 h1 .line{white-space:normal;text-wrap:balance}
+.tablet10 header p{margin:26px 0 0;font-size:34px;max-width:520px}

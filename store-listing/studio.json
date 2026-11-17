@@ -1,0 +1,9 @@
+{
+  "app": "Cash Balancer",
+  "package": "com.bernaferrari.cash_balancer",
+  "locales": [
+    "en-US"
+  ],
+  "defaultLocale": "en-US",
+  "supersample": 2
+}

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg" cx="0.3" cy="0.2" r="1">
+      <stop offset="0" stop-color="#FFF8EF"/>
+      <stop offset="1" stop-color="#F3E8D8"/>
+    </radialGradient>
+    <pattern id="hatch" width="46" height="46" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="46" height="46" fill="#000000" fill-opacity="0.3"/>
+      <rect width="22" height="46" fill="#000000"/>
+    </pattern>
+    <mask id="amber">
+      <path d="M241.9,488.6 A289.0,289.0 0 0 0 439.9,786.6 L461.5,681.7 A183.0,183.0 0 0 1 347.0,509.4 Z" stroke-width="44" stroke-linejoin="round" fill="#fff" stroke="#fff"/>
+    </mask>
+  </defs>
+  <g transform="translate(512 512) scale(0.84) translate(-512 -512)">
+  <path d="M751.4,326.2 A289.0,289.0 0 0 0 254.8,423.9 L359.8,444.7 A183.0,183.0 0 0 1 670.2,394.4 Z" stroke-width="44" stroke-linejoin="round" fill="#000000" stroke="#000000"/>
+  <g mask="url(#amber)">
+    <path d="M227.5,424.1 A315.0,315.0 0 0 0 317.6,744.6 L424.1,627.9 A157.0,157.0 0 0 1 379.2,468.2 Z" fill="#000000"/>
+    <path d="M317.6,744.6 A315.0,315.0 0 0 0 493.8,824.9 L512.0,668.0 A157.0,157.0 0 0 1 424.1,627.9 Z" fill="url(#hatch)"/>
+  </g>
+  <path d="M504.6,799.9 A289.0,289.0 0 0 0 751.4,697.8 L670.2,629.6 A183.0,183.0 0 0 1 526.1,695.0 Z" stroke-width="44" stroke-linejoin="round" fill="#000000" stroke="#000000"/>
+  <circle cx="710.8" cy="360.3" r="75.0" fill="#000000"/>
+  <circle cx="710.8" cy="663.7" r="75.0" fill="#000000"/>
+  </g>
+</svg>

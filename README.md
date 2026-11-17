@@ -1,14 +1,20 @@
 [![Cash Balancer: a portfolio rebalancing from its current allocation to its target while each wallet counts up how much to buy or sell](assets/header.webp)](https://bernaferrari.github.io/CashBalancer)
 
-# Cash Balancer
+<p align="center">
+  <img src="assets/app_icon_rounded.png" alt="Cash Balancer app icon: a C-shaped allocation ring in green, amber and indigo, with the amber slice's excess hatched" width="128">
+</p>
+
+<h1 align="center">Cash Balancer</h1>
 
 It is too hard to balance money across different assets and accounts. Spreadsheets are too hostile; banks are too
 complex. This app should help you understand your finances without the help of an expert. It works basically as a
 finance calculator for asset allocation: you put what you have, how much you want to have (%), and check the difference.
 
-[Try the web version](https://bernaferrari.github.io/CashBalancer)
-
-[<img src="assets/google_play.png" alt="Get it on Google Play" height="60">](https://play.google.com/store/apps/details?id=com.bernaferrari.cash_balancer)
+<p align="center">
+  <a href="https://bernaferrari.github.io/CashBalancer">Try the web version</a>
+  <br><br>
+  <a href="https://play.google.com/store/apps/details?id=com.bernaferrari.cash_balancer"><img src="assets/google_play.png" alt="Get it on Google Play" height="60"></a>
+</p>
 
 Usage examples:
 
@@ -21,10 +27,14 @@ Usage examples:
 
 ## Screenshots
 
-| Main Screen | Analysis Screen |
-|:-:|:-:|
-| ![iPad Main Screen](assets/screen_ipad_main.png) | ![Analysis Screen](assets/screen_ipad_analysis.png) |
+### Portfolio
 
-| Main Screen | Edit Screen |
-|:-:|:-:|
-| ![MacOS Main Screen](assets/screen_macos_main.png) | ![Analysis Screen](assets/screen_macos_edit.png) |
+Every wallet and asset, how far each is from its target, and what to buy or sell.
+
+![Portfolio on a wide screen](store-listing/en-US/raw/desktop/01-portfolio.png)
+
+### Rebalance
+
+Enter what you want to invest and see exactly where each dollar goes.
+
+![Rebalance on a wide screen](store-listing/en-US/raw/desktop/02-rebalance.png)

@@ -16,6 +16,7 @@ import 'package:cash_balancer/page_rebalance/rebalance_page.dart';
 import 'package:cash_balancer/page_settings/settings_page.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/services.dart';
 
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
@@ -152,6 +153,12 @@ class _AppState extends State<App> {
             locale: appPrefs.$2,
             theme: buildTheme(Brightness.light),
             darkTheme: buildTheme(Brightness.dark),
+            builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+              value: Theme.of(context).brightness == Brightness.dark
+                  ? SystemUiOverlayStyle.light
+                  : SystemUiOverlayStyle.dark,
+              child: child!,
+            ),
             localizationsDelegates: [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,

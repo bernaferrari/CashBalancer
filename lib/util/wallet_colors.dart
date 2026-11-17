@@ -73,9 +73,14 @@ enum WalletColor(final Color seed) {
   );
 
   /// The seed faded [step] times toward the background of [brightness].
-  Color fade(int step, Brightness brightness) => step == 0
-      ? seed
-      : shade((brightness == Brightness.light ? 11 : -10) * step.toDouble());
+  Color fade(int step, Brightness brightness) {
+    if (step == 0) return seed;
+    final hct = Hct.fromInt(seed.toARGB32());
+    final tone = brightness == Brightness.light
+        ? (hct.tone + 11 * step).clamp(0.0, 75.0)
+        : (hct.tone - 10 * step).clamp(55.0, 100.0);
+    return Color(Hct.from(hct.hue, hct.chroma, tone).toInt());
+  }
 
   /// The seed at a lighter (positive) or darker HCT tone, same hue and chroma.
   Color shade(double toneShift) {
