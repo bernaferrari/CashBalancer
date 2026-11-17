@@ -25,8 +25,8 @@ class const SectionLabel(final String text, {final Widget? trailing, super.key})
   );
 }
 
-/// The raised surface every group of rows sits on. A [Material], so the ink of
-/// rows inside it shows on the card and stays within its corners.
+/// A tonal surface that sets a group apart by color, not outline. A
+/// [Material], so the ink of rows inside it stays within its corners.
 class const LedgerCard({
   required final Widget child,
   final EdgeInsetsGeometry padding = EdgeInsets.zero,
@@ -37,12 +37,47 @@ class const LedgerCard({
   Widget build(BuildContext context) => Material(
     color: color ?? context.ledger.surface,
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(20),
-      side: BorderSide(color: context.ledger.hairline),
+      borderRadius: BorderRadius.circular(SegmentedColumn.outer),
     ),
     clipBehavior: Clip.antiAlias,
     child: Padding(padding: padding, child: child),
   );
+}
+
+/// Material 3 Expressive grouping: every row is its own tonal tile, a hair
+/// apart, with large outer corners and tight inner ones, so a group reads as
+/// one shape without divider lines. [colorOf] tints individual tiles.
+class const SegmentedColumn({
+  required final List<Widget> children,
+  final Color? Function(int index)? colorOf,
+  super.key,
+}) extends StatelessWidget {
+  static const double outer = 24;
+  static const double inner = 6;
+  static const double gap = 3;
+
+  @override
+  Widget build(BuildContext context) {
+    final last = children.length - 1;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: gap,
+      children: [
+        for (final (i, child) in children.indexed)
+          Material(
+            color: colorOf?.call(i) ?? context.ledger.surface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(i == 0 ? outer : inner),
+                bottom: Radius.circular(i == last ? outer : inner),
+              ),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: child,
+          ),
+      ],
+    );
+  }
 }
 
 typedef Segment = ({Object id, Color color, double value});

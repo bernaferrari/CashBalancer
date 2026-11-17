@@ -361,25 +361,17 @@ class _RebalancePageState extends State<RebalancePage> {
                 ),
               )
             else ...[
-              LedgerCard(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
-                      child: AllocationBars([
-                        (context.l10n.now, nowSegments),
-                        (context.l10n.after, afterSegments),
-                      ], height: 12),
-                    ),
-                    for (final row in rows)
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          border: Border(top: BorderSide(color: l.hairline)),
-                        ),
-                        child: row,
-                      ),
-                  ],
-                ),
+              SegmentedColumn(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+                    child: AllocationBars([
+                      (context.l10n.now, nowSegments),
+                      (context.l10n.after, afterSegments),
+                    ], height: 12),
+                  ),
+                  ...rows,
+                ],
               ),
             ],
             for (final notice in notices)
@@ -520,7 +512,7 @@ class const _AllocationTile({
 }
 
 String _quantity(BuildContext context, double value) =>
-    formatQuantity(context, value, digits: value.abs() >= 1 ? 3 : 6);
+    formatQuantity(context, value, digits: value.abs() >= 1 ? 3 : 4);
 
 /// Grows and fades [child] in, and folds it away when it becomes null, so the
 /// content below slides instead of jumping.
@@ -557,16 +549,18 @@ class const _MinimumCashSuggestion({
     final l = context.ledger;
     return Container(
       key: const ValueKey('minimum-cash'),
-      padding: const EdgeInsets.fromLTRB(18, 12, 12, 14),
+      margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+      padding: const EdgeInsets.fromLTRB(12, 10, 10, 10),
       decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: l.hairline)),
+        color: l.sunken,
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
         children: [
           Container(
             width: 34,
             height: 34,
-            decoration: BoxDecoration(color: l.sunken, shape: BoxShape.circle),
+            decoration: BoxDecoration(color: l.surface, shape: BoxShape.circle),
             child: Icon(Icons.auto_awesome_rounded, size: 17, color: l.ink),
           ),
           const SizedBox(width: 12),
@@ -601,8 +595,6 @@ class const _MinimumCashSuggestion({
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(0, 38),
                       padding: const EdgeInsets.symmetric(horizontal: 18),
-                      backgroundColor: l.sunken,
-                      foregroundColor: l.ink,
                     ),
                     onPressed: onUse,
                     child: Text(context.l10n.useAmount),

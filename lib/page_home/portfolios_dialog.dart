@@ -60,20 +60,13 @@ class _PortfoliosDialogState extends State<PortfoliosDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            LedgerCard(
-              child: Column(
-                children: [
-                  for (final (i, portfolio) in state.portfolios.indexed)
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        border: i == 0
-                            ? null
-                            : Border(top: BorderSide(color: l.hairline)),
-                      ),
-                      child: _row(context, cubit, state, portfolio),
-                    ),
-                ],
-              ),
+            SegmentedColumn(
+              colorOf: (i) =>
+                  state.portfolios[i].id == state.userId ? l.sunken : null,
+              children: [
+                for (final portfolio in state.portfolios)
+                  _row(context, cubit, state, portfolio),
+              ],
             ),
             const SizedBox(height: 14),
             Row(

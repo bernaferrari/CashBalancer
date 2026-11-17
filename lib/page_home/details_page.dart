@@ -400,109 +400,98 @@ class const GroupCard({
     );
     final items = itemsList ?? const <ItemData>[];
 
-    return LedgerCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 14, 12, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 18,
-                      decoration: BoxDecoration(
-                        color: color.seed,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        group.name.toUpperCase(),
-                        overflow: TextOverflow.ellipsis,
-                        style: display(
-                          17,
-                          weight: FontWeight.w800,
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                    ),
-                    EditWallet(color: l.muted, groupId: group.id),
-                    const SizedBox(width: 4),
-                    AddItem(color: color, groupId: group.id),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(
-                      money(context, settings.currencySymbol, group.totalValue),
-                      style: figures(14, weight: FontWeight.w600, color: l.ink),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: ShareText(
-                        share: share,
-                        targetPercent: hasTarget ? group.targetPercent : null,
-                      ),
-                    ),
-                    if (delta != null && items.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 6),
-                        child: DeltaText(
-                          delta: delta,
-                          currency: settings.currencySymbol,
-                        ),
-                      ),
-                  ],
-                ),
-                if (items.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: TargetMeter(
-                      current: share,
-                      target: hasTarget ? group.targetPercent / 100 : null,
+    return SegmentedColumn(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(18, 14, 12, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 18,
+                    decoration: BoxDecoration(
                       color: color.seed,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      group.name.toUpperCase(),
+                      overflow: TextOverflow.ellipsis,
+                      style: display(
+                        17,
+                        weight: FontWeight.w800,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                  EditWallet(color: l.muted, groupId: group.id),
+                  const SizedBox(width: 4),
+                  AddItem(color: color, groupId: group.id),
                 ],
+              ),
+              const SizedBox(height: 6),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    money(context, settings.currencySymbol, group.totalValue),
+                    style: figures(14, weight: FontWeight.w600, color: l.ink),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: ShareText(
+                      share: share,
+                      targetPercent: hasTarget ? group.targetPercent : null,
+                    ),
+                  ),
+                  if (delta != null && items.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: DeltaText(
+                        delta: delta,
+                        currency: settings.currencySymbol,
+                      ),
+                    ),
+                ],
+              ),
+              if (items.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: TargetMeter(
+                    current: share,
+                    target: hasTarget ? group.targetPercent / 100 : null,
+                    color: color.seed,
+                  ),
+                ),
               ],
-            ),
+            ],
           ),
-          if (items.isEmpty)
-            Container(
-              padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
-              decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: l.hairline)),
-              ),
-              child: Text(
-                context.l10n.pressToAdd,
-                style: Theme.of(context).textTheme.bodySmall
-                    ?.copyWith(color: l.muted),
-              ),
-            )
-          else
-            for (final item in items)
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  border: Border(top: BorderSide(color: l.hairline)),
-                ),
-                child: ItemCard(
-                  item,
-                  settings.relativeTarget ? group.totalValue : allTotalValue,
-                  settings.currencySymbol,
-                  buyOnlyTotalValue: buyOnlyItemsTotal,
-                ),
-              ),
-        ],
-      ),
+        ),
+        if (items.isEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
+            child: Text(
+              context.l10n.pressToAdd,
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: l.muted),
+            ),
+          )
+        else
+          for (final item in items)
+            ItemCard(
+              item,
+              settings.relativeTarget ? group.totalValue : allTotalValue,
+              settings.currencySymbol,
+              buyOnlyTotalValue: buyOnlyItemsTotal,
+            ),
+      ],
     );
   }
 }

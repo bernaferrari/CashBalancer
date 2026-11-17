@@ -67,8 +67,7 @@ class const SamplePortfolioTile({
       child: Material(
         color: l.surface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: l.hairline),
+          borderRadius: BorderRadius.circular(SegmentedColumn.outer),
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(

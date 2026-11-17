@@ -61,88 +61,79 @@ class const SettingsPage({super.key}) extends StatelessWidget {
             : context.l10n.themeAuto;
 
         final l = context.ledger;
-        Widget divider() => Divider(height: 1, color: l.hairline);
 
         return DialogScreenBase(
           appBarTitle: context.l10n.settings,
           children: [
             SectionLabel(context.l10n.rebalanceCalculator),
-            LedgerCard(
-              child: Column(
-                children: [
-                  _SwitchRow(
-                    title: context.l10n.relativeTarget,
-                    subtitle: context.l10n.targetSettings,
-                    value: state.settings.relativeTarget,
-                    onChanged: (value) =>
-                        rxPrefs.setBool("relativeTarget", value),
-                  ),
-                  divider(),
-                  _SwitchRow(
-                    title: context.l10n.buyOnlyRebalance,
-                    subtitle: context.l10n.buyOnlyRebalanceSubtitle,
-                    value: state.settings.buyOnly,
-                    onChanged: (value) => rxPrefs.setBool("buyOnly", value),
-                  ),
-                ],
-              ),
+            SegmentedColumn(
+              children: [
+                _SwitchRow(
+                  title: context.l10n.relativeTarget,
+                  subtitle: context.l10n.targetSettings,
+                  value: state.settings.relativeTarget,
+                  onChanged: (value) =>
+                      rxPrefs.setBool("relativeTarget", value),
+                ),
+                _SwitchRow(
+                  title: context.l10n.buyOnlyRebalance,
+                  subtitle: context.l10n.buyOnlyRebalanceSubtitle,
+                  value: state.settings.buyOnly,
+                  onChanged: (value) => rxPrefs.setBool("buyOnly", value),
+                ),
+              ],
             ),
             const SizedBox(height: 26),
             SectionLabel(context.l10n.preferences),
-            LedgerCard(
-              child: Column(
-                children: [
-                  _SettingsRow(
-                    title: context.l10n.currencySymbol,
-                    value: state.settings.currencySymbol,
-                    onTap: () {
-                      showDialog<Object>(
-                        context: context,
-                        builder: (_) => CurrencySymbolDialog(
-                          initialValue: state.settings.currencySymbol,
-                          portfolioId: state.userId,
+            SegmentedColumn(
+              children: [
+                _SettingsRow(
+                  title: context.l10n.currencySymbol,
+                  value: state.settings.currencySymbol,
+                  onTap: () {
+                    showDialog<Object>(
+                      context: context,
+                      builder: (_) => CurrencySymbolDialog(
+                        initialValue: state.settings.currencySymbol,
+                        portfolioId: state.userId,
+                      ),
+                    );
+                  },
+                ),
+                _SettingsRow(
+                  title: context.l10n.language,
+                  value: currentLangLabel,
+                  onTap: () {
+                    showDialog<Object>(
+                      context: context,
+                      builder: (_) =>
+                          _LanguageDialog(currentLanguageCode: currentLang),
+                    );
+                  },
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 10, 10, 10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          context.l10n.sortBy,
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
-                      );
-                    },
+                      ),
+                      ConnectedButtonGroup<int>(
+                        height: 38,
+                        segments: [
+                          for (final id in const [0, 1])
+                            (id, getSortByString(context, id), null),
+                        ],
+                        selected: state.settings.sortBy,
+                        onSelected: (value) => rxPrefs.setInt('sortBy', value),
+                      ),
+                    ],
                   ),
-                  divider(),
-                  _SettingsRow(
-                    title: context.l10n.language,
-                    value: currentLangLabel,
-                    onTap: () {
-                      showDialog<Object>(
-                        context: context,
-                        builder: (_) =>
-                            _LanguageDialog(currentLanguageCode: currentLang),
-                      );
-                    },
-                  ),
-                  divider(),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(18, 10, 10, 10),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            context.l10n.sortBy,
-                            style: Theme.of(context).textTheme.titleSmall,
-                          ),
-                        ),
-                        ConnectedButtonGroup<int>(
-                          height: 38,
-                          segments: [
-                            for (final id in const [0, 1])
-                              (id, getSortByString(context, id), null),
-                          ],
-                          selected: state.settings.sortBy,
-                          onSelected: (value) =>
-                              rxPrefs.setInt('sortBy', value),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
             const SizedBox(height: 26),
             SectionLabel(context.l10n.appearance),
@@ -158,22 +149,19 @@ class const SettingsPage({super.key}) extends StatelessWidget {
             ),
             const SizedBox(height: 26),
             SectionLabel(context.l10n.backup),
-            LedgerCard(
-              child: Column(
-                children: [
-                  _SettingsRow(
-                    icon: Icons.ios_share_rounded,
-                    title: context.l10n.exportBackup,
-                    onTap: () => _export(context),
-                  ),
-                  divider(),
-                  _SettingsRow(
-                    icon: Icons.settings_backup_restore_rounded,
-                    title: context.l10n.importBackup,
-                    onTap: () => _import(context, state.userId),
-                  ),
-                ],
-              ),
+            SegmentedColumn(
+              children: [
+                _SettingsRow(
+                  icon: Icons.ios_share_rounded,
+                  title: context.l10n.exportBackup,
+                  onTap: () => _export(context),
+                ),
+                _SettingsRow(
+                  icon: Icons.settings_backup_restore_rounded,
+                  title: context.l10n.importBackup,
+                  onTap: () => _import(context, state.userId),
+                ),
+              ],
             ),
             const SizedBox(height: 32),
             Text(
@@ -284,53 +272,48 @@ class const _LanguageDialog({required final String? currentLanguageCode})
       content: SizedBox(
         width: 300,
         child: SingleChildScrollView(
-          child: LedgerCard(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (final (i, (code, label)) in entries.indexed)
-                  () {
-                    final isSelected =
-                        (code ?? '') == (currentLanguageCode ?? '');
-                    return InkWell(
-                      onTap: () async {
-                        if (code == null) {
-                          await rxPrefs.remove('languageCode');
-                        } else {
-                          await rxPrefs.setString('languageCode', code);
-                        }
-                        if (!context.mounted) return;
-                        Navigator.of(context).pop();
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.fromLTRB(18, 13, 16, 13),
-                        decoration: BoxDecoration(
-                          border: i == 0
-                              ? null
-                              : Border(top: BorderSide(color: l.hairline)),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                label,
-                                style: Theme.of(context).textTheme.titleSmall
-                                    ?.copyWith(
-                                      fontWeight: isSelected
-                                          ? FontWeight.w700
-                                          : FontWeight.w500,
-                                    ),
-                              ),
+          child: SegmentedColumn(
+            colorOf: (i) => (entries[i].$1 ?? '') == (currentLanguageCode ?? '')
+                ? l.sunken
+                : null,
+            children: [
+              for (final (code, label) in entries)
+                () {
+                  final isSelected =
+                      (code ?? '') == (currentLanguageCode ?? '');
+                  return InkWell(
+                    onTap: () async {
+                      if (code == null) {
+                        await rxPrefs.remove('languageCode');
+                      } else {
+                        await rxPrefs.setString('languageCode', code);
+                      }
+                      if (!context.mounted) return;
+                      Navigator.of(context).pop();
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(18, 13, 16, 13),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              label,
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(
+                                    fontWeight: isSelected
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                  ),
                             ),
-                            if (isSelected)
-                              Icon(Icons.check_rounded, size: 20, color: l.ink),
-                          ],
-                        ),
+                          ),
+                          if (isSelected)
+                            Icon(Icons.check_rounded, size: 20, color: l.ink),
+                        ],
                       ),
-                    );
-                  }(),
-              ],
-            ),
+                    ),
+                  );
+                }(),
+            ],
           ),
         ),
       ),

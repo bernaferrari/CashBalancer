@@ -62,24 +62,8 @@ class const DetailsPageImpl(final FullData data, {super.key})
           : PortfolioSplitView(
               header: _ItemsHero(data, items),
               children: [
-                LedgerCard(
-                  child: Column(
-                    children: [
-                      for (final (i, item) in items.indexed)
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                            border: i == 0
-                                ? null
-                                : Border(
-                                    top: BorderSide(
-                                      color: context.ledger.hairline,
-                                    ),
-                                  ),
-                          ),
-                          child: _ShareRow(data, item),
-                        ),
-                    ],
-                  ),
+                SegmentedColumn(
+                  children: [for (final item in items) _ShareRow(data, item)],
                 ),
               ],
             ),

@@ -18,7 +18,7 @@ class const Ledger({
   /// a green scheme and sell the error role, both at the scheme's brightness.
   static Ledger of(ColorScheme scheme) => Ledger(
     canvas: scheme.surface,
-    surface: scheme.surfaceContainerLow,
+    surface: scheme.surfaceContainer,
     sunken: scheme.surfaceContainerHighest,
     hairline: scheme.outlineVariant,
     ink: scheme.onSurface,
@@ -127,7 +127,6 @@ ThemeData _buildTheme(Brightness brightness, WalletColor? wallet) {
   final l = Ledger.of(m3);
   final accent = wallet == null ? l.ink : m3.primary;
   final onAccent = wallet == null ? l.canvas : m3.onPrimary;
-  final field = m3.surfaceContainerLowest;
   final scheme = m3.copyWith(
     primary: accent,
     onPrimary: onAccent,
@@ -154,11 +153,10 @@ ThemeData _buildTheme(Brightness brightness, WalletColor? wallet) {
   final shape12 = RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(12),
   );
-  OutlineInputBorder border(Color color, [double width = 1]) =>
-      OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: color, width: width),
-      );
+  InputBorder well([BorderSide side = BorderSide.none]) => UnderlineInputBorder(
+    borderRadius: BorderRadius.circular(16),
+    borderSide: side,
+  );
 
   return ThemeData(
     brightness: brightness,
@@ -195,13 +193,10 @@ ThemeData _buildTheme(Brightness brightness, WalletColor? wallet) {
       extendedPadding: const EdgeInsets.symmetric(horizontal: 22),
     ),
     dialogTheme: DialogThemeData(
-      backgroundColor: l.surface,
+      backgroundColor: l.canvas,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(28),
-        side: BorderSide(color: l.hairline),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       titleTextStyle: textTheme.headlineSmall,
       contentTextStyle: textTheme.bodyMedium?.copyWith(color: l.muted),
     ),
@@ -240,7 +235,8 @@ ThemeData _buildTheme(Brightness brightness, WalletColor? wallet) {
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(48, 48),
         foregroundColor: l.ink,
-        side: BorderSide(color: l.hairline, width: 1.2),
+        backgroundColor: l.sunken,
+        side: BorderSide.none,
         shape: const StadiumBorder(),
         textStyle: textTheme.labelLarge,
       ),
@@ -258,13 +254,13 @@ ThemeData _buildTheme(Brightness brightness, WalletColor? wallet) {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: field,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      border: border(l.hairline, 1.2),
-      enabledBorder: border(l.hairline, 1.2),
-      focusedBorder: border(accent, 1.6),
-      errorBorder: border(l.sell),
-      focusedErrorBorder: border(l.sell, 1.6),
+      fillColor: l.sunken,
+      contentPadding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      border: well(),
+      enabledBorder: well(),
+      focusedBorder: well(BorderSide(color: accent, width: 2.5)),
+      errorBorder: well(BorderSide(color: l.sell, width: 2)),
+      focusedErrorBorder: well(BorderSide(color: l.sell, width: 2.5)),
       labelStyle: textTheme.bodyMedium?.copyWith(color: l.muted),
       floatingLabelStyle: WidgetStateTextStyle.resolveWith(
         (states) => _inter(13, FontWeight.w500).copyWith(
@@ -277,9 +273,9 @@ ThemeData _buildTheme(Brightness brightness, WalletColor? wallet) {
       suffixStyle: figures(15, color: l.muted),
     ),
     chipTheme: ChipThemeData(
-      backgroundColor: l.surface,
+      backgroundColor: l.sunken,
       selectedColor: accent,
-      side: BorderSide(color: l.hairline, width: 1.2),
+      side: BorderSide.none,
       shape: const StadiumBorder(),
       labelStyle: figures(13, weight: FontWeight.w500, color: l.ink),
       secondaryLabelStyle: figures(
@@ -292,7 +288,7 @@ ThemeData _buildTheme(Brightness brightness, WalletColor? wallet) {
     ),
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.selected) ? onAccent : field,
+        (states) => states.contains(WidgetState.selected) ? onAccent : l.canvas,
       ),
       trackColor: WidgetStateProperty.resolveWith(
         (states) => states.contains(WidgetState.selected)

@@ -42,86 +42,77 @@ class _MoveItemPageState extends State<MoveItemPage> {
         ),
       ],
       children: [
-        LedgerCard(
-          child: Column(
-            children: [
-              for (final (i, group) in widget.wallets.indexed)
-                () {
-                  final isSelected = selectedGroupId == group.id;
-                  final isCurrent = widget.item.walletId == group.id;
-                  final accent = walletSeed(group.colorName);
-                  return Semantics(
-                    selected: isSelected,
-                    child: InkWell(
-                      onTap: () => setState(() => selectedGroupId = group.id),
-                      child: Container(
-                        padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? accent.withValues(alpha: 0.10)
-                              : null,
-                          border: i == 0
-                              ? null
-                              : Border(top: BorderSide(color: l.hairline)),
-                        ),
-                        child: Row(
-                          spacing: 12,
-                          children: [
-                            Container(
-                              width: 4,
-                              height: 18,
-                              decoration: BoxDecoration(
-                                color: accent,
-                                borderRadius: BorderRadius.circular(2),
-                              ),
+        SegmentedColumn(
+          colorOf: (i) => widget.wallets[i].id == selectedGroupId
+              ? WalletColor.fromName(widget.wallets[i].colorName)
+                    .scheme(Theme.of(context).brightness)
+                    .secondaryContainer
+              : null,
+          children: [
+            for (final group in widget.wallets)
+              () {
+                final isSelected = selectedGroupId == group.id;
+                final isCurrent = widget.item.walletId == group.id;
+                final accent = walletSeed(group.colorName);
+                return Semantics(
+                  selected: isSelected,
+                  child: InkWell(
+                    onTap: () => setState(() => selectedGroupId = group.id),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
+                      child: Row(
+                        spacing: 12,
+                        children: [
+                          Container(
+                            width: 4,
+                            height: 18,
+                            decoration: BoxDecoration(
+                              color: accent,
+                              borderRadius: BorderRadius.circular(2),
                             ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                spacing: 3,
-                                children: [
-                                  Text(
-                                    group.name.toUpperCase(),
-                                    overflow: TextOverflow.ellipsis,
-                                    style: display(
-                                      15,
-                                      weight: FontWeight.w800,
-                                      letterSpacing: 0.2,
-                                    ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: 3,
+                              children: [
+                                Text(
+                                  group.name.toUpperCase(),
+                                  overflow: TextOverflow.ellipsis,
+                                  style: display(
+                                    15,
+                                    weight: FontWeight.w800,
+                                    letterSpacing: 0.2,
                                   ),
-                                  Text(
-                                    [
-                                      money(
-                                        context,
-                                        currency,
-                                        group.totalValue,
-                                      ),
-                                      if (isCurrent) context.l10n.currentWallet,
-                                    ].join('  ·  '),
-                                    style: figures(12.5, color: l.muted),
-                                  ),
-                                ],
-                              ),
+                                ),
+                                Text(
+                                  [
+                                    money(context, currency, group.totalValue),
+                                    if (isCurrent) context.l10n.currentWallet,
+                                  ].join('  ·  '),
+                                  style: figures(12.5, color: l.muted),
+                                ),
+                              ],
                             ),
-                            AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 160),
-                              child: Icon(
-                                isSelected
-                                    ? Icons.check_circle_rounded
-                                    : Icons.circle_outlined,
-                                key: ValueKey(isSelected),
-                                size: 22,
-                                color: isSelected ? accent : l.faint,
-                              ),
+                          ),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 160),
+                            child: Icon(
+                              isSelected
+                                  ? Icons.check_circle_rounded
+                                  : Icons.circle_outlined,
+                              key: ValueKey(isSelected),
+                              size: 22,
+                              color: isSelected ? accent : l.faint,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  );
-                }(),
-            ],
-          ),
+                  ),
+                );
+              }(),
+          ],
         ),
       ],
     );

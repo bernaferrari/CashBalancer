@@ -116,7 +116,6 @@ class const DialogScreenBase({
                           decoration: BoxDecoration(
                             color: surface,
                             borderRadius: BorderRadius.circular(28),
-                            border: Border.all(color: ledger.hairline),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.08),

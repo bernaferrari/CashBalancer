@@ -4,8 +4,8 @@ import 'package:material_ui/material_ui.dart';
 import '../app/theme.dart';
 import 'dialog_screen_base.dart';
 
-/// A big number in a borderless tonal well that outlines only while focused
-/// or invalid. [label] is announced, not drawn: the surrounding card names it.
+/// A big number in the theme's tonal well. [label] is announced, not drawn:
+/// the surrounding card names it.
 class const TonalNumberField({
   super.key,
   required final TextEditingController controller,
@@ -21,12 +21,6 @@ class const TonalNumberField({
   @override
   Widget build(BuildContext context) {
     final l = context.ledger;
-    final scheme = Theme.of(context).colorScheme;
-    OutlineInputBorder border([BorderSide side = BorderSide.none]) =>
-        OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: side,
-        );
     Widget? affix(String? text, EdgeInsets padding) => text == null
         ? null
         : Padding(
@@ -54,7 +48,6 @@ class const TonalNumberField({
           prefixIconConstraints: affixConstraints,
           suffixIcon: affix(suffix, const EdgeInsets.only(left: 4, right: 14)),
           suffixIconConstraints: affixConstraints,
-          fillColor: l.sunken,
           contentPadding: EdgeInsets.fromLTRB(
             12,
             size * 0.55,
@@ -62,11 +55,6 @@ class const TonalNumberField({
             size * 0.55,
           ),
           errorMaxLines: 3,
-          border: border(),
-          enabledBorder: border(),
-          focusedBorder: border(BorderSide(color: scheme.primary, width: 2)),
-          errorBorder: border(BorderSide(color: l.sell, width: 1.5)),
-          focusedErrorBorder: border(BorderSide(color: l.sell, width: 2)),
         ),
       ),
     );
