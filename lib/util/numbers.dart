@@ -33,9 +33,10 @@ String money(
   decimalDigits: decimalDigits,
 );
 
-String formatPercent(double value, [String? locale]) {
+/// Formats a value already expressed as a percentage, such as 10 for 10%.
+String formatPercent(double value, String? locale, {int fractionDigits = 1}) {
   final formatter = NumberFormat.percentPattern(locale)
-    ..maximumFractionDigits = 1;
+    ..maximumFractionDigits = fractionDigits;
   return formatter.format(value.isFinite ? value / 100 : 0);
 }
 

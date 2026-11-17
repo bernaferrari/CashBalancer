@@ -224,9 +224,8 @@ class const AllocationBars(
   }
 }
 
-/// A segmented meter in the Material 3 track-gap style that always breaks at
-/// [target]: below it, a pale stretch shows what is missing; above it, the
-/// excess is split off and striped.
+/// A segmented meter where a pale extension shows what is missing and a
+/// separate striped segment shows any excess above [target].
 class const TargetMeter({
   required final double current,
   required final Color color,
@@ -260,7 +259,7 @@ class const TargetMeter({
   );
 }
 
-enum _Fill { held, missing, excess, track }
+enum _Fill { held, buy, excess, track }
 
 class const _MeterPainter({
   required final double current,
@@ -279,8 +278,7 @@ class const _MeterPainter({
         (0, current, _Fill.held),
         (current, 1, _Fill.track),
       ] else if (current < t) ...[
-        (0, current, _Fill.held),
-        (current, t, _Fill.missing),
+        (0, t, _Fill.buy),
         (t, 1, _Fill.track),
       ] else ...[
         (0, t, _Fill.held),
@@ -297,17 +295,32 @@ class const _MeterPainter({
       switch (fill) {
         case _Fill.held:
           canvas.drawRRect(rrect, Paint()..color = color);
-        case _Fill.missing:
-          canvas.drawRRect(
-            rrect,
-            Paint()..color = color.withValues(alpha: 0.3),
-          );
+        case _Fill.buy:
+          _drawBuyFill(canvas, rrect, current * w);
         case _Fill.excess:
           _hatch(canvas, rrect);
         case _Fill.track:
           canvas.drawRRect(rrect, Paint()..color = track);
       }
     }
+  }
+
+  void _drawBuyFill(Canvas canvas, RRect bounds, double split) {
+    canvas.save();
+    canvas.clipRRect(bounds);
+    canvas.drawRect(
+      Rect.fromLTRB(bounds.left, bounds.top, split, bounds.bottom),
+      Paint()
+        ..color = color
+        ..isAntiAlias = false,
+    );
+    canvas.drawRect(
+      Rect.fromLTRB(split, bounds.top, bounds.right, bounds.bottom),
+      Paint()
+        ..color = color.withValues(alpha: 0.3)
+        ..isAntiAlias = false,
+    );
+    canvas.restore();
   }
 
   /// Diagonal stripes: held, but beyond the target.

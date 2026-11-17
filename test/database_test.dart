@@ -1,9 +1,8 @@
-
 import 'package:cash_balancer/database/data.dart';
 import 'package:cash_balancer/database/database.dart';
 import 'package:cash_balancer/util/shade_by_quantile.dart';
 import 'package:cash_balancer/util/wallet_colors.dart';
-import 'package:cash_balancer/widgets/dialog_screen_base.dart';
+import 'package:cash_balancer/widgets/decimal_text_input_formatter.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -124,6 +123,12 @@ void main() {
     );
     expect(
       formatter
+          .formatEditUpdate(empty, const TextEditingValue(text: '1,234.56'))
+          .text,
+      '1234.56',
+    );
+    expect(
+      formatter
           .formatEditUpdate(
             const TextEditingValue(text: '12.34'),
             const TextEditingValue(text: '12.345'),
@@ -131,6 +136,26 @@ void main() {
           .text,
       '12.34',
     );
+  });
+
+  test('pasted digit groups follow the active locale', () {
+    const examples = [
+      ('de', '1.234,56', '1234.56'),
+      ('fr', '1\u202f234,56', '1234.56'),
+      ('hi', '12,34,567.89', '1234567.89'),
+      ('tr', '1.234', '1234'),
+    ];
+    for (final (locale, input, expected) in examples) {
+      expect(
+        DecimalTextInputFormatter(locale: locale)
+            .formatEditUpdate(
+              TextEditingValue.empty,
+              TextEditingValue(text: input),
+            )
+            .text,
+        expected,
+      );
+    }
   });
 
   test('Buy-only rebalancing calculates required total without selling', () {

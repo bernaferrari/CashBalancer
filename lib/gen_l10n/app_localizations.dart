@@ -208,6 +208,12 @@ abstract class AppLocalizations {
   /// **'Move'**
   String get move;
 
+  /// Confirms the asset moved to a different wallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Moved {itemName} to {walletName}'**
+  String assetMoved(String itemName, String walletName);
+
   /// Used on dialogs for moving items from one wallet into another
   ///
   /// In en, this message translates to:
@@ -693,6 +699,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{percent} of 100% assigned'**
   String targetAssigned(String percent);
+
+  /// No description provided for @amountEntered.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount entered'**
+  String get amountEntered;
 
   /// No description provided for @useAmount.
   ///

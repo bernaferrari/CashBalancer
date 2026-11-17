@@ -1,6 +1,7 @@
 // Generates the README header for Cash Balancer:
 //   - assets/header.png (the rebalanced ledger)
 //   - build/readme_frames/header/*.png -> assets/header.webp (the rebalance)
+//   - assets/og.png and web/og.png (the 2:1 social preview)
 //
 // Run via `./tool/generate_assets.sh` (uses the app's bundled fonts).
 //
@@ -22,7 +23,8 @@ const ui.Color _muted = ui.Color(0xFF8E887F);
 const ui.Color _buy = ui.Color(0xFF86EFAC);
 const ui.Color _sell = ui.Color(0xFFFCA5A5);
 
-const ui.Size _size = ui.Size(760, 320);
+const ui.Size _headerSize = ui.Size(760, 320);
+const ui.Size _socialSize = ui.Size(640, 320);
 const double _dpr = 2.0;
 
 typedef _Wallet = ({String name, ui.Color color, double now, double target});
@@ -142,31 +144,43 @@ List<(double, double)> _paintStack(
   return spans;
 }
 
-void _paintHeader(ui.Canvas canvas, double progress) {
+void _paintHeader(ui.Canvas canvas, double progress, ui.Size size) {
   double towards(_Wallet w) => w.now + (w.target - w.now) * progress;
 
-  final sheet = ui.RRect.fromRectAndRadius(
-    ui.Offset.zero & _size,
-    const ui.Radius.circular(22),
-  ).deflate(0.5);
-  canvas.drawRRect(sheet, ui.Paint()..color = _bg);
-  canvas.drawRRect(
-    sheet,
-    ui.Paint()
-      ..style = ui.PaintingStyle.stroke
-      ..color = _hairline,
-  );
+  final social = size == _socialSize;
+  final bounds = ui.Offset.zero & size;
+  if (social) {
+    canvas.drawRect(bounds, ui.Paint()..color = _bg);
+  } else {
+    final sheet = ui.RRect.fromRectAndRadius(
+      bounds,
+      const ui.Radius.circular(22),
+    ).deflate(0.5);
+    canvas.drawRRect(sheet, ui.Paint()..color = _bg);
+    canvas.drawRRect(
+      sheet,
+      ui.Paint()
+        ..style = ui.PaintingStyle.stroke
+        ..color = _hairline,
+    );
+  }
 
   // Wordmark column.
-  const left = 40.0;
+  final left = social ? 28.0 : 40.0;
+  final wordmarkSize = social ? 50.0 : 58.0;
   _text(
     canvas,
     [('ASSET ALLOCATION CALCULATOR', _mono(10, weight: 400))],
     x: left,
     baseline: 56,
   );
-  _text(canvas, [('CASH', _display(58))], x: left - 3, baseline: 116);
-  _text(canvas, [('BALANCER', _display(58))], x: left - 3, baseline: 170);
+  _text(canvas, [('CASH', _display(wordmarkSize))], x: left - 3, baseline: 116);
+  _text(
+    canvas,
+    [('BALANCER', _display(wordmarkSize))],
+    x: left - 3,
+    baseline: 170,
+  );
   _text(
     canvas,
     [('Say what you want to hold.', _body(15, color: _cream))],
@@ -192,8 +206,23 @@ void _paintHeader(ui.Canvas canvas, double progress) {
   // Now → target.
   const barTop = 64.0;
   const barBottom = 276.0;
-  const nowBar = ui.Rect.fromLTRB(380, barTop, 402, barBottom);
-  const targetBar = ui.Rect.fromLTRB(486, barTop, 508, barBottom);
+  const barWidth = 22.0;
+  final ledgerRight = size.width - left;
+  final ledgerLeft = ledgerRight - (social ? 152 : 174);
+  final targetLeft = ledgerLeft - (social ? 23 : 38) - barWidth;
+  final nowLeft = targetLeft - (social ? 90 : 106);
+  final nowBar = ui.Rect.fromLTRB(
+    nowLeft,
+    barTop,
+    nowLeft + barWidth,
+    barBottom,
+  );
+  final targetBar = ui.Rect.fromLTRB(
+    targetLeft,
+    barTop,
+    targetLeft + barWidth,
+    barBottom,
+  );
   _text(
     canvas,
     [('NOW', _mono(10))],
@@ -266,8 +295,6 @@ void _paintHeader(ui.Canvas canvas, double progress) {
   canvas.restore();
 
   // Ledger.
-  const ledgerLeft = 546.0;
-  const ledgerRight = 720.0;
   const rowHeight = 53.0;
   for (var i = 0; i < _wallets.length; i++) {
     final wallet = _wallets[i];
@@ -359,14 +386,18 @@ double _progressAt(int frame) {
 
 const int _frames = 150;
 
-Future<void> _render(double progress, String path) async {
+Future<void> _render(
+  double progress,
+  String path, {
+  ui.Size size = _headerSize,
+}) async {
   final recorder = ui.PictureRecorder();
   final canvas = ui.Canvas(recorder)..scale(_dpr, _dpr);
-  _paintHeader(canvas, progress);
+  _paintHeader(canvas, progress, size);
   final picture = recorder.endRecording();
   final image = await picture.toImage(
-    (_size.width * _dpr).round(),
-    (_size.height * _dpr).round(),
+    (size.width * _dpr).round(),
+    (size.height * _dpr).round(),
   );
   final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
   File(path)
@@ -380,6 +411,8 @@ void main() {
   test('render Cash Balancer README header', () async {
     await _loadFonts();
     await _render(1, 'assets/header.png');
+    await _render(1, 'assets/og.png', size: _socialSize);
+    File('assets/og.png').copySync('web/og.png');
     for (var frame = 0; frame < _frames; frame++) {
       final name = frame.toString().padLeft(4, '0');
       await _render(

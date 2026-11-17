@@ -15,6 +15,18 @@
   "howMuchTarget": "The share it should have.",
   "value": "Value",
   "move": "Move",
+  "assetMoved": "Moved {itemName} to {walletName}",
+  "@assetMoved": {
+    "description": "Confirms the asset moved to a different wallet.",
+    "placeholders": {
+      "itemName": {
+        "type": "String"
+      },
+      "walletName": {
+        "type": "String"
+      }
+    }
+  },
   "moveWallet": "Move \"{itemName}\"",
   "@moveWallet": {
     "description": "Used on dialogs for moving items from one wallet into another",
@@ -131,6 +143,7 @@
       }
     }
   },
+  "amountEntered": "Amount entered",
   "useAmount": "Use",
   "noTarget": "None",
   "balanceOnlySubtitle": "For savings or cash: a single balance, no units.",

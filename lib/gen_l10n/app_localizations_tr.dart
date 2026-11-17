@@ -57,6 +57,11 @@ class AppLocalizationsTr extends AppLocalizations {
   String get move => 'Taşı';
 
   @override
+  String assetMoved(String itemName, String walletName) {
+    return '$itemName, $walletName cüzdanına taşındı';
+  }
+
+  @override
   String moveWallet(String itemName) {
     return '\"$itemName\" öğesini taşı';
   }
@@ -315,6 +320,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String targetAssigned(String percent) {
     return '%100\'ün $percent kadarı atandı';
   }
+
+  @override
+  String get amountEntered => 'Tutar girildi';
 
   @override
   String get useAmount => 'Kullan';

@@ -31,10 +31,10 @@ Usage examples:
 
 Every wallet and asset, how far each is from its target, and what to buy or sell.
 
-![Portfolio on a wide screen](store-listing/en-US/raw/desktop/01-portfolio.png)
+![Portfolio on a 7-inch tablet in landscape](store-listing/en-US/raw/tablet7-landscape/01-portfolio.png)
 
 ### Rebalance
 
 Enter what you want to invest and see exactly where each dollar goes.
 
-![Rebalance on a wide screen](store-listing/en-US/raw/desktop/02-rebalance.png)
+![Rebalance on a 7-inch tablet in portrait](store-listing/en-US/raw/tablet7/02-rebalance.png)

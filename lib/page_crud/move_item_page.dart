@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import '../app/theme.dart';
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
+import '../util/error_handler.dart';
 import '../util/numbers.dart';
 import '../util/wallet_colors.dart';
 import '../widgets/dialog_screen_base.dart';
@@ -21,29 +22,32 @@ class const MoveItemPage({
 }
 
 class _MoveItemPageState extends State<MoveItemPage> {
-  late int selectedGroupId =
-      widget.wallets.any((w) => w.id == widget.item.walletId)
-      ? widget.item.walletId
-      : widget.wallets.first.id;
+  int? _selectedWalletId;
+  bool _saving = false;
 
   @override
   Widget build(BuildContext context) {
     final l = context.ledger;
     final currency = widget.bloc.state?.settings.currencySymbol ?? r'$';
-    final selected = widget.wallets.firstWhere((w) => w.id == selectedGroupId);
+    final selectedId = _selectedWalletId ?? widget.item.walletId;
+    final selected = widget.wallets
+        .where((w) => w.id == selectedId)
+        .firstOrNull;
+    final canMove =
+        !_saving && selected != null && selected.id != widget.item.walletId;
     return DialogScreenBase(
       appBarTitle: context.l10n.moveWallet(widget.item.name),
-      colorName: selected.colorName,
+      colorName: selected?.colorName,
       bottom: [
         ElevatedButton.icon(
           icon: const Icon(Icons.check_rounded),
           label: Text(context.l10n.dialogSave),
-          onPressed: onSubmit,
+          onPressed: canMove ? () => _move(selected) : null,
         ),
       ],
       children: [
         SegmentedColumn(
-          colorOf: (i) => widget.wallets[i].id == selectedGroupId
+          colorOf: (i) => widget.wallets[i].id == selectedId
               ? WalletColor.fromName(widget.wallets[i].colorName)
                     .scheme(Theme.of(context).brightness)
                     .secondaryContainer
@@ -51,13 +55,15 @@ class _MoveItemPageState extends State<MoveItemPage> {
           children: [
             for (final group in widget.wallets)
               () {
-                final isSelected = selectedGroupId == group.id;
+                final isSelected = selectedId == group.id;
                 final isCurrent = widget.item.walletId == group.id;
                 final accent = walletSeed(group.colorName);
                 return Semantics(
                   selected: isSelected,
                   child: InkWell(
-                    onTap: () => setState(() => selectedGroupId = group.id),
+                    onTap: _saving
+                        ? null
+                        : () => setState(() => _selectedWalletId = group.id),
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
                       child: Row(
@@ -118,13 +124,27 @@ class _MoveItemPageState extends State<MoveItemPage> {
     );
   }
 
-  Future<void> onSubmit([String? value]) async {
-    await widget.bloc.db.updateItemWallet(
-      item: widget.item,
-      walletId: selectedGroupId,
+  Future<void> _move(WalletData destination) async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    final item = widget.item;
+    final strings = context.l10n;
+    final result = await safeDbOperation(
+      () =>
+          widget.bloc.db.updateItemWallet(item: item, walletId: destination.id),
+      errorMessage: strings.operationFailed,
     );
-
     if (!mounted) return;
-    Beamer.of(context).popToNamed('/');
+    setState(() => _saving = false);
+    if (result case Success(data: true)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(strings.assetMoved(item.name, destination.name)),
+        ),
+      );
+      Beamer.of(context).popToNamed('/');
+    } else {
+      showErrorSnackbar(context, strings.operationFailed);
+    }
   }
 }

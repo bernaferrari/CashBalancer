@@ -122,6 +122,32 @@ for (const wallet of [false, true]) {
   }));
 }
 
+test('paste a grouped price and get a named confirmation when moving the asset', t => withApp(t, async page => {
+  await button(page, 'Load sample portfolio').click();
+  await total(page, /10,460/).waitFor();
+  await button(page, 'Update price').first().click();
+  await page.getByRole('textbox', {name: 'Unit price'}).fill('5,000.00');
+  await button(page, 'Save').click();
+  await total(page, /11,260/).waitFor();
+
+  await page.getByRole('button', {name: /^S&P 500 ETF/}).click();
+  await button(page, 'Move').click();
+  await page.getByRole('heading', {name: 'Move "S&P 500 ETF"'}).waitFor();
+  assert.equal(await button(page, 'Save').isDisabled(), true);
+  await page.getByRole('button', {name: /^CRYPTO/}).click();
+  await button(page, 'Save').click();
+  await page.getByText('Moved S&P 500 ETF to Crypto', {exact: true}).first().waitFor();
+  await total(page, /11,260/).waitFor();
+
+  await settings(page);
+  const wallets = JSON.parse(await download(page)).portfolios[0].wallets;
+  const moved = wallets.find(wallet => wallet.name === 'Crypto').items
+    .find(item => item.name === 'S&P 500 ETF');
+  assert.equal(moved.price, 5000);
+  assert.equal(wallets.find(wallet => wallet.name === 'Stocks').items
+    .some(item => item.name === 'S&P 500 ETF'), false);
+}));
+
 test('backup preview keeps the edited price and malformed files keep the portfolio intact', t => withApp(t, async page => {
   await button(page, 'Load sample portfolio').click();
   await total(page, /10,460/).waitFor();

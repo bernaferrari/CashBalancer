@@ -57,6 +57,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get move => 'Verschieben';
 
   @override
+  String assetMoved(String itemName, String walletName) {
+    return '$itemName wurde in „$walletName“ verschoben';
+  }
+
+  @override
   String moveWallet(String itemName) {
     return '\"$itemName\" verschieben';
   }
@@ -318,6 +323,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String targetAssigned(String percent) {
     return '$percent von 100 % vergeben';
   }
+
+  @override
+  String get amountEntered => 'Betrag übernommen';
 
   @override
   String get useAmount => 'Übernehmen';

@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../app/theme.dart';
-import 'dialog_screen_base.dart';
+import 'decimal_text_input_formatter.dart';
 
 /// A big number in the theme's tonal well. [label] is announced, not drawn:
 /// the surrounding card names it.
@@ -17,6 +17,7 @@ class const TonalNumberField({
   final String? prefix,
   final String? suffix,
   final double size = 24,
+  final int decimalRange = 2,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -38,8 +39,11 @@ class const TonalNumberField({
         style: figures(size, weight: FontWeight.w600),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         onChanged: (_) => onChanged(),
-        inputFormatters: const <TextInputFormatter>[
-          DecimalTextInputFormatter(),
+        inputFormatters: <TextInputFormatter>[
+          DecimalTextInputFormatter.localized(
+            context,
+            decimalRange: decimalRange,
+          ),
         ],
         decoration: InputDecoration(
           hintText: hint,

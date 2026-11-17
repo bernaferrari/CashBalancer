@@ -55,6 +55,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get move => '移动';
 
   @override
+  String assetMoved(String itemName, String walletName) {
+    return '已将 $itemName 移至 $walletName';
+  }
+
+  @override
   String moveWallet(String itemName) {
     return '移动“$itemName”';
   }
@@ -305,6 +310,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String targetAssigned(String percent) {
     return '已分配 $percent / 100%';
   }
+
+  @override
+  String get amountEntered => '已填入金额';
 
   @override
   String get useAmount => '使用';

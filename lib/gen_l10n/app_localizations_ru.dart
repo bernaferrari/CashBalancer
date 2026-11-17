@@ -57,6 +57,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get move => 'Переместить';
 
   @override
+  String assetMoved(String itemName, String walletName) {
+    return 'Актив «$itemName» перемещён в «$walletName»';
+  }
+
+  @override
   String moveWallet(String itemName) {
     return 'Переместить «$itemName»';
   }
@@ -315,6 +320,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String targetAssigned(String percent) {
     return 'Распределено $percent из 100%';
   }
+
+  @override
+  String get amountEntered => 'Сумма введена';
 
   @override
   String get useAmount => 'Применить';

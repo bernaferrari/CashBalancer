@@ -11,6 +11,50 @@ void main() {
   });
   tearDown(() => db.close());
 
+  test(
+    'moving an asset preserves changes made after the editor opened',
+    () async {
+      final user = await db.getDefaultUser();
+      final source = await db.createGroup(
+        id: user,
+        name: 'Brokerage',
+        colorName: 'sky',
+        targetPercent: 50,
+      );
+      final destination = await db.createGroup(
+        id: user,
+        name: 'Retirement',
+        colorName: 'sky',
+        targetPercent: 50,
+      );
+      final id = await db.createItem(
+        walletId: source,
+        userId: user,
+        name: 'VTI',
+        value: '100',
+        target: '25',
+      );
+      final before = (await db.getItemFromId(id))!;
+      await db.updatePrice(id, 125);
+      expect(
+        await db.updateItemWallet(item: before, walletId: destination),
+        isTrue,
+      );
+      expect(
+        await db.getItemFromId(id),
+        before.copyWith(walletId: destination, price: 125),
+      );
+
+      expect(
+        await db.updateItemWallet(item: before, walletId: source),
+        isFalse,
+      );
+      final current = (await db.getItemFromId(id))!;
+      expect(await db.updateItemWallet(item: current, walletId: -1), isFalse);
+      expect(await db.getItemFromId(id), current);
+    },
+  );
+
   test('v1 portfolios retain their rows on schema upgrade', () async {
     await db.close();
     db = Database(
