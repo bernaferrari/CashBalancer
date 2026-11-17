@@ -1,4 +1,5 @@
 import '../util/numbers.dart';
+import '../util/wallet_colors.dart';
 
 import 'package:beamer/beamer.dart';
 import 'package:material_ui/material_ui.dart';
@@ -94,7 +95,11 @@ class const _ItemsHero(final FullData data, final List<ItemData> items)
               context.l10n.now,
               [
                 for (final i in items)
-                  (id: i.id, color: i.color, value: i.totalValue / total * 100),
+                  (
+                    id: i.id,
+                    color: i.colorIn(context),
+                    value: i.totalValue / total * 100,
+                  ),
               ],
             ),
             if (hasTargets && !data.settings.relativeTarget)
@@ -104,7 +109,7 @@ class const _ItemsHero(final FullData data, final List<ItemData> items)
                   for (final i in items)
                     (
                       id: i.id,
-                      color: i.color,
+                      color: i.colorIn(context),
                       value: i.targetPercent.clamp(0.0, 100.0),
                     ),
                 ],
@@ -139,51 +144,63 @@ class const _ShareRow(final FullData data, final ItemData item)
 
     return TextButton(
       style: TextButton.styleFrom(
-        padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
+        padding: const EdgeInsets.fromLTRB(18, 14, 8, 14),
         shape: const RoundedRectangleBorder(),
         alignment: Alignment.centerLeft,
       ),
       onPressed: () => Beamer.of(context).beamToNamed('/editItem/${item.id}'),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  item.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleMedium
-                      ?.copyWith(color: l.ink),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(color: l.ink),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      money(context, currency, item.totalValue),
+                      style: figures(
+                        14.5,
+                        weight: FontWeight.w600,
+                        color: l.ink,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                money(context, currency, item.totalValue),
-                style: figures(14.5, weight: FontWeight.w600, color: l.ink),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          TargetMeter(
-            current: share,
-            target: hasTarget ? item.targetPercent / 100 : null,
-            color: item.color,
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: ShareText(
-                  share: share,
-                  targetPercent: hasTarget ? item.targetPercent : null,
+                const SizedBox(height: 10),
+                TargetMeter(
+                  current: share,
+                  target: hasTarget ? item.targetPercent / 100 : null,
+                  color: item.colorIn(context),
                 ),
-              ),
-              if (delta != null)
-                DeltaText(delta: delta, currency: currency, size: 12.5),
-            ],
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ShareText(
+                        share: share,
+                        targetPercent: hasTarget ? item.targetPercent : null,
+                      ),
+                    ),
+                    if (delta != null)
+                      DeltaText(delta: delta, currency: currency, size: 12.5),
+                  ],
+                ),
+              ],
+            ),
           ),
+          const SizedBox(width: 4),
+          Icon(Icons.chevron_right_rounded, size: 20, color: l.faint),
         ],
       ),
     );

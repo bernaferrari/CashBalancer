@@ -1,13 +1,12 @@
 // don't import moor_web.dart or moor_flutter/moor_flutter.dart in shared code
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:drift/drift.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../util/get_color_by_quantile.dart';
+import '../util/shade_by_quantile.dart';
 import 'data.dart';
 import 'backup.dart';
 import '../page_rebalance/rebalance_plan.dart';
@@ -189,10 +188,7 @@ class Database(super.e) extends _$Database {
           walletsMap[wallet.id] = WalletData(wallet, walletValue);
         }
 
-        final Map<int, Color> colors = getColorByQuantile(
-          groupedItems,
-          walletsMap,
-        );
+        final shades = getShadeByQuantile(groupedItems);
 
         final allItemData = sortedItems
             .where((d) => walletsMap.containsKey(d.walletId))
@@ -200,7 +196,7 @@ class Database(super.e) extends _$Database {
               (d) => ItemData(
                 item: d,
                 colorName: walletsMap[d.walletId]?.colorName ?? 'gray',
-                color: colors[d.id] ?? const Color(0xFF9E9E9E),
+                shade: shades[d.id] ?? 0,
               ),
             )
             .toList();

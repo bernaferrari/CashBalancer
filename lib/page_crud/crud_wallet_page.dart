@@ -99,7 +99,6 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
               return null;
             },
             decoration: InputDecoration(
-              labelText: context.l10n.dialogAssetName,
               hintText: context.l10n.walletNameHint,
               prefixIcon: Padding(
                 padding: const EdgeInsets.only(left: 16, right: 12),

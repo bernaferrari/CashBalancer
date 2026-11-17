@@ -1,12 +1,10 @@
-import 'dart:ui';
 
 import 'package:cash_balancer/database/data.dart';
 import 'package:cash_balancer/database/database.dart';
-import 'package:cash_balancer/util/get_color_by_quantile.dart';
+import 'package:cash_balancer/util/shade_by_quantile.dart';
 import 'package:cash_balancer/util/wallet_colors.dart';
 import 'package:cash_balancer/widgets/dialog_screen_base.dart';
 import 'package:drift/native.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -58,25 +56,7 @@ void main() {
     expect(recreatedUserId, greaterThan(0));
   });
 
-  test('getColorByQuantile assigns colors per wallet without overwriting', () {
-    const w1 = Wallet(
-      id: 1,
-      name: 'Stocks',
-      colorName: 'emerald',
-      targetPercent: -1,
-      userId: 1,
-    );
-    const w2 = Wallet(
-      id: 2,
-      name: 'Crypto',
-      colorName: 'amber',
-      targetPercent: -1,
-      userId: 1,
-    );
-    final groupMap = <int, WalletData>{
-      1: WalletData(w1, 400),
-      2: WalletData(w2, 50),
-    };
+  test('getShadeByQuantile ranks items within each wallet', () {
     const item1 = Item(
       isBalance: false,
       id: 1,
@@ -112,13 +92,13 @@ void main() {
       2: [item3],
     };
 
-    final colors = getColorByQuantile(itemsMap, groupMap);
-    expect(colors.keys, containsAll([1, 2, 3]));
-    expect(colors[1]?.colorSpace, ColorSpace.sRGB);
-    expect(colors[2]?.colorSpace, ColorSpace.sRGB);
-    expect(colors[3]?.colorSpace, ColorSpace.sRGB);
-    // Wallet 1 items and Wallet 2 items use their respective wallet colors.
-    expect(colors[1], isNot(equals(colors[3])));
+    final shades = getShadeByQuantile(itemsMap);
+    expect(shades.keys, containsAll([1, 2, 3]));
+    // The largest holding keeps the wallet color; smaller ones fade.
+    expect(shades[2], 0);
+    expect(shades[1], greaterThan(0));
+    // A wallet's only item is its largest.
+    expect(shades[3], 0);
 
     // Saved color names resolve via asNameMap.
     expect(WalletColor.fromName('sky'), WalletColor.sky);
@@ -184,7 +164,6 @@ void main() {
             targetPercent: 60,
           ),
           colorName: 'emerald',
-          color: const Color(0xFF10B981),
         ),
         ItemData(
           item: const Item(
@@ -198,7 +177,6 @@ void main() {
             targetPercent: 40,
           ),
           colorName: 'amber',
-          color: const Color(0xFFF59E0B),
         ),
       ],
       walletsItems: const {},

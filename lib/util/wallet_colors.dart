@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../database/data.dart';
+
 final _schemes = <(WalletColor, Brightness), ColorScheme>{};
 
 /// The colors a wallet can take, saved by name. Each is only a seed: every
@@ -70,6 +72,11 @@ enum WalletColor(final Color seed) {
     ),
   );
 
+  /// The seed faded [step] times toward the background of [brightness].
+  Color fade(int step, Brightness brightness) => step == 0
+      ? seed
+      : shade((brightness == Brightness.light ? 11 : -10) * step.toDouble());
+
   /// The seed at a lighter (positive) or darker HCT tone, same hue and chroma.
   Color shade(double toneShift) {
     final hct = Hct.fromInt(seed.toARGB32());
@@ -81,6 +88,13 @@ enum WalletColor(final Color seed) {
       ).toInt(),
     );
   }
+}
+
+extension ItemColorX on ItemData {
+  /// The wallet color for the wallet's largest holdings, fading toward the
+  /// background for smaller ones.
+  Color colorIn(BuildContext context) =>
+      WalletColor.fromName(colorName).fade(shade, Theme.of(context).brightness);
 }
 
 /// The seed color of the wallet color saved as [name].

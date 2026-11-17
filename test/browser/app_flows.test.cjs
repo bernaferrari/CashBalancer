@@ -106,8 +106,7 @@ for (const wallet of [false, true]) {
     const editor = wallet ? 'Edit a Wallet' : 'Edit an Asset';
     // The first wallet and the first asset both belong to Stocks.
     if (wallet) {
-      const stocks = page.getByRole('group', {name: /^STOCKS/});
-      await button(stocks, 'Edit a Wallet').click();
+      await page.getByRole('button', {name: /^Edit a Wallet STOCKS/}).click();
     } else {
       await page.getByRole('button', {name: /^S&P 500 ETF/}).click();
     }

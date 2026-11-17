@@ -153,9 +153,9 @@ ThemeData _buildTheme(Brightness brightness, WalletColor? wallet) {
   final shape12 = RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(12),
   );
-  InputBorder well([BorderSide side = BorderSide.none]) => UnderlineInputBorder(
+  final well = UnderlineInputBorder(
     borderRadius: BorderRadius.circular(16),
-    borderSide: side,
+    borderSide: BorderSide.none,
   );
 
   return ThemeData(
@@ -254,13 +254,16 @@ ThemeData _buildTheme(Brightness brightness, WalletColor? wallet) {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: l.sunken,
+      fillColor: WidgetStateColor.resolveWith(
+        (states) => states.contains(WidgetState.error)
+            ? Color.alphaBlend(l.sell.withValues(alpha: 0.12), l.sunken)
+            : states.contains(WidgetState.focused)
+            ? Color.alphaBlend(accent.withValues(alpha: 0.08), l.sunken)
+            : l.sunken,
+      ),
+      hoverColor: Colors.transparent,
       contentPadding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-      border: well(),
-      enabledBorder: well(),
-      focusedBorder: well(BorderSide(color: accent, width: 2.5)),
-      errorBorder: well(BorderSide(color: l.sell, width: 2)),
-      focusedErrorBorder: well(BorderSide(color: l.sell, width: 2.5)),
+      border: well,
       labelStyle: textTheme.bodyMedium?.copyWith(color: l.muted),
       floatingLabelStyle: WidgetStateTextStyle.resolveWith(
         (states) => _inter(13, FontWeight.w500).copyWith(

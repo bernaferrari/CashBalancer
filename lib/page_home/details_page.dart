@@ -402,76 +402,100 @@ class const GroupCard({
 
     return SegmentedColumn(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(18, 14, 12, 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
+        Semantics(
+          container: true,
+          button: true,
+          label: context.l10n.editWallet,
+          child: InkWell(
+            onTap: () =>
+                Beamer.of(context).beamToNamed('/editWallet/${group.id}'),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 14, 12, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Container(
-                    width: 4,
-                    height: 18,
-                    decoration: BoxDecoration(
-                      color: color.seed,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      group.name.toUpperCase(),
-                      overflow: TextOverflow.ellipsis,
-                      style: display(
-                        17,
-                        weight: FontWeight.w800,
-                        letterSpacing: 0.2,
+                  Row(
+                    children: [
+                      AssetMark(
+                        color: color.seed,
+                        sell: delta != null && delta <= -0.005,
+                        width: 4,
+                        height: 18,
                       ),
-                    ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                group.name.toUpperCase(),
+                                overflow: TextOverflow.ellipsis,
+                                style: display(
+                                  17,
+                                  weight: FontWeight.w800,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              size: 20,
+                              color: l.faint,
+                            ),
+                          ],
+                        ),
+                      ),
+                      AddItem(color: color, groupId: group.id),
+                    ],
                   ),
-                  EditWallet(color: l.muted, groupId: group.id),
-                  const SizedBox(width: 4),
-                  AddItem(color: color, groupId: group.id),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    money(context, settings.currencySymbol, group.totalValue),
-                    style: figures(14, weight: FontWeight.w600, color: l.ink),
+                  const SizedBox(height: 6),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        money(
+                          context,
+                          settings.currencySymbol,
+                          group.totalValue,
+                        ),
+                        style: figures(
+                          14,
+                          weight: FontWeight.w600,
+                          color: l.ink,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: ShareText(
+                          share: share,
+                          targetPercent: hasTarget ? group.targetPercent : null,
+                        ),
+                      ),
+                      if (delta != null && items.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: DeltaText(
+                            delta: delta,
+                            currency: settings.currencySymbol,
+                          ),
+                        ),
+                    ],
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: ShareText(
-                      share: share,
-                      targetPercent: hasTarget ? group.targetPercent : null,
-                    ),
-                  ),
-                  if (delta != null && items.isNotEmpty)
+                  if (items.isNotEmpty) ...[
+                    const SizedBox(height: 12),
                     Padding(
                       padding: const EdgeInsets.only(right: 6),
-                      child: DeltaText(
-                        delta: delta,
-                        currency: settings.currencySymbol,
+                      child: TargetMeter(
+                        current: share,
+                        target: hasTarget ? group.targetPercent / 100 : null,
+                        color: color.seed,
                       ),
                     ),
+                  ],
                 ],
               ),
-              if (items.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: TargetMeter(
-                    current: share,
-                    target: hasTarget ? group.targetPercent / 100 : null,
-                    color: color.seed,
-                  ),
-                ),
-              ],
-            ],
+            ),
           ),
         ),
         if (items.isEmpty)
@@ -519,27 +543,6 @@ class const AddItem({
   }
 }
 
-class const EditWallet({
-  super.key,
-  required final Color color,
-  required final int groupId,
-}) extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      tooltip: context.l10n.editWallet,
-      style: IconButton.styleFrom(
-        foregroundColor: color,
-        fixedSize: const Size(38, 38),
-        minimumSize: Size.zero,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      icon: const Icon(Icons.edit_outlined, size: 19),
-      onPressed: () => Beamer.of(context).beamToNamed("/editWallet/$groupId"),
-    );
-  }
-}
-
 /// One holding as a ledger line: name and allocation on the left, value and
 /// what to buy or sell on the right.
 class const ItemCard(
@@ -566,22 +569,17 @@ class const ItemCard(
         Expanded(
           child: TextButton(
             style: TextButton.styleFrom(
-              padding: const EdgeInsets.fromLTRB(18, 13, 4, 13),
+              padding: const EdgeInsets.fromLTRB(18, 12, 4, 12),
               shape: const RoundedRectangleBorder(),
               alignment: Alignment.centerLeft,
             ),
-            onPressed: () {
-              Beamer.of(context).beamToNamed('/editItem/${item.id}');
-            },
+            onPressed: () =>
+                Beamer.of(context).beamToNamed('/editItem/${item.id}'),
             child: Row(
               children: [
-                Container(
-                  width: 3,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(2),
-                    color: item.color,
-                  ),
+                AssetMark(
+                  color: item.colorIn(context),
+                  sell: delta != null && delta <= -0.005,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -647,7 +645,7 @@ class const ItemCard(
           ),
         ),
         Padding(
-          padding: const EdgeInsets.only(right: 6),
+          padding: const EdgeInsets.only(right: 4),
           child: QuickPriceButton(item),
         ),
       ],

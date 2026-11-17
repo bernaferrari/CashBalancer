@@ -80,6 +80,54 @@ class const SegmentedColumn({
   }
 }
 
+/// The colored stroke beside a wallet or asset. Hatched with the meters'
+/// excess stripes when it should shrink (sell), so the signal survives without
+/// color.
+class const AssetMark({
+  required final Color color,
+  final bool sell = false,
+  final double width = 3,
+  final double height = 34,
+  super.key,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: width,
+    height: height,
+    child: CustomPaint(painter: _MarkPainter(color, sell)),
+  );
+}
+
+class const _MarkPainter(final Color color, final bool hatched)
+    extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rrect = RRect.fromRectAndRadius(
+      Offset.zero & size,
+      Radius.circular(size.width / 2),
+    );
+    if (!hatched) {
+      canvas.drawRRect(rrect, Paint()..color = color);
+      return;
+    }
+    canvas.save();
+    canvas.clipRRect(rrect);
+    canvas.drawRRect(rrect, Paint()..color = color.withValues(alpha: 0.25));
+    final stripe = Paint()
+      ..color = color
+      ..strokeWidth = 1.8;
+    final w = size.width;
+    for (var y = -w; y < size.height + w; y += 4.5) {
+      canvas.drawLine(Offset(0, y + w), Offset(w, y), stripe);
+    }
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_MarkPainter old) =>
+      old.color != color || old.hatched != hatched;
+}
+
 typedef Segment = ({Object id, Color color, double value});
 
 /// One stacked allocation bar; anything short of [total] stays empty track.

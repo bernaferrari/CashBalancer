@@ -247,8 +247,8 @@ class const _SettingsRow({
               style: figures(13.5, weight: FontWeight.w500, color: l.muted),
             ),
             const SizedBox(width: 4),
-            Icon(Icons.chevron_right_rounded, size: 20, color: l.faint),
           ],
+          Icon(Icons.chevron_right_rounded, size: 20, color: l.faint),
         ],
       ),
     );

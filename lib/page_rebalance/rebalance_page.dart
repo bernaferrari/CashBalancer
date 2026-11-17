@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:beamer/beamer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 
@@ -155,7 +156,11 @@ class _RebalancePageState extends State<RebalancePage> {
         final nowSegments = percentages([
           if (byItem)
             for (final item in state.allItems)
-              (id: item.id, color: item.color, value: item.totalValue)
+              (
+                id: item.id,
+                color: item.colorIn(context),
+                value: item.totalValue,
+              )
           else
             for (final wallet in state.walletsMap.values)
               (
@@ -169,7 +174,7 @@ class _RebalancePageState extends State<RebalancePage> {
             for (final item in state.allItems)
               (
                 id: item.id,
-                color: item.color,
+                color: item.colorIn(context),
                 value: item.totalValue + (actionableDeltas[item.id] ?? 0),
               )
           else
@@ -207,12 +212,15 @@ class _RebalancePageState extends State<RebalancePage> {
                 delta: activeDeltas[wallet.id] ?? 0,
                 targetPercent: wallet.targetPercent,
                 currency: currency,
+                onTap: () =>
+                    Beamer.of(context)
+                        .beamToNamed('/rebalance/editWallet/${wallet.id}'),
               )
           else
             for (final item in targetedItems)
               _AllocationTile(
                 name: item.name,
-                color: item.color,
+                color: item.colorIn(context),
                 share: () {
                   final base = relative
                       ? state.walletsMap[item.walletId]?.totalValue ?? 0
@@ -230,6 +238,9 @@ class _RebalancePageState extends State<RebalancePage> {
                       ),
                 targetPercent: item.targetPercent,
                 currency: currency,
+                onTap: () =>
+                    Beamer.of(context)
+                        .beamToNamed('/rebalance/editItem/${item.id}'),
               ),
         ];
 
@@ -447,6 +458,7 @@ class const _AllocationTile({
   required final double delta,
   required final double targetPercent,
   required final String currency,
+  required final VoidCallback onTap,
   final double quantity = 0,
   final double? units,
 }) extends StatelessWidget {
@@ -454,58 +466,60 @@ class const _AllocationTile({
   Widget build(BuildContext context) {
     final l = context.ledger;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 13, 16, 13),
-      child: Row(
-        children: [
-          Container(
-            width: 3,
-            height: 34,
-            margin: const EdgeInsets.only(right: 12),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: Theme.of(context).textTheme.titleMedium,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 3),
-                ShareText(share: share, targetPercent: targetPercent),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              DeltaText(delta: delta, currency: currency, size: 14),
-              if (units != null && delta.abs() >= 0.005) ...[
-                const SizedBox(height: 3),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(text: '${_quantity(context, quantity)}×'),
-                      towards(l),
-                      TextSpan(
-                        text:
-                            '${_quantity(context, quantity + (delta > 0 ? units! : -units!))}×',
-                        style: TextStyle(color: l.ink),
-                      ),
-                    ],
+    return TextButton(
+      style: TextButton.styleFrom(
+        padding: EdgeInsets.zero,
+        shape: const RoundedRectangleBorder(),
+        alignment: Alignment.centerLeft,
+      ),
+      onPressed: onTap,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(18, 13, 16, 13),
+        child: Row(
+          children: [
+            AssetMark(color: color, sell: delta <= -0.005),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: Theme.of(context).textTheme.titleMedium
+                        ?.copyWith(color: l.ink),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  style: figures(12, color: l.muted),
-                ),
+                  const SizedBox(height: 3),
+                  ShareText(share: share, targetPercent: targetPercent),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                DeltaText(delta: delta, currency: currency, size: 14),
+                if (units != null && delta.abs() >= 0.005) ...[
+                  const SizedBox(height: 3),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(text: '${_quantity(context, quantity)}×'),
+                        towards(l),
+                        TextSpan(
+                          text:
+                              '${_quantity(context, quantity + (delta > 0 ? units! : -units!))}×',
+                          style: TextStyle(color: l.ink),
+                        ),
+                      ],
+                    ),
+                    style: figures(12, color: l.muted),
+                  ),
+                ],
               ],
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

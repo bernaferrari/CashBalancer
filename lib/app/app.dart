@@ -65,20 +65,10 @@ final simpleBuilder = RoutesLocationBuilder(
         return CRUDWalletPage(userId: id);
       },
     ),
-    '/editWallet/:walletId': (context, state, obj) => _dataPage(
-      context,
-      'editWallet',
-      state.pathParameters['walletId'],
-      context.l10n.editWallet,
-      (context, state, id) {
-        if (!state.walletsMap.containsKey(id)) return const ErrorPage();
-        return CRUDWalletPage(
-          userId: state.userId,
-          previousWallet: state.walletsMap[id]!,
-        );
-      },
-      walletColor: (state, id) => state.walletsMap[id]?.colorName,
-    ),
+    '/editWallet/:walletId': (context, state, obj) =>
+        _editWallet(context, state),
+    '/rebalance/editWallet/:walletId': (context, state, obj) =>
+        _editWallet(context, state, popTo: '/rebalance'),
     '/addItem/:walletId': (context, state, obj) => _dataPage(
       context,
       'addItem',
@@ -96,26 +86,9 @@ final simpleBuilder = RoutesLocationBuilder(
       },
       walletColor: (state, id) => state.walletsMap[id]?.colorName,
     ),
-    '/editItem/:itemId': (context, state, obj) => _dataPage(
-      context,
-      'editItem',
-      state.pathParameters['itemId'],
-      context.l10n.editAsset,
-      (context, state, id) {
-        final item = state.allItems.where((item) => item.id == id).firstOrNull;
-        if (item == null) return const ErrorPage();
-        return CRUDItemPage(
-          userId: state.userId,
-          previousItem: item,
-          walletId: item.walletId,
-          colorName: item.colorName,
-          totalValue: state.totalValue,
-          currency: state.settings.currencySymbol,
-        );
-      },
-      walletColor: (state, id) =>
-          state.allItems.where((item) => item.id == id).firstOrNull?.colorName,
-    ),
+    '/editItem/:itemId': (context, state, obj) => _editItem(context, state),
+    '/rebalance/editItem/:itemId': (context, state, obj) =>
+        _editItem(context, state, popTo: '/rebalance'),
     '/moveItem/:itemId': (context, state, obj) => _dataPage(
       context,
       'moveItem',
@@ -199,6 +172,52 @@ class _AppState extends State<App> {
   }
 }
 
+BeamPage _editWallet(
+  BuildContext context,
+  BeamState state, {
+  String popTo = '/',
+}) => _dataPage(
+  context,
+  'editWallet',
+  state.pathParameters['walletId'],
+  context.l10n.editWallet,
+  (context, state, id) {
+    if (!state.walletsMap.containsKey(id)) return const ErrorPage();
+    return CRUDWalletPage(
+      userId: state.userId,
+      previousWallet: state.walletsMap[id]!,
+    );
+  },
+  walletColor: (state, id) => state.walletsMap[id]?.colorName,
+  popTo: popTo,
+);
+
+BeamPage _editItem(
+  BuildContext context,
+  BeamState state, {
+  String popTo = '/',
+}) => _dataPage(
+  context,
+  'editItem',
+  state.pathParameters['itemId'],
+  context.l10n.editAsset,
+  (context, state, id) {
+    final item = state.allItems.where((item) => item.id == id).firstOrNull;
+    if (item == null) return const ErrorPage();
+    return CRUDItemPage(
+      userId: state.userId,
+      previousItem: item,
+      walletId: item.walletId,
+      colorName: item.colorName,
+      totalValue: state.totalValue,
+      currency: state.settings.currencySymbol,
+    );
+  },
+  walletColor: (state, id) =>
+      state.allItems.where((item) => item.id == id).firstOrNull?.colorName,
+  popTo: popTo,
+);
+
 BeamPage _dataPage(
   BuildContext context,
   String route,
@@ -206,12 +225,13 @@ BeamPage _dataPage(
   String title,
   Widget Function(BuildContext, FullData, int) build, {
   String? Function(FullData, int)? walletColor,
+  String popTo = '/',
 }) {
   final id = int.tryParse(parameter ?? '');
   return BeamPage(
     key: ValueKey('$route-$id'),
     title: title,
-    popToNamed: '/',
+    popToNamed: popTo,
     child: _DataRouteContent(id, build, walletColor),
     routeBuilder: (context, settings, child) => PageRouteBuilder<Object?>(
       settings: settings,

@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'database.dart';
 
@@ -10,7 +9,7 @@ extension ItemValueX on Item {
 class ItemData({
   required Item item,
   required final String colorName,
-  required final Color color,
+  final int shade = 0,
 }) extends Item {
   this
     : super(
