@@ -2,6 +2,12 @@ import 'dart:math' as math;
 
 typedef Holding = ({int id, double value, double target});
 
+const targetPercentagePrecision = 6;
+const targetTotalTolerance = 0.000001;
+
+bool targetTotalIsComplete(double total) =>
+    (total - 100).abs() <= targetTotalTolerance;
+
 /// Targets are percentages of the group total. A negative target is unset.
 /// Cash with no remaining target gap is left unallocated.
 Map<int, double> allocate(
@@ -72,7 +78,7 @@ double? minimumBuyOnlyCash(Iterable<Holding> holdings, double total) {
     if (h.target == 0 && h.value > 0) return null;
     if (h.target > 0) required = math.max(required, h.value / (h.target / 100));
   }
-  if (targetSum > 100.000001 || !required.isFinite) return null;
+  if (targetSum > 100 + targetTotalTolerance || !required.isFinite) return null;
   final cash = required - total;
   final plan = allocate(targeted, total: total, cash: cash, buyOnly: false);
   final cost = plan.values.fold(0.0, (a, b) => a + math.max(0, b));
@@ -85,6 +91,7 @@ double? quantityAfterTrade(double price, double value, double delta) =>
 bool targetsIncomplete(Iterable<double> values) {
   final targets = values.where((target) => target >= 0);
   return targets.isNotEmpty &&
-      (targets.fold(0.0, (total, target) => total + target) - 100).abs() >
-          0.000001;
+      !targetTotalIsComplete(
+        targets.fold(0.0, (total, target) => total + target),
+      );
 }

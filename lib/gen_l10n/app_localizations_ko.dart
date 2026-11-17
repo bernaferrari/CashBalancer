@@ -56,6 +56,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get move => '이동';
 
   @override
+  String assetMoved(String itemName, String walletName) {
+    return '$itemName 항목을 $walletName 지갑으로 옮겼습니다';
+  }
+
+  @override
   String moveWallet(String itemName) {
     return '\"$itemName\" 이동';
   }
@@ -307,6 +312,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String targetAssigned(String percent) {
     return '100% 중 $percent 배분됨';
   }
+
+  @override
+  String get amountEntered => '금액을 입력했습니다';
 
   @override
   String get useAmount => '적용';

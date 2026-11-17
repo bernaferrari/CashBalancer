@@ -357,9 +357,26 @@ class Database(super.e) extends _$Database {
     if (changed != 1) throw StateError('Asset no longer exists');
   }
 
-  Future<bool> updateItemWallet({required Item item, required int walletId}) {
-    return update(items).replace(item.copyWith(walletId: walletId));
-  }
+  Future<bool> updateItemWallet({required Item item, required int walletId}) =>
+      transaction(() async {
+        final destination =
+            await (select(wallets)..where(
+                  (row) =>
+                      row.id.equals(walletId) & row.userId.equals(item.userId),
+                ))
+                .getSingleOrNull();
+        if (destination == null) return false;
+
+        final changed =
+            await (update(items)..where(
+                  (row) =>
+                      row.id.equals(item.id) &
+                      row.userId.equals(item.userId) &
+                      row.walletId.equals(item.walletId),
+                ))
+                .write(ItemsCompanion(walletId: Value(walletId)));
+        return changed == 1;
+      });
 
   Future<void> Function() _restoreRows({
     User? portfolio,

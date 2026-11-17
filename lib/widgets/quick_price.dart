@@ -9,7 +9,7 @@ import '../database/database.dart';
 import '../l10n/l10n.dart';
 import '../util/error_handler.dart';
 import '../util/numbers.dart';
-import 'dialog_screen_base.dart';
+import 'decimal_text_input_formatter.dart';
 
 class const QuickPriceButton(final ItemData item, {super.key})
     extends StatelessWidget {
@@ -90,8 +90,8 @@ class _QuickPriceDialogState extends State<_QuickPriceDialog> {
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
-              inputFormatters: const <TextInputFormatter>[
-                DecimalTextInputFormatter(decimalRange: 324),
+              inputFormatters: <TextInputFormatter>[
+                DecimalTextInputFormatter.localized(context, decimalRange: 324),
               ],
               onChanged: (_) => setState(() {}),
               decoration: InputDecoration(

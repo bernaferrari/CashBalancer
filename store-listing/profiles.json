@@ -18,6 +18,15 @@
     "frame": "tablet",
     "label": "7\u2033 tablet"
   },
+  "tablet7-landscape": {
+    "width": 1920,
+    "height": 1200,
+    "captureWidth": 1920,
+    "captureHeight": 1200,
+    "captureDensity": 320,
+    "frame": "tablet",
+    "label": "7\u2033 tablet landscape"
+  },
   "tablet10": {
     "width": 1920,
     "height": 1200,

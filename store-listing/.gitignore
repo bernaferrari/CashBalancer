@@ -9,7 +9,9 @@ __pycache__/
 /*/assets.json
 /export-report.json
 /*/raw/*
-!/en-US/raw/desktop/
-/en-US/raw/desktop/*
-!/en-US/raw/desktop/01-portfolio.png
-!/en-US/raw/desktop/02-rebalance.png
+!/en-US/raw/tablet7/
+/en-US/raw/tablet7/*
+!/en-US/raw/tablet7/02-rebalance.png
+!/en-US/raw/tablet7-landscape/
+/en-US/raw/tablet7-landscape/*
+!/en-US/raw/tablet7-landscape/01-portfolio.png

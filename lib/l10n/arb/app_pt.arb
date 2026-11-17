@@ -15,6 +15,7 @@
   "howMuchTarget": "A porcentagem alvo que você desejar.",
   "value": "Valor",
   "move": "Mover",
+  "assetMoved": "{itemName} foi movido para {walletName}",
   "moveWallet": "Mover \"{itemName}\"",
   "@moveWallet": {
     "description": "Used on dialogs for moving items from one group into another",
@@ -105,6 +106,7 @@
   "backup": "Backup",
   "sampleDescription": "Ações, cripto e caixa para explorar",
   "targetAssigned": "{percent} de 100% definidos",
+  "amountEntered": "Valor preenchido",
   "useAmount": "Usar",
   "noTarget": "Nenhum",
   "balanceOnlySubtitle": "Para dinheiro ou poupança. Informe apenas o saldo.",

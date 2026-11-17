@@ -13,6 +13,7 @@ import '../database/database.dart';
 import '../l10n/l10n.dart';
 import '../util/error_handler.dart';
 import '../util/wallet_colors.dart';
+import '../widgets/decimal_text_input_formatter.dart';
 import '../widgets/dialog_screen_base.dart';
 import '../widgets/ledger.dart';
 import '../widgets/target_percentage_card.dart';
@@ -213,8 +214,8 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
         }
         return null;
       },
-      inputFormatters: const <TextInputFormatter>[
-        DecimalTextInputFormatter(decimalRange: 324),
+      inputFormatters: <TextInputFormatter>[
+        DecimalTextInputFormatter.localized(context, decimalRange: 324),
       ],
       textAlign: TextAlign.right,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -250,8 +251,8 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
             },
             textAlign: TextAlign.right,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: const <TextInputFormatter>[
-              DecimalTextInputFormatter(decimalRange: 324),
+            inputFormatters: <TextInputFormatter>[
+              DecimalTextInputFormatter.localized(context, decimalRange: 324),
             ],
             decoration: InputDecoration(
               labelText: context.l10n.quantity,

@@ -561,6 +561,9 @@ class const _MinimumCashSuggestion({
   @override
   Widget build(BuildContext context) {
     final l = context.ledger;
+    final duration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : const Duration(milliseconds: 180);
     return Container(
       key: const ValueKey('minimum-cash'),
       margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -596,23 +599,40 @@ class const _MinimumCashSuggestion({
             ),
           ),
           const SizedBox(width: 8),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 180),
-            child: applied
-                ? Padding(
-                    key: const ValueKey('applied'),
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    child: Icon(Icons.check_rounded, color: l.buy, size: 22),
-                  )
-                : FilledButton(
-                    key: const ValueKey('use'),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              AnimatedOpacity(
+                opacity: applied ? 0 : 1,
+                duration: duration,
+                child: ExcludeSemantics(
+                  excluding: applied,
+                  child: FilledButton(
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(0, 38),
                       padding: const EdgeInsets.symmetric(horizontal: 18),
                     ),
-                    onPressed: onUse,
+                    onPressed: applied ? null : onUse,
                     child: Text(context.l10n.useAmount),
                   ),
+                ),
+              ),
+              AnimatedOpacity(
+                opacity: applied ? 1 : 0,
+                duration: duration,
+                alwaysIncludeSemantics: true,
+                child: IgnorePointer(
+                  child: ExcludeSemantics(
+                    excluding: !applied,
+                    child: Semantics(
+                      label: context.l10n.amountEntered,
+                      liveRegion: true,
+                      child: Icon(Icons.check_rounded, color: l.buy, size: 22),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

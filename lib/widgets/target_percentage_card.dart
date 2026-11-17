@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../app/theme.dart';
 import '../l10n/l10n.dart';
+import '../page_rebalance/rebalance_plan.dart';
 import 'ledger.dart';
 import 'expressive.dart';
 
@@ -19,21 +20,28 @@ class const TargetPercentageCard({
   final double allocatedOtherPercent = 0,
   final double? currentPercent,
 }) extends StatelessWidget {
-  static const _presets = ['10', '25', '50'];
+  static const _presets = [10.0, 25.0, 50.0];
 
   @override
   Widget build(BuildContext context) {
     final l = context.ledger;
     final locale = Localizations.localeOf(context).toString();
     final double remaining = (100.0 - allocatedOtherPercent).clamp(0.0, 100.0);
-    final double? currentTarget = double.tryParse(controller.text);
+    final enteredTarget = double.tryParse(controller.text);
+    final currentTarget = enteredTarget?.isFinite == true
+        ? enteredTarget
+        : null;
     final double totalTarget = allocatedOtherPercent + (currentTarget ?? 0);
-    final over = totalTarget > 100.01;
-    final rest = allocatedOtherPercent > 0 && remaining > 0 && remaining < 100
-        ? editableNumber(double.parse(remaining.toStringAsFixed(1)))
+    final isComplete = targetTotalIsComplete(totalTarget);
+    final over = totalTarget > 100 && !isComplete;
+    final rest = allocatedOtherPercent > 0 && remaining > targetTotalTolerance
+        ? double.parse(remaining.toStringAsFixed(targetPercentagePrecision))
         : null;
 
-    Widget chip(String label, String? value, {IconData? icon}) =>
+    String precisePercent(double value) =>
+        formatPercent(value, locale, fractionDigits: targetPercentagePrecision);
+
+    Widget chip(String label, double? value, {IconData? icon}) =>
         ConstrainedBox(
           constraints: const BoxConstraints(minWidth: 44),
           child: PresetChip(
@@ -41,9 +49,9 @@ class const TargetPercentageCard({
             icon: icon,
             selected: value == null
                 ? controller.text.isEmpty
-                : currentTarget == double.parse(value),
+                : currentTarget == value,
             onPressed: () {
-              controller.text = value ?? '';
+              controller.text = editableNumber(value);
               onChanged();
             },
           ),
@@ -88,12 +96,13 @@ class const TargetPercentageCard({
                   onFieldSubmitted: onFieldSubmitted,
                   hint: '–',
                   suffix: '%',
+                  decimalRange: targetPercentagePrecision,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return null;
                     }
                     final num = double.tryParse(value);
-                    if (num == null) {
+                    if (num == null || !num.isFinite) {
                       return context.l10n.invalidValue;
                     }
                     if (num < 0 || num > 100) {
@@ -113,16 +122,15 @@ class const TargetPercentageCard({
             children: [
               chip(context.l10n.noTarget, null),
               for (final preset in _presets)
-                if (preset != rest)
-                  chip(formatPercent(double.parse(preset), locale), preset),
+                if (preset != rest) chip(precisePercent(preset), preset),
               if (rest != null)
                 chip(
-                  formatPercent(remaining, locale),
+                  precisePercent(rest),
                   rest,
                   icon: Icons.pie_chart_outline_rounded,
                 )
               else
-                chip(formatPercent(100, locale), '100'),
+                chip(precisePercent(100), 100),
             ],
           ),
           const SizedBox(height: 16),
@@ -144,7 +152,7 @@ class const TargetPercentageCard({
               Expanded(
                 child: Text(
                   context.l10n.targetAssigned(
-                    formatPercent(totalTarget, locale),
+                    precisePercent(isComplete ? 100 : totalTarget),
                   ),
                   style: figures(
                     12,
