@@ -6,12 +6,15 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../app/theme.dart';
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
 import '../database/database.dart';
 import '../l10n/l10n.dart';
 import '../util/error_handler.dart';
+import '../util/wallet_colors.dart';
 import '../widgets/dialog_screen_base.dart';
+import '../widgets/ledger.dart';
 import '../widgets/target_percentage_card.dart';
 
 class const CRUDItemPage({
@@ -45,7 +48,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
         text: editableNumber(widget.previousItem?.targetPercent),
       );
 
-  String relativePercentage = '';
+  double? currentPercent;
 
   // Reset focus to name's TextInput on save and add more.
   late final FocusNode nameFocusNode = FocusNode();
@@ -75,13 +78,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = getPrimaryColor(context, widget.colorName);
-    final primaryColorWeaker = getPrimaryColorWeaker(context, widget.colorName);
-    final backgroundDialogColor = getBackgroundDialogColor(
-      context,
-      widget.colorName,
-    );
-
+    final l = context.ledger;
     final dataState = context.watch<DataCubit>().state;
     final siblingItems = dataState == null
         ? const <ItemData>[]
@@ -96,7 +93,6 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
       key: _formKey,
       child: DialogScreenBase(
         colorName: widget.colorName,
-        backgroundDialogColor: backgroundDialogColor,
         appBarTitle: widget.previousItem == null
             ? context.l10n.addAsset
             : context.l10n.editAsset,
@@ -107,203 +103,168 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
                 Beamer.of(context)
                     .beamToNamed('/moveItem/${widget.previousItem!.id}');
               },
-              icon: const Icon(Icons.low_priority),
+              icon: const Icon(Icons.drive_file_move_outline),
               tooltip: context.l10n.move,
             ),
         ],
-        children: [
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(context.l10n.balanceOnly),
-            value: _isBalance,
-            onChanged: (value) {
-              setState(() => _isBalance = value);
-              onChanged();
-            },
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      controller: nameEditingController,
-                      onFieldSubmitted: (value) {
-                        valueFocusNode.requestFocus();
-                      },
-                      autofocus: widget.previousItem == null,
-                      focusNode: nameFocusNode,
-                      keyboardType: TextInputType.text,
-                      textCapitalization: TextCapitalization.sentences,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return context.l10n.mainDialogValidator;
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: getInputFillColor(context),
-                        labelText: context.l10n.dialogAssetName,
-                        labelStyle: TextStyle(color: primaryColor),
-                        border: getInputDecorationBorder(primaryColor),
-                        focusedBorder: getInputDecorationBorder(primaryColor),
-                        enabledBorder: getInputDecorationBorder(primaryColor),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      context.l10n.theAssetsName,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 24),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      controller: moneyEditingController,
-                      onFieldSubmitted: onSubmit,
-                      onChanged: onChanged,
-                      autofocus: widget.previousItem != null,
-                      focusNode: valueFocusNode,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return context.l10n.mainDialogValidator;
-                        }
-                        final num = double.tryParse(value);
-                        if (num == null || !num.isFinite) {
-                          return context.l10n.invalidValue;
-                        }
-                        if (num < 0) {
-                          return context.l10n.valueMustBePositive;
-                        }
-                        return null;
-                      },
-                      inputFormatters: const <TextInputFormatter>[
-                        DecimalTextInputFormatter(decimalRange: 324),
-                      ],
-                      textAlign: TextAlign.right,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: getInputFillColor(context),
-                        labelText: _isBalance
-                            ? context.l10n.balance
-                            : context.l10n.unitPrice,
-                        hintText: '0.00',
-                        prefixText: widget.currency,
-                        labelStyle: TextStyle(color: primaryColor),
-                        border: getInputDecorationBorder(primaryColor),
-                        focusedBorder: getInputDecorationBorder(primaryColor),
-                        enabledBorder: getInputDecorationBorder(primaryColor),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    if (!_isBalance)
-                      Text(
-                        context.l10n.unitPriceHelper,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          if (!_isBalance)
-            TextFormField(
-              controller: quantityEditingController,
-              onFieldSubmitted: onSubmit,
-              onChanged: onChanged,
-              validator: (value) {
-                if (value == null || value.isEmpty) return null;
-                final quantity = double.tryParse(value);
-                return quantity != null &&
-                        quantity.isFinite &&
-                        quantity >= 0 &&
-                        (quantity *
-                                (double.tryParse(moneyEditingController.text) ??
-                                    0))
-                            .isFinite
-                    ? null
-                    : context.l10n.invalidValue;
-              },
-              textAlign: TextAlign.right,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              inputFormatters: const <TextInputFormatter>[
-                DecimalTextInputFormatter(decimalRange: 324),
-              ],
-              decoration: InputDecoration(
-                isDense: true,
-                filled: true,
-                fillColor: getInputFillColor(context),
-                labelText: context.l10n.quantity,
-                hintText: '1',
-                prefixText: '× ',
-                labelStyle: TextStyle(color: primaryColorWeaker),
-                border: getInputDecorationBorder(primaryColorWeaker),
-                focusedBorder: getInputDecorationBorder(primaryColorWeaker),
-                enabledBorder: getInputDecorationBorder(primaryColorWeaker),
-              ),
-            ),
-          const SizedBox(height: 16),
-          TargetPercentageCard(
-            controller: targetEditingController,
-            primaryColor: primaryColor,
-            primaryColorWeaker: primaryColorWeaker,
-            onFieldSubmitted: onSubmit,
-            onChanged: () => setState(() {}),
-            allocatedOtherPercent: allocatedOtherPercent,
-            footer: Text(
-              "${context.l10n.rightNow}, $relativePercentage",
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ),
-          const SizedBox(height: 16),
+        bottom: [
           ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              foregroundColor: backgroundDialogColor,
-              backgroundColor: primaryColor,
-            ),
             icon: const Icon(Icons.check_rounded),
             label: Text(context.l10n.dialogSave),
             onPressed: _saving ? null : onSubmit,
           ),
-          const SizedBox(height: 8),
           if (widget.previousItem == null)
-            OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
-              icon: const Icon(Icons.checklist_outlined),
+            TextButton.icon(
+              icon: const Icon(Icons.playlist_add_rounded),
               label: Text(context.l10n.dialogSaveAddMore),
               onPressed: _saving ? null : onSaveAddMore,
             )
           else
-            OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
-              icon: const Icon(Icons.delete_outline_outlined),
+            TextButton.icon(
+              style: TextButton.styleFrom(foregroundColor: l.sell),
+              icon: const Icon(Icons.delete_outline_rounded),
               label: Text(context.l10n.dialogDelete),
               onPressed: _saving ? null : onDelete,
             ),
-          const SizedBox(height: 8),
-          TextButton.icon(
-            style: TextButton.styleFrom(foregroundColor: primaryColorWeaker),
-            icon: const Icon(Icons.close_rounded),
-            label: Text(context.l10n.dialogCancel),
-            onPressed: () => Navigator.of(context).pop(),
+        ],
+        children: [
+          TextFormField(
+            controller: nameEditingController,
+            onFieldSubmitted: (value) {
+              valueFocusNode.requestFocus();
+            },
+            autofocus: widget.previousItem == null,
+            focusNode: nameFocusNode,
+            keyboardType: TextInputType.text,
+            textCapitalization: TextCapitalization.sentences,
+            style: Theme.of(context).textTheme.titleMedium,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return context.l10n.mainDialogValidator;
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              labelText: context.l10n.dialogAssetName,
+              hintText: context.l10n.assetNameHint,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 10,
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: moneyEditingController,
+                  onFieldSubmitted: onSubmit,
+                  onChanged: onChanged,
+                  autofocus: widget.previousItem != null,
+                  focusNode: valueFocusNode,
+                  style: figures(16, weight: FontWeight.w600),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return context.l10n.mainDialogValidator;
+                    }
+                    final num = double.tryParse(value);
+                    if (num == null || !num.isFinite) {
+                      return context.l10n.invalidValue;
+                    }
+                    if (num < 0) {
+                      return context.l10n.valueMustBePositive;
+                    }
+                    return null;
+                  },
+                  inputFormatters: const <TextInputFormatter>[
+                    DecimalTextInputFormatter(decimalRange: 324),
+                  ],
+                  textAlign: TextAlign.right,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: _isBalance
+                        ? context.l10n.balance
+                        : context.l10n.unitPrice,
+                    hintText: '0.00',
+                    prefixText: '${widget.currency} ',
+                  ),
+                ),
+              ),
+              if (!_isBalance)
+                Expanded(
+                  child: TextFormField(
+                    controller: quantityEditingController,
+                    onFieldSubmitted: onSubmit,
+                    onChanged: onChanged,
+                    style: figures(16, weight: FontWeight.w600),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return null;
+                      final quantity = double.tryParse(value);
+                      return quantity != null &&
+                              quantity.isFinite &&
+                              quantity >= 0 &&
+                              (quantity *
+                                      (double.tryParse(
+                                            moneyEditingController.text,
+                                          ) ??
+                                          0))
+                                  .isFinite
+                          ? null
+                          : context.l10n.invalidValue;
+                    },
+                    textAlign: TextAlign.right,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: const <TextInputFormatter>[
+                      DecimalTextInputFormatter(decimalRange: 324),
+                    ],
+                    decoration: InputDecoration(
+                      labelText: context.l10n.quantity,
+                      hintText: '1',
+                      prefixText: '× ',
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          if (!_isBalance)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: _subtotal(context),
+            ),
+          const SizedBox(height: 16),
+          LedgerCard(
+            child: SwitchListTile(
+              contentPadding: const EdgeInsets.fromLTRB(18, 6, 14, 8),
+              title: Text(
+                context.l10n.balanceOnly,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(
+                  context.l10n.balanceOnlySubtitle,
+                  style: Theme.of(context).textTheme.bodySmall
+                      ?.copyWith(color: l.muted),
+                ),
+              ),
+              value: _isBalance,
+              onChanged: (value) {
+                setState(() => _isBalance = value);
+                onChanged();
+              },
+            ),
+          ),
+          const SizedBox(height: 12),
+          TargetPercentageCard(
+            controller: targetEditingController,
+            color: walletSeed(widget.colorName),
+            onFieldSubmitted: onSubmit,
+            onChanged: () => setState(() {}),
+            allocatedOtherPercent: allocatedOtherPercent,
+            currentPercent: currentPercent,
           ),
         ],
       ),
@@ -367,17 +328,41 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
         ? currentTotal + moneyValue
         : currentTotal + moneyValue - widget.previousItem!.totalValue;
 
-    final String finalPercent = newTotal <= 0
-        ? '0'
-        : formatPercent(
-            moneyValue / newTotal * 100,
-            Localizations.localeOf(context).toString(),
-          );
-
     setState(() {
-      relativePercentage =
-          '${money(context, widget.currency, moneyValue)} ${context.l10n.isGoingToBe} $finalPercent%';
+      currentPercent = newTotal <= 0 || moneyValue <= 0
+          ? null
+          : moneyValue / newTotal * 100;
     });
+  }
+
+  /// "8 × $220.00 = $1,760.00" once a price is in, or what the fields mean.
+  Widget _subtotal(BuildContext context) {
+    final l = context.ledger;
+    final price = double.tryParse(moneyEditingController.text);
+    final quantity = double.tryParse(quantityEditingController.text) ?? 1;
+    final total = price == null ? null : price * quantity;
+    if (price == null || total == null || !total.isFinite) {
+      return Text(
+        context.l10n.unitPriceHelper,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: l.muted),
+      );
+    }
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text:
+                '${formatQuantity(context, quantity)} × '
+                '${money(context, widget.currency, price)} = ',
+          ),
+          TextSpan(
+            text: money(context, widget.currency, total),
+            style: TextStyle(color: l.ink, fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+      style: figures(12.5, color: l.muted),
+    );
   }
 
   Future<void> onSaveAddMore([String? value]) async {

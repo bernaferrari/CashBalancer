@@ -17,7 +17,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get mainEmptySubtitle =>
-      'Toca el + para añadir una cartera, donde podrás agregar tus activos.';
+      'Agrupa tus activos en carteras, define un objetivo para cada una y mira exactamente qué comprar o vender.';
 
   @override
   String get mainDialogValidator => 'Por favor ingresa algún texto';
@@ -39,22 +39,16 @@ class AppLocalizationsEs extends AppLocalizations {
       'Sumar hasta el 100% en cada cartera, en lugar de considerar la suma de todas las carteras.';
 
   @override
-  String get theAssetsName => 'El nombre del activo, como ahorros o bitcoin.';
+  String get assetNameHint => 'Ahorros, Bitcoin, AAPL…';
+
+  @override
+  String get walletNameHint => 'Acciones, Cripto, Fondo de emergencia…';
 
   @override
   String get pressToAdd => 'Toca + para añadir.';
 
   @override
-  String get rightNow => 'Ahora mismo';
-
-  @override
-  String get isGoingToBe => 'será';
-
-  @override
   String get howMuchTarget => 'Qué porcentaje objetivo deseas para esto.';
-
-  @override
-  String get optional => 'OPCIONAL';
 
   @override
   String get value => 'Valor';
@@ -80,16 +74,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dialogAssetTarget => 'Objetivo';
 
   @override
-  String get dialogSave => 'GUARDAR';
+  String get dialogSave => 'Guardar';
 
   @override
-  String get dialogSaveAddMore => 'GUARDAR Y AÑADIR MÁS';
+  String get dialogSaveAddMore => 'Guardar y añadir más';
 
   @override
-  String get dialogCancel => 'CANCELAR';
+  String get dialogCancel => 'Cancelar';
 
   @override
-  String get dialogDelete => 'ELIMINAR';
+  String get dialogDelete => 'Eliminar';
 
   @override
   String get settings => 'Ajustes';
@@ -142,7 +136,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get autoFillBuyOnly => 'Mín. para equilibrar sin vender';
 
   @override
-  String get applyInvestment => 'APLICAR A LA CARTERA';
+  String get applyInvestment => 'Aplicar a la cartera';
 
   @override
   String get noTargetsSet =>
@@ -276,7 +270,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get enterAmountToApply =>
-      'Introduce un importe para aplicar las operaciones. Introduce 0 para rebalancear sin añadir dinero.';
+      'Déjalo vacío para rebalancear lo que ya tienes.';
 
   @override
   String get balanceOnly => 'Registrar como saldo en efectivo';
@@ -291,4 +285,46 @@ class AppLocalizationsEs extends AppLocalizations {
   String mergePreview(int added, int kept) {
     return 'Combinar añade $added registros y conserva $kept existentes. Se conservan los valores actuales de los registros coincidentes. Las copias antiguas comparan nombres dentro de cada cartera y monedero.';
   }
+
+  @override
+  String get now => 'Ahora';
+
+  @override
+  String get after => 'Después';
+
+  @override
+  String get buy => 'Comprar';
+
+  @override
+  String get sell => 'Vender';
+
+  @override
+  String get preferences => 'Preferencias';
+
+  @override
+  String get appearance => 'Apariencia';
+
+  @override
+  String get backup => 'Copia de seguridad';
+
+  @override
+  String get sampleDescription => 'Acciones, cripto y efectivo para explorar';
+
+  @override
+  String targetAssigned(String percent) {
+    return '$percent de 100% asignado';
+  }
+
+  @override
+  String get useAmount => 'Usar';
+
+  @override
+  String get noTarget => 'Ninguno';
+
+  @override
+  String get balanceOnlySubtitle =>
+      'Para ahorros o efectivo: un solo saldo, sin unidades.';
+
+  @override
+  String get currentWallet => 'Actual';
 }

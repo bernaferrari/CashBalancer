@@ -16,7 +16,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mainEmptyTitle => '첫 번째 지갑을 추가하세요.';
 
   @override
-  String get mainEmptySubtitle => '+ 버튼을 눌러 지갑을 만들고 자산을 추가해 보세요.';
+  String get mainEmptySubtitle =>
+      '자산을 지갑으로 묶고 목표 비중을 정하면, 무엇을 사고팔아야 할지 정확히 알려드려요.';
 
   @override
   String get mainDialogValidator => '텍스트를 입력해 주세요';
@@ -37,22 +38,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get targetSettings => '전체 지갑 합계가 아닌 각 지갑 내부에서 합계가 100%가 되도록 계산합니다.';
 
   @override
-  String get theAssetsName => '예금이나 비트코인 같은 자산 이름입니다.';
+  String get assetNameHint => '저축, Bitcoin, AAPL…';
+
+  @override
+  String get walletNameHint => '주식, 암호화폐, 비상금…';
 
   @override
   String get pressToAdd => '+ 버튼을 눌러 추가하세요.';
 
   @override
-  String get rightNow => '현재';
-
-  @override
-  String get isGoingToBe => '예상 비중:';
-
-  @override
   String get howMuchTarget => '원하는 목표 비중(%)을 설정하세요.';
-
-  @override
-  String get optional => '선택사항';
 
   @override
   String get value => '금액';
@@ -266,8 +261,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get walletsLabel => '지갑';
 
   @override
-  String get enterAmountToApply =>
-      '거래를 적용하려면 금액을 입력하세요. 자금을 추가하지 않고 리밸런싱하려면 0을 입력하세요.';
+  String get enterAmountToApply => '비워 두면 지금 가진 자산만으로 리밸런싱해요.';
 
   @override
   String get balanceOnly => '현금 잔액으로 관리';
@@ -282,4 +276,45 @@ class AppLocalizationsKo extends AppLocalizations {
   String mergePreview(int added, int kept) {
     return '병합하면 $added개 항목을 추가하고 기존 항목 $kept개를 유지합니다. 일치하는 항목의 현재 값은 유지됩니다. 이전 백업은 포트폴리오와 지갑 안에서 이름으로 비교합니다.';
   }
+
+  @override
+  String get now => '현재';
+
+  @override
+  String get after => '조정 후';
+
+  @override
+  String get buy => '매수';
+
+  @override
+  String get sell => '매도';
+
+  @override
+  String get preferences => '환경설정';
+
+  @override
+  String get appearance => '모양';
+
+  @override
+  String get backup => '백업';
+
+  @override
+  String get sampleDescription => '주식, 암호화폐, 현금으로 둘러보기';
+
+  @override
+  String targetAssigned(String percent) {
+    return '100% 중 $percent 배분됨';
+  }
+
+  @override
+  String get useAmount => '적용';
+
+  @override
+  String get noTarget => '없음';
+
+  @override
+  String get balanceOnlySubtitle => '예금이나 현금용: 수량 없이 잔액만 기록해요.';
+
+  @override
+  String get currentWallet => '현재';
 }

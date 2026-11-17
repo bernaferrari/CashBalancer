@@ -1,4 +1,4 @@
-[![Cash Balancer](assets/header.png)](https://bernaferrari.github.io/CashBalancer)
+[![Cash Balancer: a portfolio rebalancing from its current allocation to its target while each wallet counts up how much to buy or sell](assets/header.webp)](https://bernaferrari.github.io/CashBalancer)
 
 # Cash Balancer
 

@@ -17,7 +17,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get mainEmptySubtitle =>
-      'वॉलेट जोड़ने के लिए + पर टैप करें, जहाँ आप अपनी संपत्तियाँ जोड़ सकते हैं।';
+      'अपनी संपत्तियों को वॉलेट में बाँटें, हर एक का लक्ष्य तय करें और देखें कि ठीक-ठीक क्या खरीदना या बेचना है।';
 
   @override
   String get mainDialogValidator => 'कृपया कुछ टेक्स्ट दर्ज करें';
@@ -39,22 +39,16 @@ class AppLocalizationsHi extends AppLocalizations {
       'सभी वॉलेट के कुल योग के बजाय प्रत्येक वॉलेट में 100% तक जोड़ें।';
 
   @override
-  String get theAssetsName => 'संपत्ति का नाम, जैसे बचत या बिटकॉइन।';
+  String get assetNameHint => 'बचत, Bitcoin, AAPL…';
+
+  @override
+  String get walletNameHint => 'शेयर, क्रिप्टो, आपातकालीन फंड…';
 
   @override
   String get pressToAdd => 'जोड़ने के लिए + दबाएँ।';
 
   @override
-  String get rightNow => 'अभी';
-
-  @override
-  String get isGoingToBe => 'हो जाएगा';
-
-  @override
   String get howMuchTarget => 'आप इसे कितने प्रतिशत लक्ष्य पर रखना चाहते हैं।';
-
-  @override
-  String get optional => 'वैकल्पिक';
 
   @override
   String get value => 'मूल्य';
@@ -274,7 +268,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get enterAmountToApply =>
-      'लेन-देन लागू करने के लिए राशि दर्ज करें। बिना नकदी जोड़े पुनर्संतुलन के लिए 0 दर्ज करें।';
+      'जो पहले से है उसी को पुनर्संतुलित करने के लिए खाली छोड़ें।';
 
   @override
   String get balanceOnly => 'नकद शेष के रूप में दर्ज करें';
@@ -289,4 +283,46 @@ class AppLocalizationsHi extends AppLocalizations {
   String mergePreview(int added, int kept) {
     return 'मिलाने पर $added रिकॉर्ड जुड़ेंगे और $kept मौजूदा रिकॉर्ड रहेंगे। मेल खाने वाले रिकॉर्ड के वर्तमान मान बने रहेंगे। पुराने बैकअप में पोर्टफ़ोलियो और वॉलेट के भीतर नाम से मिलान होता है।';
   }
+
+  @override
+  String get now => 'अभी';
+
+  @override
+  String get after => 'बाद में';
+
+  @override
+  String get buy => 'खरीदें';
+
+  @override
+  String get sell => 'बेचें';
+
+  @override
+  String get preferences => 'प्राथमिकताएँ';
+
+  @override
+  String get appearance => 'रूप';
+
+  @override
+  String get backup => 'बैकअप';
+
+  @override
+  String get sampleDescription => 'आज़माने के लिए स्टॉक, क्रिप्टो और नकद';
+
+  @override
+  String targetAssigned(String percent) {
+    return '100% में से $percent तय';
+  }
+
+  @override
+  String get useAmount => 'उपयोग करें';
+
+  @override
+  String get noTarget => 'कोई नहीं';
+
+  @override
+  String get balanceOnlySubtitle =>
+      'बचत या नकद के लिए: केवल शेष राशि, कोई इकाई नहीं।';
+
+  @override
+  String get currentWallet => 'वर्तमान';
 }

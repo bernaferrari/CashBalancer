@@ -106,15 +106,15 @@ for (const wallet of [false, true]) {
     const editor = wallet ? 'Edit a Wallet' : 'Edit an Asset';
     // The first wallet and the first asset both belong to Stocks.
     if (wallet) {
-      const stocks = page.getByRole('group', {name: /Edit a Wallet Stocks/});
-      await stocks.getByRole('button').first().click();
+      const stocks = page.getByRole('group', {name: /^STOCKS/});
+      await button(stocks, 'Edit a Wallet').click();
     } else {
       await page.getByRole('button', {name: /^S&P 500 ETF/}).click();
     }
     await page.getByRole('heading', {name: editor}).waitFor();
     await recordDeletionMessages(page);
-    await button(page, 'DELETE').click();
-    if (wallet) await page.getByRole('alertdialog').getByRole('button', {name: 'DELETE'}).click();
+    await button(page, 'Delete').click();
+    if (wallet) await page.getByRole('alertdialog').getByRole('button', {name: 'Delete'}).click();
     await total(page, wallet ? /4,500/ : /6,260/).waitFor();
     await button(page, 'Undo').click();
     await total(page, /10,460/).waitFor();
@@ -132,7 +132,7 @@ test('backup preview keeps the edited price and malformed files keep the portfol
   await total(page, /10,460/).waitFor();
   await button(page, 'Update price').first().click();
   await page.getByRole('textbox', {name: 'Unit price'}).fill('5000');
-  await button(page, 'SAVE').click();
+  await button(page, 'Save').click();
   await total(page, /11,260/).waitFor();
   await settings(page);
   await selectBackup(page, backup);
@@ -163,10 +163,10 @@ test('cancel a sale, then apply it without changing a one-share holding’s unit
   await button(page, 'Back').click();
   await total(page, /400\.00/).waitFor();
   await button(page, 'Invest & Rebalance').click();
-  await page.getByRole('checkbox', {name: '+$100.00', exact: true}).click();
+  await button(page, '+$100').click();
   const confirm = page.getByRole('alertdialog');
-  await button(page, 'APPLY TO PORTFOLIO').click();
-  await button(confirm, 'CANCEL').click();
+  await button(page, 'Apply to portfolio').click();
+  await button(confirm, 'Cancel').click();
   await confirm.waitFor({state: 'hidden'});
   await button(page, 'Back').click();
   await total(page, /400\.00/).waitFor();
@@ -174,9 +174,9 @@ test('cancel a sale, then apply it without changing a one-share holding’s unit
   await page.getByRole('button', {name: /^Cash.*100\.00/}).waitFor();
 
   await button(page, 'Invest & Rebalance').click();
-  await page.getByRole('checkbox', {name: '+$100.00', exact: true}).click();
-  await button(page, 'APPLY TO PORTFOLIO').click();
-  await button(confirm, 'APPLY TO PORTFOLIO').click();
+  await button(page, '+$100').click();
+  await button(page, 'Apply to portfolio').click();
+  await button(confirm, 'Apply to portfolio').click();
   await total(page, /500\.00/).waitFor();
   await settings(page);
   const saved = JSON.parse(await download(page)).portfolios[0].wallets[0].items;

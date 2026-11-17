@@ -17,7 +17,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get mainEmptySubtitle =>
-      'Tocca il + per aggiungere un portafoglio in cui inserire i tuoi asset.';
+      'Raggruppa i tuoi asset in portafogli, assegna a ciascuno un obiettivo e scopri esattamente cosa comprare o vendere.';
 
   @override
   String get mainDialogValidator => 'Inserisci del testo';
@@ -39,23 +39,16 @@ class AppLocalizationsIt extends AppLocalizations {
       'Somma fino al 100% in ogni portafoglio, invece di considerare la somma di tutti i portafogli.';
 
   @override
-  String get theAssetsName =>
-      'Il nome dell\'asset, ad esempio risparmi o bitcoin.';
+  String get assetNameHint => 'Risparmi, Bitcoin, AAPL…';
+
+  @override
+  String get walletNameHint => 'Azioni, Cripto, Fondo emergenze…';
 
   @override
   String get pressToAdd => 'Tocca + per aggiungere.';
 
   @override
-  String get rightNow => 'In questo momento';
-
-  @override
-  String get isGoingToBe => 'sarà';
-
-  @override
   String get howMuchTarget => 'La percentuale obiettivo desiderata.';
-
-  @override
-  String get optional => 'OPZIONALE';
 
   @override
   String get value => 'Valore';
@@ -81,16 +74,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dialogAssetTarget => 'Obiettivo';
 
   @override
-  String get dialogSave => 'SALVA';
+  String get dialogSave => 'Salva';
 
   @override
-  String get dialogSaveAddMore => 'SALVA E AGGIUNGI ALTRO';
+  String get dialogSaveAddMore => 'Salva e aggiungi altro';
 
   @override
-  String get dialogCancel => 'ANNULLA';
+  String get dialogCancel => 'Annulla';
 
   @override
-  String get dialogDelete => 'ELIMINA';
+  String get dialogDelete => 'Elimina';
 
   @override
   String get settings => 'Impostazioni';
@@ -143,7 +136,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get autoFillBuyOnly => 'Min. per bilanciare senza vendere';
 
   @override
-  String get applyInvestment => 'APPLICA AL PORTAFOGLIO';
+  String get applyInvestment => 'Applica al portafoglio';
 
   @override
   String get noTargetsSet =>
@@ -277,7 +270,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get enterAmountToApply =>
-      'Inserisci un importo per applicare le operazioni. Inserisci 0 per ribilanciare senza aggiungere denaro.';
+      'Lascia vuoto per ribilanciare ciò che hai già.';
 
   @override
   String get balanceOnly => 'Registra come saldo in contanti';
@@ -292,4 +285,46 @@ class AppLocalizationsIt extends AppLocalizations {
   String mergePreview(int added, int kept) {
     return 'Unisci aggiunge $added voci e ne mantiene $kept. I valori correnti delle voci corrispondenti vengono conservati. I backup meno recenti usano i nomi nei portafogli.';
   }
+
+  @override
+  String get now => 'Ora';
+
+  @override
+  String get after => 'Dopo';
+
+  @override
+  String get buy => 'Compra';
+
+  @override
+  String get sell => 'Vendi';
+
+  @override
+  String get preferences => 'Preferenze';
+
+  @override
+  String get appearance => 'Aspetto';
+
+  @override
+  String get backup => 'Backup';
+
+  @override
+  String get sampleDescription => 'Azioni, cripto e liquidità da esplorare';
+
+  @override
+  String targetAssigned(String percent) {
+    return '$percent su 100% assegnato';
+  }
+
+  @override
+  String get useAmount => 'Usa';
+
+  @override
+  String get noTarget => 'Nessuno';
+
+  @override
+  String get balanceOnlySubtitle =>
+      'Per risparmi o contanti: un unico saldo, senza unità.';
+
+  @override
+  String get currentWallet => 'Attuale';
 }

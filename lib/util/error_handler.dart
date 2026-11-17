@@ -4,8 +4,6 @@
 // operations and displaying appropriate feedback to users.
 import 'package:material_ui/material_ui.dart';
 
-import 'tailwind_colors.dart';
-
 /// Result wrapper for database operations
 ///
 /// This class represents the result of a database operation that may succeed or fail.
@@ -48,7 +46,7 @@ void showErrorSnackbar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(message),
-      backgroundColor: TailwindColor.red.palette.s600,
+      backgroundColor: Theme.of(context).colorScheme.error,
       duration: const Duration(seconds: 4),
     ),
   );

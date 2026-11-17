@@ -3,8 +3,7 @@ import 'dart:ui';
 import 'package:cash_balancer/database/data.dart';
 import 'package:cash_balancer/database/database.dart';
 import 'package:cash_balancer/util/get_color_by_quantile.dart';
-import 'package:cash_balancer/util/retrieve_spaced_list.dart';
-import 'package:cash_balancer/util/tailwind_colors.dart';
+import 'package:cash_balancer/util/wallet_colors.dart';
 import 'package:cash_balancer/widgets/dialog_screen_base.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/services.dart';
@@ -115,56 +114,16 @@ void main() {
 
     final colors = getColorByQuantile(itemsMap, groupMap);
     expect(colors.keys, containsAll([1, 2, 3]));
-    expect(colors[1]?.colorSpace, ColorSpace.displayP3);
-    expect(colors[2]?.colorSpace, ColorSpace.displayP3);
-    expect(colors[3]?.colorSpace, ColorSpace.displayP3);
+    expect(colors[1]?.colorSpace, ColorSpace.sRGB);
+    expect(colors[2]?.colorSpace, ColorSpace.sRGB);
+    expect(colors[3]?.colorSpace, ColorSpace.sRGB);
     // Wallet 1 items and Wallet 2 items use their respective wallet colors.
     expect(colors[1], isNot(equals(colors[3])));
 
-    // Tailwind v3/v4 color names resolve via asNameMap.
-    expect(TailwindColor.fromName('sky'), TailwindColor.sky);
-    expect(TailwindColor.fromName('stone'), TailwindColor.stone);
-    expect(TailwindColor.fromName('slate'), TailwindColor.slate);
-  });
-
-  test('retrieveSpacedList handles empty, zero-total, and normal lists', () {
-    expect(retrieveSpacedList([], 200), isEmpty);
-
-    const zeroItem = Item(
-      isBalance: false,
-      id: 1,
-      name: 'Zero',
-      quantity: 1,
-      price: 0,
-      targetPercent: -1,
-      walletId: 1,
-      userId: 1,
-    );
-    final zeroResult = retrieveSpacedList([zeroItem], 200);
-    expect(zeroResult, [0.0]);
-
-    const i1 = Item(
-      isBalance: false,
-      id: 1,
-      name: 'I1',
-      quantity: 1,
-      price: 50,
-      targetPercent: -1,
-      walletId: 1,
-      userId: 1,
-    );
-    const i2 = Item(
-      isBalance: false,
-      id: 2,
-      name: 'I2',
-      quantity: 1,
-      price: 50,
-      targetPercent: -1,
-      walletId: 1,
-      userId: 1,
-    );
-    final spaced = retrieveSpacedList([i1, i2], 200);
-    expect(spaced, [99.0, 99.0]);
+    // Saved color names resolve via asNameMap.
+    expect(WalletColor.fromName('sky'), WalletColor.sky);
+    expect(WalletColor.fromName('stone'), WalletColor.stone);
+    expect(WalletColor.fromName('slate'), WalletColor.slate);
   });
 
   test('DecimalTextInputFormatter supports dot and comma cents', () {

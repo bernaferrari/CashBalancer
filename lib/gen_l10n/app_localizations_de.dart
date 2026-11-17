@@ -17,7 +17,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get mainEmptySubtitle =>
-      'Tippe auf +, um ein Wallet hinzuzufügen, in dem du deine Anlagen verwalten kannst.';
+      'Ordne deine Anlagen in Wallets, gib jedem ein Ziel und sieh genau, was du kaufen oder verkaufen solltest.';
 
   @override
   String get mainDialogValidator => 'Bitte gib einen Text ein';
@@ -39,23 +39,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'In jedem Wallet auf 100 % summieren, anstatt die Summe aller Wallets zu berücksichtigen.';
 
   @override
-  String get theAssetsName =>
-      'Der Name der Anlage, z. B. Ersparnisse oder Bitcoin.';
+  String get assetNameHint => 'Ersparnisse, Bitcoin, AAPL…';
+
+  @override
+  String get walletNameHint => 'Aktien, Krypto, Notgroschen…';
 
   @override
   String get pressToAdd => 'Tippe auf +, um hinzuzufügen.';
 
   @override
-  String get rightNow => 'Aktuell';
-
-  @override
-  String get isGoingToBe => 'wird sein';
-
-  @override
   String get howMuchTarget => 'Welchen Zielprozentsatz du anstrebst.';
-
-  @override
-  String get optional => 'OPTIONAL';
 
   @override
   String get value => 'Wert';
@@ -81,16 +74,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dialogAssetTarget => 'Ziel';
 
   @override
-  String get dialogSave => 'SPEICHERN';
+  String get dialogSave => 'Speichern';
 
   @override
-  String get dialogSaveAddMore => 'SPEICHERN UND WEITERE HINZUFÜGEN';
+  String get dialogSaveAddMore => 'Speichern und weitere hinzufügen';
 
   @override
-  String get dialogCancel => 'ABBRECHEN';
+  String get dialogCancel => 'Abbrechen';
 
   @override
-  String get dialogDelete => 'LÖSCHEN';
+  String get dialogDelete => 'Löschen';
 
   @override
   String get settings => 'Einstellungen';
@@ -143,7 +136,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get autoFillBuyOnly => 'Min. zum Ausgleich ohne Verkauf';
 
   @override
-  String get applyInvestment => 'AUF PORTFOLIO ANWENDEN';
+  String get applyInvestment => 'Auf Portfolio anwenden';
 
   @override
   String get noTargetsSet =>
@@ -279,7 +272,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get enterAmountToApply =>
-      'Gib einen Betrag ein, um die Trades anzuwenden. Gib 0 ein, um ohne Einzahlung umzuschichten.';
+      'Leer lassen, um deinen aktuellen Bestand umzuschichten.';
 
   @override
   String get balanceOnly => 'Als Barguthaben erfassen';
@@ -294,4 +287,46 @@ class AppLocalizationsDe extends AppLocalizations {
   String mergePreview(int added, int kept) {
     return 'Die Zusammenführung fügt $added Einträge hinzu und behält $kept bestehende Einträge. Bei Übereinstimmungen bleiben die aktuellen Werte erhalten. Ältere Sicherungen verwenden die Namen innerhalb von Portfolios und Wallets.';
   }
+
+  @override
+  String get now => 'Jetzt';
+
+  @override
+  String get after => 'Danach';
+
+  @override
+  String get buy => 'Kaufen';
+
+  @override
+  String get sell => 'Verkaufen';
+
+  @override
+  String get preferences => 'Präferenzen';
+
+  @override
+  String get appearance => 'Darstellung';
+
+  @override
+  String get backup => 'Backup';
+
+  @override
+  String get sampleDescription => 'Aktien, Krypto und Bargeld zum Ausprobieren';
+
+  @override
+  String targetAssigned(String percent) {
+    return '$percent von 100 % vergeben';
+  }
+
+  @override
+  String get useAmount => 'Übernehmen';
+
+  @override
+  String get noTarget => 'Keins';
+
+  @override
+  String get balanceOnlySubtitle =>
+      'Für Erspartes oder Bargeld: ein Saldo, keine Stückzahl.';
+
+  @override
+  String get currentWallet => 'Aktuell';
 }

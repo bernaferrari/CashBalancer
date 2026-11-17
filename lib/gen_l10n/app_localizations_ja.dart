@@ -16,7 +16,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mainEmptyTitle => '最初のウォレットを追加しましょう。';
 
   @override
-  String get mainEmptySubtitle => '＋をタップしてウォレットを作成し、資産を追加できます。';
+  String get mainEmptySubtitle =>
+      '資産をウォレットにまとめて目標を決めると、何を買い、何を売ればいいかがすぐにわかります。';
 
   @override
   String get mainDialogValidator => 'テキストを入力してください';
@@ -37,22 +38,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get targetSettings => '全ウォレットの合計ではなく、各ウォレット内で100%になるように計算します。';
 
   @override
-  String get theAssetsName => '貯金やビットコインなどの資産名。';
+  String get assetNameHint => '貯金, Bitcoin, AAPL…';
+
+  @override
+  String get walletNameHint => '株式、暗号資産、生活防衛資金…';
 
   @override
   String get pressToAdd => '＋を押して追加';
 
   @override
-  String get rightNow => '現在';
-
-  @override
-  String get isGoingToBe => 'の割合は';
-
-  @override
   String get howMuchTarget => '目標とする割合（%）を設定します。';
-
-  @override
-  String get optional => '任意';
 
   @override
   String get value => '評価額';
@@ -265,8 +260,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get walletsLabel => 'ウォレット';
 
   @override
-  String get enterAmountToApply =>
-      '取引を適用するには金額を入力してください。資金を追加せずにリバランスするには 0 を入力してください。';
+  String get enterAmountToApply => '空欄のままにすると、今の資産だけでリバランスします。';
 
   @override
   String get balanceOnly => '現金残高として管理';
@@ -281,4 +275,45 @@ class AppLocalizationsJa extends AppLocalizations {
   String mergePreview(int added, int kept) {
     return '統合すると$added件を追加し、既存の$kept件を保持します。一致するデータは現在の値を維持します。旧形式ではポートフォリオとウォレット内の名前を照合します。';
   }
+
+  @override
+  String get now => '現在';
+
+  @override
+  String get after => '調整後';
+
+  @override
+  String get buy => '買い';
+
+  @override
+  String get sell => '売り';
+
+  @override
+  String get preferences => '環境設定';
+
+  @override
+  String get appearance => '外観';
+
+  @override
+  String get backup => 'バックアップ';
+
+  @override
+  String get sampleDescription => '株式・暗号資産・現金で試してみる';
+
+  @override
+  String targetAssigned(String percent) {
+    return '100% のうち $percent を割り当て済み';
+  }
+
+  @override
+  String get useAmount => '使う';
+
+  @override
+  String get noTarget => 'なし';
+
+  @override
+  String get balanceOnlySubtitle => '貯金や現金向け：数量なしの残高のみ。';
+
+  @override
+  String get currentWallet => '現在';
 }

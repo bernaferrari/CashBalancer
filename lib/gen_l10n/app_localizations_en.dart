@@ -17,7 +17,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mainEmptySubtitle =>
-      'Tap the + to add a wallet, where you\'ll be able to add your assets.';
+      'Group your assets into wallets, give each a target, and see exactly what to buy or sell.';
 
   @override
   String get mainDialogValidator => 'Please enter some text';
@@ -36,25 +36,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get targetSettings =>
-      'Sum up to 100% in each wallet, instead of considering the sum of all wallets.';
+      'Asset targets add up to 100% inside each wallet, not across the whole portfolio.';
 
   @override
-  String get theAssetsName => 'The asset’s name, such as savings or bitcoin.';
+  String get assetNameHint => 'Savings, Bitcoin, AAPL…';
 
   @override
-  String get pressToAdd => 'Press + to add.';
+  String get walletNameHint => 'Stocks, Crypto, Emergency fund…';
 
   @override
-  String get rightNow => 'Right now';
+  String get pressToAdd => 'No assets yet. Tap + to add one.';
 
   @override
-  String get isGoingToBe => 'is going to be';
-
-  @override
-  String get howMuchTarget => 'How much percentage you want this to be.';
-
-  @override
-  String get optional => 'OPTIONAL';
+  String get howMuchTarget => 'The share it should have.';
 
   @override
   String get value => 'Value';
@@ -80,16 +74,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dialogAssetTarget => 'Target';
 
   @override
-  String get dialogSave => 'SAVE';
+  String get dialogSave => 'Save';
 
   @override
-  String get dialogSaveAddMore => 'SAVE AND ADD MORE';
+  String get dialogSaveAddMore => 'Save and add more';
 
   @override
-  String get dialogCancel => 'CANCEL';
+  String get dialogCancel => 'Cancel';
 
   @override
-  String get dialogDelete => 'DELETE';
+  String get dialogDelete => 'Delete';
 
   @override
   String get settings => 'Settings';
@@ -98,7 +92,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currencySymbol => 'Currency';
 
   @override
-  String get relativeTarget => 'Relative Target';
+  String get relativeTarget => 'Targets per wallet';
 
   @override
   String get sortBy => 'Sort by';
@@ -125,11 +119,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get designedDeveloped => 'Designed & developed by Bernardo Ferrari.';
 
   @override
-  String get buyOnlyRebalance => 'Buy-Only Rebalancing';
+  String get buyOnlyRebalance => 'Buy-only rebalancing';
 
   @override
-  String get buyOnlyRebalanceSubtitle =>
-      'Rebalance using only new cash without selling any overweight assets.';
+  String get buyOnlyRebalanceSubtitle => 'Only add money. Nothing gets sold.';
 
   @override
   String get rebalanceCalculator => 'Invest & Rebalance';
@@ -141,7 +134,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get autoFillBuyOnly => 'Min. to balance without selling';
 
   @override
-  String get applyInvestment => 'APPLY TO PORTFOLIO';
+  String get applyInvestment => 'Apply to portfolio';
 
   @override
   String get noTargetsSet =>
@@ -151,10 +144,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hold => 'Hold';
 
   @override
-  String get portfolios => 'Portfolios & Goals';
+  String get portfolios => 'Portfolios & goals';
 
   @override
-  String get newPortfolio => 'New Portfolio / Goal';
+  String get newPortfolio => 'New portfolio or goal';
 
   @override
   String get themeAuto => 'Auto';
@@ -273,8 +266,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get walletsLabel => 'Wallets';
 
   @override
-  String get enterAmountToApply =>
-      'Enter an amount to apply trades. Enter 0 to rebalance without adding cash.';
+  String get enterAmountToApply => 'Leave it empty to rebalance what you have.';
 
   @override
   String get balanceOnly => 'Track as a cash balance';
@@ -289,4 +281,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String mergePreview(int added, int kept) {
     return 'Merge adds $added records and keeps $kept existing records. When records match, your current values are kept. Older backups match by name within each portfolio and wallet.';
   }
+
+  @override
+  String get now => 'Now';
+
+  @override
+  String get after => 'After';
+
+  @override
+  String get buy => 'Buy';
+
+  @override
+  String get sell => 'Sell';
+
+  @override
+  String get preferences => 'Preferences';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get backup => 'Backup';
+
+  @override
+  String get sampleDescription => 'Stocks, crypto and cash';
+
+  @override
+  String targetAssigned(String percent) {
+    return '$percent of 100% assigned';
+  }
+
+  @override
+  String get useAmount => 'Use';
+
+  @override
+  String get noTarget => 'None';
+
+  @override
+  String get balanceOnlySubtitle =>
+      'For savings or cash: a single balance, no units.';
+
+  @override
+  String get currentWallet => 'Current';
 }

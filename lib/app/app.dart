@@ -20,8 +20,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
 import '../database/database.dart';
-import '../util/tailwind_colors.dart';
-import '../widgets/dialog_screen_base.dart';
+import 'theme.dart';
 import '../widgets/delete_actions.dart';
 
 final simpleBuilder = RoutesLocationBuilder(
@@ -38,21 +37,21 @@ final simpleBuilder = RoutesLocationBuilder(
       title: context.l10n.settings,
       child: const SettingsPage(),
       popToNamed: '/',
-      fillColor: getScaffoldDialogBackgroundColor(context, 'stone'),
+      fillColor: context.ledger.sunken,
     ),
     '/analysis': (context, state, obj) => BeamerMaterialTransitionPage(
       key: const ValueKey('analysis'),
       title: context.l10n.allItems,
       child: const AnalysisPage(),
       popToNamed: '/',
-      fillColor: getScaffoldDialogBackgroundColor(context, 'stone'),
+      fillColor: context.ledger.sunken,
     ),
     '/rebalance': (context, state, obj) => BeamerMaterialTransitionPage(
       key: const ValueKey('rebalance'),
       title: context.l10n.rebalanceCalculator,
       child: const RebalancePage(),
       popToNamed: '/',
-      fillColor: getScaffoldDialogBackgroundColor(context, 'emerald'),
+      fillColor: context.ledger.sunken,
     ),
     '/addWallet/:userId': (context, state, obj) => _dataPage(
       context,
@@ -150,78 +149,6 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = TextTheme(
-      bodyLarge: TextStyle(
-        fontFamily: 'Inter',
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-      ),
-      bodyMedium: TextStyle(
-        fontFamily: 'IBM Plex Mono',
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-      ),
-      bodySmall: TextStyle(
-        fontFamily: 'Inter',
-        fontSize: 12,
-        fontWeight: FontWeight.w400,
-      ),
-      labelSmall: TextStyle(
-        fontFamily: 'IBM Plex Mono',
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        letterSpacing: 0.6,
-      ),
-      headlineSmall: TextStyle(
-        fontFamily: 'Rubik',
-        fontSize: 20,
-        fontWeight: FontWeight.w700,
-        letterSpacing: -0.3,
-      ),
-      titleLarge: TextStyle(
-        fontFamily: 'Rubik',
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-      ),
-      titleMedium: TextStyle(
-        fontFamily: 'Rubik',
-        fontSize: 15,
-        fontWeight: FontWeight.w600,
-      ),
-      titleSmall: TextStyle(
-        fontFamily: 'Inter',
-        fontSize: 13,
-        fontWeight: FontWeight.w500,
-      ),
-    );
-
-    final textButtonTheme = TextButtonThemeData(
-      style: TextButton.styleFrom(
-        minimumSize: const Size(48, 48),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
-
-    final elevatedButtonTheme = ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        minimumSize: const Size(48, 48),
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w700),
-      ),
-    );
-
-    OutlinedButtonThemeData buildOutlinedButtonTheme(
-      Color borderColor,
-    ) => OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size(48, 48),
-        side: BorderSide(color: borderColor),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w700),
-      ),
-    );
-
     return RepositoryProvider<Database>(
       create: (context) => widget.db ?? constructDb(),
       dispose: (db) {
@@ -250,85 +177,8 @@ class _AppState extends State<App> {
           builder: (context, appPrefs) => MaterialApp.router(
             themeMode: appPrefs.$1,
             locale: appPrefs.$2,
-            theme: ThemeData(
-              scaffoldBackgroundColor: TailwindColor.slate.palette.s50,
-              colorScheme: ColorScheme.light(
-                primary: TailwindColor.emerald.palette.s700,
-                onPrimary: Colors.white,
-                secondary: TailwindColor.emerald.palette.s600,
-                onSecondary: Colors.white,
-                surface: Colors.white,
-                onSurface: TailwindColor.slate.palette.s900,
-                surfaceTint: Colors.transparent,
-                onSurfaceVariant: TailwindColor.slate.palette.s600,
-              ),
-              dialogTheme: DialogThemeData(
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-              ),
-              floatingActionButtonTheme: FloatingActionButtonThemeData(
-                backgroundColor: TailwindColor.emerald.palette.s600,
-                foregroundColor: Colors.white,
-                elevation: 2,
-                shape: const StadiumBorder(),
-              ),
-              dividerTheme: DividerThemeData(
-                color: TailwindColor.slate.palette.s900.withValues(alpha: 0.08),
-              ),
-              appBarTheme: AppBarTheme(
-                backgroundColor: TailwindColor.sky.palette.s500,
-                foregroundColor: TailwindColor.slate.palette.s900,
-              ),
-              typography: Typography.material2021(),
-              visualDensity: VisualDensity.standard,
-              applyElevationOverlayColor: false,
-              elevatedButtonTheme: elevatedButtonTheme,
-              outlinedButtonTheme: buildOutlinedButtonTheme(
-                TailwindColor.slate.palette.s900.withValues(alpha: 0.14),
-              ),
-              textButtonTheme: textButtonTheme,
-              textTheme: textTheme,
-            ),
-            darkTheme: ThemeData(
-              brightness: Brightness.dark,
-              scaffoldBackgroundColor: TailwindColor.zinc.palette.s950,
-              colorScheme: ColorScheme.dark(
-                primary: TailwindColor.emerald.palette.s400,
-                onPrimary: TailwindColor.zinc.palette.s950,
-                secondary: TailwindColor.emerald.palette.s400,
-                onSecondary: TailwindColor.zinc.palette.s950,
-                surface: TailwindColor.zinc.palette.s900,
-                onSurface: TailwindColor.zinc.palette.s100,
-                surfaceTint: Colors.transparent,
-                onSurfaceVariant: TailwindColor.zinc.palette.s400,
-              ),
-              dialogTheme: DialogThemeData(
-                backgroundColor: TailwindColor.zinc.palette.s900,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-              ),
-              floatingActionButtonTheme: FloatingActionButtonThemeData(
-                backgroundColor: TailwindColor.emerald.palette.s400,
-                foregroundColor: TailwindColor.zinc.palette.s950,
-                elevation: 2,
-                shape: const StadiumBorder(),
-              ),
-              dividerTheme: DividerThemeData(
-                color: Colors.white.withValues(alpha: 0.08),
-              ),
-              typography: Typography.material2021(),
-              visualDensity: VisualDensity.standard,
-              applyElevationOverlayColor: false,
-              elevatedButtonTheme: elevatedButtonTheme,
-              outlinedButtonTheme: buildOutlinedButtonTheme(
-                Colors.white.withValues(alpha: 0.14),
-              ),
-              textButtonTheme: textButtonTheme,
-              textTheme: textTheme,
-            ),
+            theme: buildTheme(Brightness.light),
+            darkTheme: buildTheme(Brightness.dark),
             localizationsDelegates: [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
@@ -402,14 +252,15 @@ class _DataRouteContentState extends State<_DataRouteContent> {
         final color = id == null || data == null
             ? null
             : widget.walletColor?.call(data, id);
+        final theme = color == null
+            ? null
+            : buildTheme(Theme.of(context).brightness, colorName: color);
         return SharedAxisTransition(
           animation: route.animation!,
           secondaryAnimation: route.secondaryAnimation!,
           transitionType: SharedAxisTransitionType.horizontal,
-          fillColor: color == null
-              ? null
-              : getScaffoldDialogBackgroundColor(context, color),
-          child: child,
+          fillColor: theme?.colorScheme.surfaceContainer,
+          child: theme == null ? child : Theme(data: theme, child: child),
         );
       },
     );

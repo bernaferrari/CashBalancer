@@ -1,61 +1,7 @@
-import 'dart:ui' show ColorSpace;
-
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
-import '../util/tailwind_colors.dart';
-
-Color getScaffoldDialogBackgroundColor(BuildContext context, String colorName) {
-  final palette = tailwindPalette(colorName);
-  return Theme.of(context).brightness == Brightness.dark
-      ? Color.alphaBlend(
-          palette.s950.withValues(alpha: 0.55),
-          TailwindColor.zinc.palette.s950,
-        )
-      : Color.alphaBlend(
-          palette.s100.withValues(alpha: 0.65),
-          TailwindColor.slate.palette.s50,
-        );
-}
-
-Color getPrimaryColor(BuildContext context, String colorName) {
-  final palette = tailwindPalette(colorName);
-  return Theme.of(context).brightness == Brightness.dark
-      ? palette.s200
-      : palette.s800;
-}
-
-Color getPrimaryColorWeaker(BuildContext context, String colorName) {
-  final palette = tailwindPalette(colorName);
-  return Theme.of(context).brightness == Brightness.dark
-      ? palette.s300
-      : palette.s700;
-}
-
-Color getBackgroundDialogColor(BuildContext context, String colorName) {
-  final palette = tailwindPalette(colorName);
-  return Theme.of(context).brightness == Brightness.dark
-      ? Color.alphaBlend(
-          palette.s900.withValues(alpha: 0.28),
-          TailwindColor.zinc.palette.s900,
-        )
-      : Color.alphaBlend(
-          palette.s50.withValues(alpha: 0.85),
-          Colors.white.withValues(colorSpace: ColorSpace.displayP3),
-        );
-}
-
-Color getInputFillColor(BuildContext context) {
-  return Theme.of(context).brightness == Brightness.dark
-      ? Colors.white.withValues(alpha: 0.06)
-      : Colors.black.withValues(alpha: 0.04);
-}
-
-InputBorder getInputDecorationBorder(Color primaryColorWeaker) =>
-    OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: primaryColorWeaker.withValues(alpha: 0.55)),
-    );
+import '../app/theme.dart';
 
 /// Accepts digits and a single decimal separator (`.` or `,`), normalizing `,`
 /// to `.` and allowing up to [decimalRange] fractional digits.
@@ -84,87 +30,105 @@ class const DecimalTextInputFormatter({final int decimalRange = 2})
   }
 }
 
+/// A form screen: full-bleed on phones, a floating card on wider windows.
+/// [bottom] stays pinned under the scrolling [children]. A [colorName] tints
+/// the screen with that wallet's scheme; without one it stays neutral.
 class const DialogScreenBase({
   super.key,
   required final List<Widget> children,
-  required final String colorName,
+  final String? colorName,
   required final String appBarTitle,
-  final Color? backgroundDialogColor,
   final List<Widget>? appBarActions,
+  final List<Widget> bottom = const [],
 }) extends StatelessWidget {
+  static const double _wideBreakpoint = 640;
+
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final palette = tailwindPalette(colorName);
-    final primaryColor = getPrimaryColor(context, colorName);
+    final wide = MediaQuery.sizeOf(context).width >= _wideBreakpoint;
+    final theme = buildTheme(
+      Theme.of(context).brightness,
+      colorName: colorName,
+    );
+    final ledger = theme.extension<Ledger>()!;
+    final surface = ledger.canvas;
+    final backdrop = theme.colorScheme.surfaceContainer;
 
-    return Scaffold(
-      backgroundColor: getScaffoldDialogBackgroundColor(context, colorName),
-      body: SafeArea(
-        top: true,
-        bottom: true,
-        child: Shortcuts(
-          shortcuts: const <ShortcutActivator, Intent>{
-            SingleActivator(LogicalKeyboardKey.escape): PopIntent(),
-          },
-          child: Actions(
-            actions: <Type, Action<Intent>>{
-              PopIntent: CallbackAction<PopIntent>(
-                onInvoke: (_) => Navigator.of(context).pop(),
-              ),
+    final content = Column(
+      mainAxisSize: wide ? MainAxisSize.min : MainAxisSize.max,
+      children: [
+        AppBar(
+          backgroundColor: Colors.transparent,
+          centerTitle: true,
+          primary: !wide,
+          title: Text(appBarTitle),
+          actions: [...?appBarActions, const SizedBox(width: 4)],
+        ),
+        Flexible(
+          fit: wide ? FlexFit.loose : FlexFit.tight,
+          child: Material(
+            type: MaterialType.transparency,
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+              shrinkWrap: wide,
+              children: children,
+            ),
+          ),
+        ),
+        if (bottom.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.fromLTRB(20, 4, 20, wide ? 20 : 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: 6,
+              children: bottom,
+            ),
+          ),
+      ],
+    );
+
+    return AnimatedTheme(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+      data: theme,
+      child: Scaffold(
+        backgroundColor: wide ? backdrop : surface,
+        body: SafeArea(
+          top: !wide,
+          child: Shortcuts(
+            shortcuts: const <ShortcutActivator, Intent>{
+              SingleActivator(LogicalKeyboardKey.escape): PopIntent(),
             },
-            child: Center(
-              child: SizedBox(
-                width: 416,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: isDark
-                          ? palette.s700.withValues(alpha: 0.45)
-                          : palette.s300.withValues(alpha: 0.85),
-                      width: 1.5,
-                    ),
-                    color:
-                        backgroundDialogColor ??
-                        getBackgroundDialogColor(context, colorName),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AppBar(
-                        surfaceTintColor: Colors.transparent,
-
-                        foregroundColor: primaryColor,
-                        title: Text(
-                          appBarTitle,
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(color: primaryColor),
-                        ),
-                        centerTitle: true,
-                        elevation: 0,
-                        scrolledUnderElevation: 0,
-                        backgroundColor: isDark
-                            ? palette.s900.withValues(alpha: 0.55)
-                            : palette.s100.withValues(alpha: 0.90),
-                        actions: appBarActions,
-                      ),
-                      Flexible(
-                        child: Material(
-                          type: MaterialType.transparency,
-                          child: ListView(
-                            padding: const EdgeInsets.all(24),
-                            shrinkWrap: true,
-                            children: children,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+            child: Actions(
+              actions: <Type, Action<Intent>>{
+                PopIntent: CallbackAction<PopIntent>(
+                  onInvoke: (_) => Navigator.of(context).pop(),
                 ),
-              ),
+              },
+              child: !wide
+                  ? content
+                  : Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 32),
+                        child: Container(
+                          width: 460,
+                          clipBehavior: Clip.antiAlias,
+                          decoration: BoxDecoration(
+                            color: surface,
+                            borderRadius: BorderRadius.circular(28),
+                            border: Border.all(color: ledger.hairline),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.08),
+                                blurRadius: 48,
+                                offset: const Offset(0, 18),
+                              ),
+                            ],
+                          ),
+                          child: content,
+                        ),
+                      ),
+                    ),
             ),
           ),
         ),

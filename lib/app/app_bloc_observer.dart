@@ -4,7 +4,10 @@ import 'package:bloc/bloc.dart';
 
 class const AppBlocObserver() extends BlocObserver {
   @override
-  void onTransition(Bloc<dynamic, dynamic> bloc, Transition<dynamic, dynamic> transition) {
+  void onTransition(
+    Bloc<dynamic, dynamic> bloc,
+    Transition<dynamic, dynamic> transition,
+  ) {
     super.onTransition(bloc, transition);
     log('onTransition(${bloc.runtimeType}, $transition)');
   }

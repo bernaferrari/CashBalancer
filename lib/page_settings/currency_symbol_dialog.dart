@@ -1,8 +1,7 @@
-import 'package:cash_balancer/util/tailwind_colors.dart';
-import 'package:cash_balancer/widgets/dialog_screen_base.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../app/theme.dart';
 import '../blocs/data_bloc.dart';
 
 import '../l10n/l10n.dart';
@@ -33,19 +32,13 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = TailwindColor.zinc.palette;
-    final primaryColor = (Theme.of(context).brightness == Brightness.dark)
-        ? palette.s300
-        : palette.s800;
-    final backgroundDialogColor = Theme.of(context).colorScheme.surface;
-
     return AlertDialog(
       title: Text(context.l10n.currencySymbol),
-      backgroundColor: backgroundDialogColor,
       content: Form(
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextFormField(
               controller: currencyEditingController,
@@ -53,6 +46,7 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
               onChanged: (_) => setState(() {}),
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
+              style: figures(20, weight: FontWeight.w600),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return context.l10n.pleaseEnterCurrency;
@@ -60,31 +54,20 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
                 return null;
               },
               decoration: InputDecoration(
-                filled: true,
-                fillColor: getInputFillColor(context),
                 labelText: context.l10n.currencySymbol,
-                labelStyle: TextStyle(color: primaryColor),
-                // border is used when there is an error
-                border: getInputDecorationBorder(primaryColor),
-                // focusedBorder is used when focused
-                focusedBorder: getInputDecorationBorder(primaryColor),
-                // enabledBorder is the default, first shown, border.
-                enabledBorder: getInputDecorationBorder(primaryColor),
               ),
             ),
             const SizedBox(height: 12),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: 6,
+              runSpacing: 6,
               children: [
                 for (final symbol in _commonCurrencies)
-                  ActionChip(
+                  ChoiceChip(
+                    showCheckmark: false,
                     label: Text(symbol),
-                    backgroundColor:
-                        currencyEditingController.text.trim() == symbol
-                        ? primaryColor.withValues(alpha: 0.20)
-                        : null,
-                    onPressed: () {
+                    selected: currencyEditingController.text.trim() == symbol,
+                    onSelected: (_) {
                       setState(() {
                         currencyEditingController.text = symbol;
                       });
@@ -92,22 +75,16 @@ class _CurrencySymbolDialogState extends State<CurrencySymbolDialog> {
                   ),
               ],
             ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: backgroundDialogColor,
-                  backgroundColor: primaryColor,
-                ),
-                label: Text(context.l10n.dialogSave),
-                icon: const Icon(Icons.check_rounded),
-                onPressed: onSubmit,
-              ),
-            ),
           ],
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(context.l10n.dialogCancel),
+        ),
+        FilledButton(onPressed: onSubmit, child: Text(context.l10n.dialogSave)),
+      ],
     );
   }
 

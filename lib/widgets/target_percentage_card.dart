@@ -1,167 +1,168 @@
 import '../util/numbers.dart';
 
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter/services.dart';
 
+import '../app/theme.dart';
 import '../l10n/l10n.dart';
-import 'dialog_screen_base.dart';
+import 'ledger.dart';
+import 'expressive.dart';
 
+/// The target editor shared by wallets and assets: a big percentage field,
+/// quick picks (including none), and a bar showing how much of 100% is
+/// already spoken for.
 class const TargetPercentageCard({
   super.key,
   required final TextEditingController controller,
-  required final Color primaryColor,
-  required final Color primaryColorWeaker,
+  required final Color color,
   required final ValueChanged<String> onFieldSubmitted,
   required final VoidCallback onChanged,
   final double allocatedOtherPercent = 0,
-  final Widget? footer,
+  final double? currentPercent,
 }) extends StatelessWidget {
+  static const _presets = ['10', '25', '50'];
+
   @override
   Widget build(BuildContext context) {
+    final l = context.ledger;
+    final locale = Localizations.localeOf(context).toString();
     final double remaining = (100.0 - allocatedOtherPercent).clamp(0.0, 100.0);
-    final String remainingStr = formatPercent(
-      remaining,
-      Localizations.localeOf(context).toString(),
-    );
-    final double currentTarget = double.tryParse(controller.text) ?? 0;
-    final double totalTarget = allocatedOtherPercent + currentTarget;
+    final double? currentTarget = double.tryParse(controller.text);
+    final double totalTarget = allocatedOtherPercent + (currentTarget ?? 0);
+    final over = totalTarget > 100.01;
+    final rest = allocatedOtherPercent > 0 && remaining > 0 && remaining < 100
+        ? editableNumber(double.parse(remaining.toStringAsFixed(1)))
+        : null;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: primaryColorWeaker.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(16.0),
+    Widget chip(String label, String? value, {IconData? icon}) => Expanded(
+      child: PresetChip(
+        label: label,
+        icon: icon,
+        selected: value == null
+            ? controller.text.isEmpty
+            : currentTarget == double.parse(value),
+        onPressed: () {
+          controller.text = value ?? '';
+          onChanged();
+        },
       ),
-      padding: const EdgeInsets.all(20),
+    );
+
+    return LedgerCard(
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
-        spacing: 12,
         children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 12,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 2,
+                    children: [
+                      Text(
+                        context.l10n.dialogAssetTarget,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Text(
+                        context.l10n.howMuchTarget,
+                        style: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(color: l.muted),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 116,
+                child: TonalNumberField(
+                  controller: controller,
+                  label: context.l10n.dialogAssetTarget,
+                  onChanged: onChanged,
+                  onFieldSubmitted: onFieldSubmitted,
+                  hint: '–',
+                  suffix: '%',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return null;
+                    }
+                    final num = double.tryParse(value);
+                    if (num == null) {
+                      return context.l10n.invalidValue;
+                    }
+                    if (num < 0 || num > 100) {
+                      return context.l10n.targetMustBeBetween;
+                    }
+                    return null;
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            spacing: 6,
+            children: [
+              chip(context.l10n.noTarget, null),
+              for (final preset in _presets)
+                if (preset != rest) chip('$preset%', preset),
+              if (rest != null)
+                chip(
+                  '${formatPercent(remaining, locale)}%',
+                  rest,
+                  icon: Icons.pie_chart_outline_rounded,
+                )
+              else
+                chip('100%', '100'),
+            ],
+          ),
+          const SizedBox(height: 16),
+          AllocationBar([
+            (
+              id: 'others',
+              color: l.faint.withValues(alpha: 0.55),
+              value: allocatedOtherPercent,
+            ),
+            (
+              id: 'this',
+              color: over ? l.sell : color,
+              value: currentTarget ?? 0,
+            ),
+          ], height: 8),
+          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      context.l10n.optional,
-                      style: Theme.of(context).textTheme.labelSmall!
-                          .copyWith(color: primaryColor),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      context.l10n.howMuchTarget,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 24),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      controller: controller,
-                      onFieldSubmitted: onFieldSubmitted,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return null;
-                        }
-                        final num = double.tryParse(value);
-                        if (num == null) {
-                          return context.l10n.invalidValue;
-                        }
-                        if (num < 0 || num > 100) {
-                          return context.l10n.targetMustBeBetween;
-                        }
-                        return null;
-                      },
-                      textAlign: TextAlign.right,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      onChanged: (_) => onChanged(),
-                      inputFormatters: const <TextInputFormatter>[
-                        DecimalTextInputFormatter(),
-                      ],
-                      decoration: InputDecoration(
-                        labelText: context.l10n.dialogAssetTarget,
-                        hintText: '0',
-                        filled: true,
-                        fillColor: getInputFillColor(context),
-                        suffixText: " %",
-                        labelStyle: TextStyle(color: primaryColorWeaker),
-                        border: getInputDecorationBorder(primaryColorWeaker),
-                        focusedBorder: getInputDecorationBorder(
-                          primaryColorWeaker,
-                        ),
-                        enabledBorder: getInputDecorationBorder(
-                          primaryColorWeaker,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          Wrap(
-            spacing: 8,
-            runSpacing: 6,
-            alignment: WrapAlignment.center,
-            children: [
-              if (allocatedOtherPercent > 0 &&
-                  remaining > 0 &&
-                  remaining < 100 &&
-                  !const ['10', '25', '50', '100'].contains(remainingStr))
-                ActionChip(
-                  visualDensity: VisualDensity.compact,
-                  avatar: Icon(
-                    Icons.pie_chart_outline_rounded,
-                    size: 14,
-                    color: primaryColor,
+                child: Text(
+                  context.l10n.targetAssigned(
+                    '${formatPercent(totalTarget, locale)}%',
                   ),
-                  label: Text('$remainingStr%'),
-                  backgroundColor:
-                      double.tryParse(controller.text) ==
-                          double.parse(remaining.toStringAsFixed(1))
-                      ? primaryColor.withValues(alpha: 0.25)
-                      : null,
-                  onPressed: () {
-                    controller.text = editableNumber(
-                      double.parse(remaining.toStringAsFixed(1)),
-                    );
-                    onChanged();
-                  },
+                  style: figures(
+                    12,
+                    weight: FontWeight.w500,
+                    color: over ? l.sell : l.muted,
+                  ),
                 ),
-              for (final preset in const ['10', '25', '50', '100'])
-                ActionChip(
-                  visualDensity: VisualDensity.compact,
-                  label: Text('$preset%'),
-                  backgroundColor: controller.text.trim() == preset
-                      ? primaryColor.withValues(alpha: 0.25)
-                      : null,
-                  onPressed: () {
-                    controller.text = preset;
-                    onChanged();
-                  },
+              ),
+              if (currentPercent != null)
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(text: '${context.l10n.now.toUpperCase()}  '),
+                      TextSpan(
+                        text: '${formatPercent(currentPercent!, locale)}%',
+                        style: TextStyle(color: l.ink),
+                      ),
+                    ],
+                  ),
+                  style: figures(12, weight: FontWeight.w500, color: l.muted),
                 ),
             ],
           ),
-          if (allocatedOtherPercent > 0 || currentTarget > 0)
-            Text(
-              '${formatPercent(totalTarget, Localizations.localeOf(context).toString())}% / 100%',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: totalTarget > 100.01
-                    ? Theme.of(context).colorScheme.error
-                    : primaryColorWeaker,
-              ),
-            ),
-          ?footer,
         ],
       ),
     );

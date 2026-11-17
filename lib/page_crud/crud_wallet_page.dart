@@ -4,9 +4,10 @@ import 'package:cash_balancer/l10n/l10n.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../app/theme.dart';
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
-import '../util/tailwind_colors.dart';
+import '../util/wallet_colors.dart';
 import '../util/error_handler.dart';
 import '../widgets/color_picker.dart';
 import '../widgets/dialog_screen_base.dart';
@@ -27,8 +28,8 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
   bool _saving = false;
 
   late String colorName = widget.previousWallet != null
-      ? TailwindColor.fromName(widget.previousWallet!.colorName).name
-      : TailwindColor.random().name;
+      ? WalletColor.fromName(widget.previousWallet!.colorName).name
+      : WalletColor.random().name;
 
   late final TextEditingController nameEditingController =
       TextEditingController(text: widget.previousWallet?.name);
@@ -54,9 +55,6 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = getPrimaryColor(context, colorName);
-    final primaryColorWeaker = getPrimaryColorWeaker(context, colorName);
-    final backgroundDialogColor = getBackgroundDialogColor(context, colorName);
     final dataState = context.watch<DataCubit>().state;
     final allocatedOtherPercent = dataState == null
         ? 0.0
@@ -72,14 +70,28 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
         appBarTitle: widget.previousWallet == null
             ? context.l10n.addAWallet
             : context.l10n.editWallet,
-        backgroundDialogColor: backgroundDialogColor,
         colorName: colorName,
+        bottom: [
+          ElevatedButton.icon(
+            label: Text(context.l10n.dialogSave),
+            icon: const Icon(Icons.check_rounded),
+            onPressed: _saving ? null : onSubmit,
+          ),
+          if (widget.previousWallet != null)
+            TextButton.icon(
+              style: TextButton.styleFrom(foregroundColor: context.ledger.sell),
+              label: Text(context.l10n.dialogDelete),
+              icon: const Icon(Icons.delete_outline_rounded),
+              onPressed: _saving ? null : onDelete,
+            ),
+        ],
         children: [
           TextFormField(
             controller: nameEditingController,
             onFieldSubmitted: onSubmit,
-            autofocus: true,
+            autofocus: widget.previousWallet == null,
             textCapitalization: TextCapitalization.sentences,
+            style: Theme.of(context).textTheme.titleMedium,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
                 return context.l10n.mainDialogValidator;
@@ -87,58 +99,36 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
               return null;
             },
             decoration: InputDecoration(
-              filled: true,
-              fillColor: getInputFillColor(context),
               labelText: context.l10n.dialogAssetName,
-              labelStyle: TextStyle(color: primaryColor),
-              border: getInputDecorationBorder(primaryColor),
-              focusedBorder: getInputDecorationBorder(primaryColor),
-              enabledBorder: getInputDecorationBorder(primaryColor),
+              hintText: context.l10n.walletNameHint,
+              prefixIcon: Padding(
+                padding: const EdgeInsets.only(left: 16, right: 12),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  width: 14,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: walletSeed(colorName),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              prefixIconConstraints: const BoxConstraints(),
             ),
           ),
           const SizedBox(height: 16),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: ColorPicker(colorName, (changed) {
-              setState(() {
-                colorName = changed;
-              });
-            }),
-          ),
-          const SizedBox(height: 16),
+          ColorPicker(colorName, (changed) {
+            setState(() {
+              colorName = changed;
+            });
+          }),
+          const SizedBox(height: 20),
           TargetPercentageCard(
             controller: targetEditingController,
-            primaryColor: primaryColor,
-            primaryColorWeaker: primaryColorWeaker,
+            color: walletSeed(colorName),
             onFieldSubmitted: onSubmit,
             onChanged: () => setState(() {}),
             allocatedOtherPercent: allocatedOtherPercent,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              foregroundColor: backgroundDialogColor,
-              backgroundColor: primaryColor,
-            ),
-            label: Text(context.l10n.dialogSave),
-            icon: const Icon(Icons.check_rounded),
-            onPressed: _saving ? null : onSubmit,
-          ),
-          if (widget.previousWallet != null) ...[
-            const SizedBox(height: 8),
-            OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(foregroundColor: primaryColor),
-              label: Text(context.l10n.dialogDelete),
-              icon: const Icon(Icons.delete_outline_outlined),
-              onPressed: _saving ? null : onDelete,
-            ),
-          ],
-          const SizedBox(height: 8),
-          TextButton.icon(
-            style: TextButton.styleFrom(foregroundColor: primaryColor),
-            label: Text(context.l10n.dialogCancel),
-            icon: const Icon(Icons.close_rounded),
-            onPressed: () => Navigator.of(context).pop(),
           ),
         ],
       ),

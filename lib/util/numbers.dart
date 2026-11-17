@@ -1,23 +1,37 @@
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
-String formatMoney(double value, String locale, String symbol) {
+String formatMoney(
+  double value,
+  String locale,
+  String symbol, {
+  int decimalDigits = 2,
+}) {
   final sanitized = value.abs() < 0.005 ? 0.0 : value;
   final formatter = NumberFormat.currency(
     locale: locale,
     symbol: symbol,
-    decimalDigits: 2,
+    decimalDigits: decimalDigits,
   );
   // intl internally converts doubles to integers. Format the digits directly
   // once the value exceeds the exact integer range shared by native and web.
   if (sanitized.isFinite && sanitized.abs() >= 1e15) {
-    return _largeNumber(formatter, sanitized, fractionDigits: 2);
+    return _largeNumber(formatter, sanitized, fractionDigits: decimalDigits);
   }
   return formatter.format(sanitized);
 }
 
-String money(BuildContext context, String currency, double value) =>
-    formatMoney(value, Localizations.localeOf(context).toString(), currency);
+String money(
+  BuildContext context,
+  String currency,
+  double value, {
+  int decimalDigits = 2,
+}) => formatMoney(
+  value,
+  Localizations.localeOf(context).toString(),
+  currency,
+  decimalDigits: decimalDigits,
+);
 
 String formatPercent(double value, [String? locale]) =>
     NumberFormat('0.#', locale).format(value.isFinite ? value : 0);

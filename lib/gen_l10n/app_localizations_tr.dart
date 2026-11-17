@@ -17,7 +17,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get mainEmptySubtitle =>
-      'Varlıklarınızı ekleyebileceğiniz bir cüzdan oluşturmak için + düğmesine dokunun.';
+      'Varlıklarınızı cüzdanlarda gruplayın, her birine bir hedef verin ve tam olarak neyi alıp satacağınızı görün.';
 
   @override
   String get mainDialogValidator => 'Lütfen bir metin girin';
@@ -39,22 +39,16 @@ class AppLocalizationsTr extends AppLocalizations {
       'Tüm cüzdanların toplamı yerine her cüzdanın kendi içinde %100\'e ulaşmasını hesapla.';
 
   @override
-  String get theAssetsName => 'Birikim veya bitcoin gibi varlık adı.';
+  String get assetNameHint => 'Birikim, Bitcoin, AAPL…';
+
+  @override
+  String get walletNameHint => 'Hisseler, Kripto, Acil durum fonu…';
 
   @override
   String get pressToAdd => 'Eklemek için + düğmesine basın.';
 
   @override
-  String get rightNow => 'Şu anda';
-
-  @override
-  String get isGoingToBe => 'oranı:';
-
-  @override
   String get howMuchTarget => 'Olmasını istediğiniz hedef yüzde.';
-
-  @override
-  String get optional => 'İSTEĞE BAĞLI';
 
   @override
   String get value => 'Değer';
@@ -80,16 +74,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get dialogAssetTarget => 'Hedef';
 
   @override
-  String get dialogSave => 'KAYDET';
+  String get dialogSave => 'Kaydet';
 
   @override
-  String get dialogSaveAddMore => 'KAYDET VE DAHA FAZLA EKLE';
+  String get dialogSaveAddMore => 'Kaydet ve daha fazla ekle';
 
   @override
-  String get dialogCancel => 'İPTAL';
+  String get dialogCancel => 'İptal';
 
   @override
-  String get dialogDelete => 'SİL';
+  String get dialogDelete => 'Sil';
 
   @override
   String get settings => 'Ayarlar';
@@ -142,7 +136,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get autoFillBuyOnly => 'Satış yapmadan dengelemek için min.';
 
   @override
-  String get applyInvestment => 'PORTFÖYE UYGULA';
+  String get applyInvestment => 'Portföye uygula';
 
   @override
   String get noTargetsSet =>
@@ -275,7 +269,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get enterAmountToApply =>
-      'İşlemleri uygulamak için bir tutar girin. Nakit eklemeden dengelemek için 0 girin.';
+      'Elinizdekileri yeniden dengelemek için boş bırakın.';
 
   @override
   String get balanceOnly => 'Nakit bakiye olarak kaydet';
@@ -290,4 +284,46 @@ class AppLocalizationsTr extends AppLocalizations {
   String mergePreview(int added, int kept) {
     return 'Birleştirme $added kayıt ekler ve $kept mevcut kaydı korur. Eşleşen kayıtların güncel değerleri korunur. Eski yedekler portföy ve cüzdan içindeki adlara göre eşleştirilir.';
   }
+
+  @override
+  String get now => 'Şimdi';
+
+  @override
+  String get after => 'Sonra';
+
+  @override
+  String get buy => 'Al';
+
+  @override
+  String get sell => 'Sat';
+
+  @override
+  String get preferences => 'Tercihler';
+
+  @override
+  String get appearance => 'Görünüm';
+
+  @override
+  String get backup => 'Yedekleme';
+
+  @override
+  String get sampleDescription => 'Denemek için hisse, kripto ve nakit';
+
+  @override
+  String targetAssigned(String percent) {
+    return '%100\'ün $percent kadarı atandı';
+  }
+
+  @override
+  String get useAmount => 'Kullan';
+
+  @override
+  String get noTarget => 'Yok';
+
+  @override
+  String get balanceOnlySubtitle =>
+      'Birikim veya nakit için: adet yok, tek bir bakiye.';
+
+  @override
+  String get currentWallet => 'Mevcut';
 }

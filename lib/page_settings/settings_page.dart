@@ -9,14 +9,16 @@ import '../util/error_handler.dart';
 
 import 'package:cash_balancer/blocs/data_bloc.dart';
 import 'package:cash_balancer/database/data.dart';
-import 'package:cash_balancer/page_settings/sort_by_dialog.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 
+import '../app/theme.dart';
 import '../l10n/l10n.dart';
 import '../widgets/dialog_screen_base.dart';
+import '../widgets/expressive.dart';
+import '../widgets/ledger.dart';
 import 'currency_symbol_dialog.dart';
 import 'backup_download.dart';
 
@@ -58,69 +60,42 @@ class const SettingsPage({super.key}) extends StatelessWidget {
             ? _supportedLanguageNames[currentLang]!
             : context.l10n.themeAuto;
 
+        final l = context.ledger;
+        Widget divider() => Divider(height: 1, color: l.hairline);
+
         return DialogScreenBase(
-          colorName: 'stone',
           appBarTitle: context.l10n.settings,
           children: [
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(context.l10n.relativeTarget),
-              subtitle: Text(
-                context.l10n.targetSettings,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+            SectionLabel(context.l10n.rebalanceCalculator),
+            LedgerCard(
+              child: Column(
+                children: [
+                  _SwitchRow(
+                    title: context.l10n.relativeTarget,
+                    subtitle: context.l10n.targetSettings,
+                    value: state.settings.relativeTarget,
+                    onChanged: (value) =>
+                        rxPrefs.setBool("relativeTarget", value),
+                  ),
+                  divider(),
+                  _SwitchRow(
+                    title: context.l10n.buyOnlyRebalance,
+                    subtitle: context.l10n.buyOnlyRebalanceSubtitle,
+                    value: state.settings.buyOnly,
+                    onChanged: (value) => rxPrefs.setBool("buyOnly", value),
+                  ),
+                ],
               ),
-              value: state.settings.relativeTarget,
-              onChanged: (value) async {
-                await rxPrefs.setBool("relativeTarget", value);
-              },
             ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(context.l10n.buyOnlyRebalance),
-              subtitle: Text(
-                context.l10n.buyOnlyRebalanceSubtitle,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-              value: state.settings.buyOnly,
-              onChanged: (value) async {
-                await rxPrefs.setBool("buyOnly", value);
-              },
-            ),
-            const SizedBox(height: 12),
-            Row(
-              spacing: 10,
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 10,
-                      ),
-                    ),
-                    child: Column(
-                      spacing: 4,
-                      children: [
-                        Text(
-                          context.l10n.currencySymbol,
-                          style: Theme.of(context).textTheme.titleSmall,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          state.settings.currencySymbol,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                        ),
-                      ],
-                    ),
-                    onPressed: () {
+            const SizedBox(height: 26),
+            SectionLabel(context.l10n.preferences),
+            LedgerCard(
+              child: Column(
+                children: [
+                  _SettingsRow(
+                    title: context.l10n.currencySymbol,
+                    value: state.settings.currencySymbol,
+                    onTap: () {
                       showDialog<Object>(
                         context: context,
                         builder: (_) => CurrencySymbolDialog(
@@ -130,70 +105,11 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                       );
                     },
                   ),
-                ),
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 10,
-                      ),
-                    ),
-                    child: Column(
-                      spacing: 4,
-                      children: [
-                        Text(
-                          context.l10n.sortBy,
-                          style: Theme.of(context).textTheme.titleSmall,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          getSortByString(context, state.settings.sortBy),
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                        ),
-                      ],
-                    ),
-                    onPressed: () {
-                      showDialog<Object>(
-                        context: context,
-                        builder: (_) =>
-                            SortByDialog(initialValue: state.settings.sortBy),
-                      );
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 10,
-                      ),
-                    ),
-                    child: Column(
-                      spacing: 4,
-                      children: [
-                        Text(
-                          context.l10n.language,
-                          style: Theme.of(context).textTheme.titleSmall,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          currentLangLabel,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                        ),
-                      ],
-                    ),
-                    onPressed: () {
+                  divider(),
+                  _SettingsRow(
+                    title: context.l10n.language,
+                    value: currentLangLabel,
+                    onTap: () {
                       showDialog<Object>(
                         context: context,
                         builder: (_) =>
@@ -201,60 +117,76 @@ class const SettingsPage({super.key}) extends StatelessWidget {
                       );
                     },
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              spacing: 8,
-              children: [
-                for (final (modeId, icon, label) in themeModes)
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 8,
+                  divider(),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(18, 10, 10, 10),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            context.l10n.sortBy,
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
                         ),
-                        backgroundColor: state.settings.themeMode == modeId
-                            ? Theme.of(context).colorScheme.primary
-                                  .withValues(alpha: 0.14)
-                            : null,
-                        foregroundColor: state.settings.themeMode == modeId
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                      icon: Icon(icon, size: 16),
-                      label: Text(label, style: const TextStyle(fontSize: 12)),
-                      onPressed: () async {
-                        await rxPrefs.setInt('themeMode', modeId);
-                      },
+                        ConnectedButtonGroup<int>(
+                          height: 38,
+                          segments: [
+                            for (final id in const [0, 1])
+                              (id, getSortByString(context, id), null),
+                          ],
+                          selected: state.settings.sortBy,
+                          onSelected: (value) =>
+                              rxPrefs.setInt('sortBy', value),
+                        ),
+                      ],
                     ),
                   ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 26),
+            SectionLabel(context.l10n.appearance),
+            ConnectedButtonGroup<int>(
+              expand: true,
+              height: 48,
+              segments: [
+                for (final (modeId, icon, label) in themeModes)
+                  (modeId, label, icon),
               ],
+              selected: state.settings.themeMode,
+              onSelected: (value) => rxPrefs.setInt('themeMode', value),
             ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              icon: const Icon(Icons.file_upload_outlined),
-              label: Text(context.l10n.exportBackup),
-              onPressed: () => _export(context),
+            const SizedBox(height: 26),
+            SectionLabel(context.l10n.backup),
+            LedgerCard(
+              child: Column(
+                children: [
+                  _SettingsRow(
+                    icon: Icons.ios_share_rounded,
+                    title: context.l10n.exportBackup,
+                    onTap: () => _export(context),
+                  ),
+                  divider(),
+                  _SettingsRow(
+                    icon: Icons.settings_backup_restore_rounded,
+                    title: context.l10n.importBackup,
+                    onTap: () => _import(context, state.userId),
+                  ),
+                ],
+              ),
             ),
-            OutlinedButton.icon(
-              icon: const Icon(Icons.file_download_outlined),
-              label: Text(context.l10n.importBackup),
-              onPressed: () => _import(context, state.userId),
-            ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 32),
             Text(
               context.l10n.designedDeveloped,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleSmall,
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: l.muted),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 2),
             Text(
               "@bernaferrari",
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleSmall,
+              style: figures(12, color: l.faint),
             ),
           ],
         );
@@ -263,10 +195,83 @@ class const SettingsPage({super.key}) extends StatelessWidget {
   }
 }
 
+String getSortByString(BuildContext context, int value) => switch (value) {
+  0 => context.l10n.sortBy0,
+  1 => context.l10n.sortBy1,
+  _ => '',
+};
+
+class const _SwitchRow({
+  required final String title,
+  required final String subtitle,
+  required final bool value,
+  required final ValueChanged<bool> onChanged,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => SwitchListTile(
+    contentPadding: const EdgeInsets.fromLTRB(18, 6, 14, 8),
+    title: Text(title, style: Theme.of(context).textTheme.titleSmall),
+    subtitle: Padding(
+      padding: const EdgeInsets.only(top: 2),
+      child: Text(
+        subtitle,
+        style: Theme.of(context).textTheme.bodySmall
+            ?.copyWith(color: context.ledger.muted),
+      ),
+    ),
+    value: value,
+    onChanged: onChanged,
+  );
+}
+
+class const _SettingsRow({
+  required final String title,
+  required final VoidCallback onTap,
+  final String? value,
+  final IconData? icon,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final l = context.ledger;
+    return TextButton(
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.fromLTRB(18, 16, 14, 16),
+        shape: const RoundedRectangleBorder(),
+        alignment: Alignment.centerLeft,
+      ),
+      onPressed: onTap,
+      child: Row(
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 20, color: l.ink),
+            const SizedBox(width: 14),
+          ],
+          Expanded(
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.titleSmall
+                  ?.copyWith(color: l.ink),
+            ),
+          ),
+          if (value != null) ...[
+            Text(
+              value!,
+              style: figures(13.5, weight: FontWeight.w500, color: l.muted),
+            ),
+            const SizedBox(width: 4),
+            Icon(Icons.chevron_right_rounded, size: 20, color: l.faint),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class const _LanguageDialog({required final String? currentLanguageCode})
     extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l = context.ledger;
     final rxPrefs = RxSharedPreferences.getInstance();
     final entries = [
       (null, context.l10n.themeAuto),
@@ -275,27 +280,20 @@ class const _LanguageDialog({required final String? currentLanguageCode})
 
     return AlertDialog(
       title: Text(context.l10n.language),
+      contentPadding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
       content: SizedBox(
-        width: 280,
+        width: 300,
         child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 6,
-            children: [
-              for (final (code, label) in entries)
-                () {
-                  final isSelected =
-                      (code ?? '') == (currentLanguageCode ?? '');
-                  return SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: isSelected
-                            ? Theme.of(context).colorScheme.primary
-                                  .withValues(alpha: 0.14)
-                            : null,
-                      ),
-                      onPressed: () async {
+          child: LedgerCard(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final (i, (code, label)) in entries.indexed)
+                  () {
+                    final isSelected =
+                        (code ?? '') == (currentLanguageCode ?? '');
+                    return InkWell(
+                      onTap: () async {
                         if (code == null) {
                           await rxPrefs.remove('languageCode');
                         } else {
@@ -304,11 +302,35 @@ class const _LanguageDialog({required final String? currentLanguageCode})
                         if (!context.mounted) return;
                         Navigator.of(context).pop();
                       },
-                      child: Text(label),
-                    ),
-                  );
-                }(),
-            ],
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(18, 13, 16, 13),
+                        decoration: BoxDecoration(
+                          border: i == 0
+                              ? null
+                              : Border(top: BorderSide(color: l.hairline)),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                label,
+                                style: Theme.of(context).textTheme.titleSmall
+                                    ?.copyWith(
+                                      fontWeight: isSelected
+                                          ? FontWeight.w700
+                                          : FontWeight.w500,
+                                    ),
+                              ),
+                            ),
+                            if (isSelected)
+                              Icon(Icons.check_rounded, size: 20, color: l.ink),
+                          ],
+                        ),
+                      ),
+                    );
+                  }(),
+              ],
+            ),
           ),
         ),
       ),

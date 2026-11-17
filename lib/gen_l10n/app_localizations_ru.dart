@@ -17,7 +17,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get mainEmptySubtitle =>
-      'Нажмите +, чтобы создать кошелёк и добавить в него свои активы.';
+      'Сгруппируйте активы по кошелькам, задайте каждому цель и узнайте, что именно покупать или продавать.';
 
   @override
   String get mainDialogValidator => 'Пожалуйста, введите текст';
@@ -39,23 +39,16 @@ class AppLocalizationsRu extends AppLocalizations {
       'Считать 100% внутри каждого кошелька отдельно, а не от общей суммы всех кошельков.';
 
   @override
-  String get theAssetsName =>
-      'Название актива, например сбережения или биткоин.';
+  String get assetNameHint => 'Сбережения, Bitcoin, AAPL…';
+
+  @override
+  String get walletNameHint => 'Акции, Крипта, Подушка безопасности…';
 
   @override
   String get pressToAdd => 'Нажмите +, чтобы добавить.';
 
   @override
-  String get rightNow => 'Сейчас';
-
-  @override
-  String get isGoingToBe => 'составит';
-
-  @override
   String get howMuchTarget => 'Желаемая целевая доля в процентах.';
-
-  @override
-  String get optional => 'ОПЦИОНАЛЬНО';
 
   @override
   String get value => 'Сумма';
@@ -81,16 +74,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dialogAssetTarget => 'Цель';
 
   @override
-  String get dialogSave => 'СОХРАНИТЬ';
+  String get dialogSave => 'Сохранить';
 
   @override
-  String get dialogSaveAddMore => 'СОХРАНИТЬ И ДОБАВИТЬ ЕЩЁ';
+  String get dialogSaveAddMore => 'Сохранить и добавить ещё';
 
   @override
-  String get dialogCancel => 'ОТМЕНА';
+  String get dialogCancel => 'Отмена';
 
   @override
-  String get dialogDelete => 'УДАЛИТЬ';
+  String get dialogDelete => 'Удалить';
 
   @override
   String get settings => 'Настройки';
@@ -142,7 +135,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get autoFillBuyOnly => 'Мин. для баланса без продаж';
 
   @override
-  String get applyInvestment => 'ПРИМЕНИТЬ К ПОРТФЕЛЮ';
+  String get applyInvestment => 'Применить к портфелю';
 
   @override
   String get noTargetsSet =>
@@ -276,7 +269,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get enterAmountToApply =>
-      'Введите сумму для применения сделок. Введите 0 для ребалансировки без пополнения.';
+      'Оставьте пустым, чтобы перебалансировать то, что уже есть.';
 
   @override
   String get balanceOnly => 'Учитывать как денежный остаток';
@@ -291,4 +284,46 @@ class AppLocalizationsRu extends AppLocalizations {
   String mergePreview(int added, int kept) {
     return 'При объединении добавится $added записей и сохранится $kept. Для совпадающих записей сохраняются текущие значения. Старые копии сопоставляются по именам внутри портфелей и кошельков.';
   }
+
+  @override
+  String get now => 'Сейчас';
+
+  @override
+  String get after => 'После';
+
+  @override
+  String get buy => 'Купить';
+
+  @override
+  String get sell => 'Продать';
+
+  @override
+  String get preferences => 'Параметры';
+
+  @override
+  String get appearance => 'Оформление';
+
+  @override
+  String get backup => 'Резервная копия';
+
+  @override
+  String get sampleDescription => 'Акции, крипта и наличные, чтобы попробовать';
+
+  @override
+  String targetAssigned(String percent) {
+    return 'Распределено $percent из 100%';
+  }
+
+  @override
+  String get useAmount => 'Применить';
+
+  @override
+  String get noTarget => 'Нет';
+
+  @override
+  String get balanceOnlySubtitle =>
+      'Для сбережений и наличных: только остаток, без количества.';
+
+  @override
+  String get currentWallet => 'Текущий';
 }

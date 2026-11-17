@@ -133,7 +133,7 @@ abstract class AppLocalizations {
   /// No description provided for @mainEmptySubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Tap the + to add a wallet, where you\'ll be able to add your assets.'**
+  /// **'Group your assets into wallets, give each a target, and see exactly what to buy or sell.'**
   String get mainEmptySubtitle;
 
   /// No description provided for @mainDialogValidator.
@@ -169,44 +169,32 @@ abstract class AppLocalizations {
   /// No description provided for @targetSettings.
   ///
   /// In en, this message translates to:
-  /// **'Sum up to 100% in each wallet, instead of considering the sum of all wallets.'**
+  /// **'Asset targets add up to 100% inside each wallet, not across the whole portfolio.'**
   String get targetSettings;
 
-  /// No description provided for @theAssetsName.
+  /// No description provided for @assetNameHint.
   ///
   /// In en, this message translates to:
-  /// **'The asset’s name, such as savings or bitcoin.'**
-  String get theAssetsName;
+  /// **'Savings, Bitcoin, AAPL…'**
+  String get assetNameHint;
+
+  /// No description provided for @walletNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Stocks, Crypto, Emergency fund…'**
+  String get walletNameHint;
 
   /// No description provided for @pressToAdd.
   ///
   /// In en, this message translates to:
-  /// **'Press + to add.'**
+  /// **'No assets yet. Tap + to add one.'**
   String get pressToAdd;
-
-  /// No description provided for @rightNow.
-  ///
-  /// In en, this message translates to:
-  /// **'Right now'**
-  String get rightNow;
-
-  /// No description provided for @isGoingToBe.
-  ///
-  /// In en, this message translates to:
-  /// **'is going to be'**
-  String get isGoingToBe;
 
   /// No description provided for @howMuchTarget.
   ///
   /// In en, this message translates to:
-  /// **'How much percentage you want this to be.'**
+  /// **'The share it should have.'**
   String get howMuchTarget;
-
-  /// No description provided for @optional.
-  ///
-  /// In en, this message translates to:
-  /// **'OPTIONAL'**
-  String get optional;
 
   /// No description provided for @value.
   ///
@@ -253,25 +241,25 @@ abstract class AppLocalizations {
   /// No description provided for @dialogSave.
   ///
   /// In en, this message translates to:
-  /// **'SAVE'**
+  /// **'Save'**
   String get dialogSave;
 
   /// No description provided for @dialogSaveAddMore.
   ///
   /// In en, this message translates to:
-  /// **'SAVE AND ADD MORE'**
+  /// **'Save and add more'**
   String get dialogSaveAddMore;
 
   /// No description provided for @dialogCancel.
   ///
   /// In en, this message translates to:
-  /// **'CANCEL'**
+  /// **'Cancel'**
   String get dialogCancel;
 
   /// No description provided for @dialogDelete.
   ///
   /// In en, this message translates to:
-  /// **'DELETE'**
+  /// **'Delete'**
   String get dialogDelete;
 
   /// No description provided for @settings.
@@ -289,7 +277,7 @@ abstract class AppLocalizations {
   /// No description provided for @relativeTarget.
   ///
   /// In en, this message translates to:
-  /// **'Relative Target'**
+  /// **'Targets per wallet'**
   String get relativeTarget;
 
   /// No description provided for @sortBy.
@@ -343,13 +331,13 @@ abstract class AppLocalizations {
   /// No description provided for @buyOnlyRebalance.
   ///
   /// In en, this message translates to:
-  /// **'Buy-Only Rebalancing'**
+  /// **'Buy-only rebalancing'**
   String get buyOnlyRebalance;
 
   /// No description provided for @buyOnlyRebalanceSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Rebalance using only new cash without selling any overweight assets.'**
+  /// **'Only add money. Nothing gets sold.'**
   String get buyOnlyRebalanceSubtitle;
 
   /// No description provided for @rebalanceCalculator.
@@ -373,7 +361,7 @@ abstract class AppLocalizations {
   /// No description provided for @applyInvestment.
   ///
   /// In en, this message translates to:
-  /// **'APPLY TO PORTFOLIO'**
+  /// **'Apply to portfolio'**
   String get applyInvestment;
 
   /// No description provided for @noTargetsSet.
@@ -391,13 +379,13 @@ abstract class AppLocalizations {
   /// No description provided for @portfolios.
   ///
   /// In en, this message translates to:
-  /// **'Portfolios & Goals'**
+  /// **'Portfolios & goals'**
   String get portfolios;
 
   /// No description provided for @newPortfolio.
   ///
   /// In en, this message translates to:
-  /// **'New Portfolio / Goal'**
+  /// **'New portfolio or goal'**
   String get newPortfolio;
 
   /// No description provided for @themeAuto.
@@ -625,7 +613,7 @@ abstract class AppLocalizations {
   /// No description provided for @enterAmountToApply.
   ///
   /// In en, this message translates to:
-  /// **'Enter an amount to apply trades. Enter 0 to rebalance without adding cash.'**
+  /// **'Leave it empty to rebalance what you have.'**
   String get enterAmountToApply;
 
   /// No description provided for @balanceOnly.
@@ -651,6 +639,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Merge adds {added} records and keeps {kept} existing records. When records match, your current values are kept. Older backups match by name within each portfolio and wallet.'**
   String mergePreview(int added, int kept);
+
+  /// No description provided for @now.
+  ///
+  /// In en, this message translates to:
+  /// **'Now'**
+  String get now;
+
+  /// No description provided for @after.
+  ///
+  /// In en, this message translates to:
+  /// **'After'**
+  String get after;
+
+  /// No description provided for @buy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy'**
+  String get buy;
+
+  /// No description provided for @sell.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell'**
+  String get sell;
+
+  /// No description provided for @preferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences'**
+  String get preferences;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get backup;
+
+  /// No description provided for @sampleDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Stocks, crypto and cash'**
+  String get sampleDescription;
+
+  /// No description provided for @targetAssigned.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent} of 100% assigned'**
+  String targetAssigned(String percent);
+
+  /// No description provided for @useAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Use'**
+  String get useAmount;
+
+  /// No description provided for @noTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get noTarget;
+
+  /// No description provided for @balanceOnlySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'For savings or cash: a single balance, no units.'**
+  String get balanceOnlySubtitle;
+
+  /// No description provided for @currentWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get currentWallet;
 }
 
 class _AppLocalizationsDelegate

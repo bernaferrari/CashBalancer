@@ -16,7 +16,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mainEmptyTitle => '添加您的第一个钱包。';
 
   @override
-  String get mainEmptySubtitle => '点击 + 添加钱包，即可在其中管理您的资产。';
+  String get mainEmptySubtitle => '将资产分组到钱包中，为每个钱包设定目标，即可清楚看到该买入或卖出什么。';
 
   @override
   String get mainDialogValidator => '请输入内容';
@@ -37,22 +37,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get targetSettings => '在每个钱包内部合计达到 100%，而不是按所有钱包的总和计算。';
 
   @override
-  String get theAssetsName => '资产名称，例如储蓄或比特币。';
+  String get assetNameHint => '储蓄, Bitcoin, AAPL…';
+
+  @override
+  String get walletNameHint => '股票、加密货币、应急资金…';
 
   @override
   String get pressToAdd => '点击 + 添加。';
 
   @override
-  String get rightNow => '当前';
-
-  @override
-  String get isGoingToBe => '占比将为';
-
-  @override
   String get howMuchTarget => '您希望该资产达到的目标百分比。';
-
-  @override
-  String get optional => '可选';
 
   @override
   String get value => '价值';
@@ -265,7 +259,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get walletsLabel => '钱包';
 
   @override
-  String get enterAmountToApply => '输入金额以应用交易。若要在不增加资金的情况下再平衡，请输入 0。';
+  String get enterAmountToApply => '留空则仅用现有资产进行再平衡。';
 
   @override
   String get balanceOnly => '按现金余额记录';
@@ -280,4 +274,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String mergePreview(int added, int kept) {
     return '合并会新增 $added 条记录并保留 $kept 条现有记录。匹配记录保留当前数值。旧版备份按投资组合和钱包中的名称匹配。';
   }
+
+  @override
+  String get now => '当前';
+
+  @override
+  String get after => '调整后';
+
+  @override
+  String get buy => '买入';
+
+  @override
+  String get sell => '卖出';
+
+  @override
+  String get preferences => '偏好设置';
+
+  @override
+  String get appearance => '外观';
+
+  @override
+  String get backup => '备份';
+
+  @override
+  String get sampleDescription => '用股票、加密货币和现金体验一下';
+
+  @override
+  String targetAssigned(String percent) {
+    return '已分配 $percent / 100%';
+  }
+
+  @override
+  String get useAmount => '使用';
+
+  @override
+  String get noTarget => '无';
+
+  @override
+  String get balanceOnlySubtitle => '适用于储蓄或现金：只记余额，不计数量。';
+
+  @override
+  String get currentWallet => '当前';
 }

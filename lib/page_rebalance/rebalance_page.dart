@@ -1,14 +1,16 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rx_shared_preferences/rx_shared_preferences.dart';
 
+import '../app/theme.dart';
 import '../blocs/data_bloc.dart';
 import '../database/data.dart';
 import '../l10n/l10n.dart';
 import '../util/numbers.dart';
-import '../util/tailwind_colors.dart';
+import '../util/wallet_colors.dart';
 import '../widgets/dialog_screen_base.dart';
+import '../widgets/ledger.dart';
+import '../widgets/expressive.dart';
 import '../util/error_handler.dart';
 import 'rebalance_plan.dart';
 
@@ -36,24 +38,21 @@ class _RebalancePageState extends State<RebalancePage> {
           return const SizedBox.shrink();
         }
 
-        const colorName = 'emerald';
-        final primaryColor = getPrimaryColor(context, colorName);
-        final primaryColorWeaker = getPrimaryColorWeaker(context, colorName);
-        final backgroundDialogColor = getBackgroundDialogColor(
-          context,
-          colorName,
-        );
+        final l = context.ledger;
         final currency = state.settings.currencySymbol;
         final buyOnly = state.settings.buyOnly;
         final rxPrefs = RxSharedPreferences.getInstance();
 
         final parsedDeposit = double.tryParse(_amountController.text);
         final explicitDeposit =
-            parsedDeposit != null &&
-            parsedDeposit.isFinite &&
-            parsedDeposit >= 0 &&
-            (state.totalValue + parsedDeposit).isFinite;
-        final deposit = explicitDeposit ? parsedDeposit : 0.0;
+            _amountController.text.isEmpty ||
+            (parsedDeposit != null &&
+                parsedDeposit.isFinite &&
+                parsedDeposit >= 0 &&
+                (state.totalValue + parsedDeposit).isFinite);
+        final deposit = parsedDeposit != null && explicitDeposit
+            ? parsedDeposit
+            : 0.0;
         final targetedItems = state.allItems
             .where((i) => i.targetPercent >= 0)
             .toList();
@@ -137,166 +136,108 @@ class _RebalancePageState extends State<RebalancePage> {
                 state.walletsMap[entry.key]!.name,
         ];
 
-        return DialogScreenBase(
-          colorName: colorName,
-          backgroundDialogColor: backgroundDialogColor,
-          appBarTitle: context.l10n.rebalanceCalculator,
-          children: [
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(context.l10n.buyOnlyRebalance),
-              subtitle: Text(
-                context.l10n.buyOnlyRebalanceSubtitle,
-                style: Theme.of(context).textTheme.bodySmall,
+        List<Segment> percentages(List<Segment> raw) {
+          final sum = raw.fold<double>(
+            0,
+            (a, s) => a + s.value.clamp(0, 1e300),
+          );
+          return [
+            for (final s in raw)
+              (
+                id: s.id,
+                color: s.color,
+                value: sum <= 0 ? 0 : s.value.clamp(0, 1e300) / sum * 100,
               ),
-              value: buyOnly,
-              onChanged: (val) async {
-                await rxPrefs.setBool('buyOnly', val);
-              },
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _amountController,
-              onChanged: (_) => setState(() {}),
-              textAlign: TextAlign.right,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
+          ];
+        }
+
+        final byItem = targetedItems.isNotEmpty;
+        final nowSegments = percentages([
+          if (byItem)
+            for (final item in state.allItems)
+              (id: item.id, color: item.color, value: item.totalValue)
+          else
+            for (final wallet in state.walletsMap.values)
+              (
+                id: wallet.id,
+                color: walletSeed(wallet.colorName),
+                value: wallet.totalValue,
               ),
-              inputFormatters: const <TextInputFormatter>[
-                DecimalTextInputFormatter(),
-              ],
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: getInputFillColor(context),
-                labelText: context.l10n.amountToInvest,
-                helperText: targetedItems.isNotEmpty
-                    ? context.l10n.enterAmountToApply
-                    : null,
-                helperMaxLines: 3,
-                hintText: '0.00',
-                prefixText: '$currency ',
-                labelStyle: TextStyle(color: primaryColor),
-                border: getInputDecorationBorder(primaryColor),
-                focusedBorder: getInputDecorationBorder(primaryColor),
-                enabledBorder: getInputDecorationBorder(primaryColor),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                if (buyOnly && autoFillCash != null && autoFillCash > 0.005)
-                  ActionChip(
-                    visualDensity: VisualDensity.compact,
-                    avatar: Icon(
-                      Icons.auto_awesome_rounded,
-                      size: 14,
-                      color: primaryColor,
-                    ),
-                    label: Text(
-                      '${context.l10n.autoFillBuyOnly}: ${money(context, currency, autoFillCash)}',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _amountController.text = editableNumber(
-                          autoFillCash < 1e15
-                              ? (autoFillCash * 100).ceilToDouble() / 100
-                              : autoFillCash,
-                        );
-                      });
-                    },
-                  ),
-                for (final preset in const ['100', '500', '1000'])
-                  ActionChip(
-                    visualDensity: VisualDensity.compact,
-                    label: Text(
-                      '+${money(context, currency, double.parse(preset))}',
-                    ),
-                    onPressed: () {
-                      final current =
-                          double.tryParse(_amountController.text) ?? 0;
-                      final next = current + double.parse(preset);
-                      setState(() {
-                        _amountController.text = editableNumber(
-                          next < 1e15
-                              ? double.parse(next.toStringAsFixed(2))
-                              : next,
-                        );
-                      });
-                    },
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (targetedItems.isEmpty && targetedWallets.isEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Text(
-                  context.l10n.noTargetsSet,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+        ]);
+        final afterSegments = percentages([
+          if (byItem)
+            for (final item in state.allItems)
+              (
+                id: item.id,
+                color: item.color,
+                value: item.totalValue + (actionableDeltas[item.id] ?? 0),
               )
-            else ...[
-              if (targetedItems.isEmpty) ...[
-                for (final wallet in targetedWallets)
-                  _AllocationTile(
-                    name: wallet.name,
-                    color: tailwindPalette(wallet.colorName).s500,
-                    currentValue: wallet.totalValue,
-                    delta: activeDeltas[wallet.id] ?? 0,
-                    targetPercent: wallet.targetPercent,
-                    currency: currency,
-                  ),
-              ],
-              if (targetedItems.isNotEmpty)
-                for (final item in targetedItems)
-                  _AllocationTile(
-                    name: item.name,
-                    color: item.color,
-                    currentValue: item.totalValue,
-                    delta: activeDeltas[item.id] ?? 0,
-                    units: item.isBalance
-                        ? null
-                        : quantityAfterTrade(
-                            item.price,
-                            0,
-                            (activeDeltas[item.id] ?? 0).abs(),
-                          ),
-                    targetPercent: item.targetPercent,
-                    currency: currency,
-                  ),
-            ],
-            if (walletTargetsIncomplete)
-              Text(
-                '${context.l10n.walletsLabel}: ${context.l10n.targetTotalWarning}',
+          else
+            for (final wallet in state.walletsMap.values)
+              (
+                id: wallet.id,
+                color: walletSeed(wallet.colorName),
+                value: wallet.totalValue + (actionableDeltas[wallet.id] ?? 0),
               ),
-            if (assetTargetsIncomplete)
-              Text(
-                '${context.l10n.allItems}: ${context.l10n.targetTotalWarning}',
+        ]);
+
+        final notices = [
+          if (walletTargetsIncomplete)
+            '${context.l10n.walletsLabel}: ${context.l10n.targetTotalWarning}',
+          if (assetTargetsIncomplete)
+            '${context.l10n.allItems}: ${context.l10n.targetTotalWarning}',
+          for (final name in walletsWithIncompleteAssetTargets)
+            '$name • ${context.l10n.allItems}: ${context.l10n.targetTotalWarning}',
+          if (unallocated >= 0.005 && holdings.isNotEmpty)
+            '${context.l10n.unallocatedCash}: ${money(context, currency, unallocated)}',
+          if (unallocated <= -0.005)
+            '${context.l10n.additionalCash}: ${money(context, currency, -unallocated)}',
+          if (invalidTrade) context.l10n.tradeRequiresPrice,
+        ];
+
+        final rows = [
+          if (!byItem)
+            for (final wallet in targetedWallets)
+              _AllocationTile(
+                name: wallet.name,
+                color: walletSeed(wallet.colorName),
+                share: state.totalValue > 0
+                    ? wallet.totalValue / state.totalValue
+                    : 0,
+                delta: activeDeltas[wallet.id] ?? 0,
+                targetPercent: wallet.targetPercent,
+                currency: currency,
+              )
+          else
+            for (final item in targetedItems)
+              _AllocationTile(
+                name: item.name,
+                color: item.color,
+                share: () {
+                  final base = relative
+                      ? state.walletsMap[item.walletId]?.totalValue ?? 0
+                      : state.totalValue;
+                  return base > 0 ? item.totalValue / base : 0.0;
+                }(),
+                delta: activeDeltas[item.id] ?? 0,
+                quantity: item.quantity,
+                units: item.isBalance
+                    ? null
+                    : quantityAfterTrade(
+                        item.price,
+                        0,
+                        (activeDeltas[item.id] ?? 0).abs(),
+                      ),
+                targetPercent: item.targetPercent,
+                currency: currency,
               ),
-            for (final name in walletsWithIncompleteAssetTargets)
-              Text(
-                '$name • ${context.l10n.allItems}: ${context.l10n.targetTotalWarning}',
-              ),
-            if (unallocated >= 0.005 && holdings.isNotEmpty)
-              Text(
-                '${context.l10n.unallocatedCash}: ${money(context, currency, unallocated)}',
-              ),
-            if (unallocated <= -0.005)
-              Text(
-                '${context.l10n.additionalCash}: ${money(context, currency, -unallocated)}',
-              ),
-            if (invalidTrade) Text(context.l10n.tradeRequiresPrice),
-            if (trades.isNotEmpty) ...[
-              const SizedBox(height: 16),
+        ];
+
+        return DialogScreenBase(
+          appBarTitle: context.l10n.rebalanceCalculator,
+          bottom: [
+            if (trades.isNotEmpty)
               ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: backgroundDialogColor,
-                  backgroundColor: primaryColor,
-                ),
                 icon: const Icon(Icons.check_rounded),
                 label: Text(context.l10n.applyInvestment),
                 onPressed:
@@ -307,14 +248,165 @@ class _RebalancePageState extends State<RebalancePage> {
                     ? null
                     : () => _applyItemDeltas(state, actionableDeltas),
               ),
-            ],
-            const SizedBox(height: 8),
-            TextButton.icon(
-              style: TextButton.styleFrom(foregroundColor: primaryColorWeaker),
-              icon: const Icon(Icons.close_rounded),
-              label: Text(context.l10n.dialogCancel),
-              onPressed: () => Navigator.of(context).pop(),
+          ],
+          children: [
+            LedgerCard(
+              padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    context.l10n.amountToInvest,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  if (targetedItems.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      context.l10n.enterAmountToApply,
+                      style: Theme.of(context).textTheme.bodySmall
+                          ?.copyWith(color: l.muted),
+                    ),
+                  ],
+                  const SizedBox(height: 14),
+                  TonalNumberField(
+                    controller: _amountController,
+                    label: context.l10n.amountToInvest,
+                    onChanged: () => setState(() {}),
+                    prefix: currency,
+                    size: 28,
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    spacing: 6,
+                    children: [
+                      for (final preset in const [100.0, 500.0, 1000.0])
+                        Expanded(
+                          child: PresetChip(
+                            label:
+                                '+${money(context, currency, preset, decimalDigits: 0)}',
+                            onPressed: () {
+                              final current =
+                                  double.tryParse(_amountController.text) ?? 0;
+                              final next = current + preset;
+                              setState(() {
+                                _amountController.text = editableNumber(
+                                  next < 1e15
+                                      ? double.parse(next.toStringAsFixed(2))
+                                      : next,
+                                );
+                              });
+                            },
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
             ),
+            const SizedBox(height: 12),
+            LedgerCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SwitchListTile(
+                    contentPadding: const EdgeInsets.fromLTRB(18, 6, 14, 8),
+                    title: Text(
+                      context.l10n.buyOnlyRebalance,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(
+                        context.l10n.buyOnlyRebalanceSubtitle,
+                        style: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(color: l.muted),
+                      ),
+                    ),
+                    value: buyOnly,
+                    onChanged: (val) async {
+                      await rxPrefs.setBool('buyOnly', val);
+                    },
+                  ),
+                  _Reveal(
+                    child:
+                        buyOnly && autoFillCash != null && autoFillCash > 0.005
+                        ? _MinimumCashSuggestion(
+                            amount: autoFillCash,
+                            currency: currency,
+                            applied:
+                                parsedDeposit != null &&
+                                (parsedDeposit - autoFillCash).abs() < 0.01,
+                            onUse: () => setState(() {
+                              _amountController.text = editableNumber(
+                                autoFillCash < 1e15
+                                    ? (autoFillCash * 100).ceilToDouble() / 100
+                                    : autoFillCash,
+                              );
+                            }),
+                          )
+                        : null,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            if (targetedItems.isEmpty && targetedWallets.isEmpty)
+              LedgerCard(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  context.l10n.noTargetsSet,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium
+                      ?.copyWith(color: l.muted),
+                ),
+              )
+            else ...[
+              LedgerCard(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+                      child: AllocationBars([
+                        (context.l10n.now, nowSegments),
+                        (context.l10n.after, afterSegments),
+                      ], height: 12),
+                    ),
+                    for (final row in rows)
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          border: Border(top: BorderSide(color: l.hairline)),
+                        ),
+                        child: row,
+                      ),
+                  ],
+                ),
+              ),
+            ],
+            for (final notice in notices)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 8,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 1),
+                      child: Icon(
+                        Icons.info_outline_rounded,
+                        size: 16,
+                        color: l.muted,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        notice,
+                        style: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(color: l.muted),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         );
       },
@@ -359,42 +451,28 @@ class _RebalancePageState extends State<RebalancePage> {
 class const _AllocationTile({
   required final String name,
   required final Color color,
-  required final double currentValue,
+  required final double share,
   required final double delta,
   required final double targetPercent,
   required final String currency,
+  final double quantity = 0,
   final double? units,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final greenColor = isDark
-        ? TailwindColor.green.palette.s400
-        : TailwindColor.green.palette.s700;
-    final redColor = isDark
-        ? TailwindColor.rose.palette.s400
-        : TailwindColor.red.palette.s600;
-    final isHold = delta.abs() < 0.005;
-    final isBuy = delta > 0;
+    final l = context.ledger;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.04)
-            : Colors.black.withValues(alpha: 0.03),
-        borderRadius: BorderRadius.circular(10),
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 13, 16, 13),
       child: Row(
         children: [
           Container(
-            width: 4,
-            height: 32,
-            margin: const EdgeInsets.only(right: 10),
+            width: 3,
+            height: 34,
+            margin: const EdgeInsets.only(right: 12),
             decoration: BoxDecoration(
               color: color,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(2),
             ),
           ),
           Expanded(
@@ -403,37 +481,132 @@ class const _AllocationTile({
               children: [
                 Text(
                   name,
-                  style: TextStyle(
-                    fontFamily: 'Fira Sans',
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  '${money(context, currency, currentValue)} • ${formatPercent(targetPercent, Localizations.localeOf(context).toString())}%',
-                  style: TextStyle(
-                    fontFamily: 'IBM Plex Mono',
-                    fontSize: 12,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                const SizedBox(height: 3),
+                ShareText(share: share, targetPercent: targetPercent),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              DeltaText(delta: delta, currency: currency, size: 14),
+              if (units != null && delta.abs() >= 0.005) ...[
+                const SizedBox(height: 3),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(text: '${_quantity(context, quantity)}×'),
+                      towards(l),
+                      TextSpan(
+                        text:
+                            '${_quantity(context, quantity + (delta > 0 ? units! : -units!))}×',
+                        style: TextStyle(color: l.ink),
+                      ),
+                    ],
                   ),
+                  style: figures(12, color: l.muted),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _quantity(BuildContext context, double value) =>
+    formatQuantity(context, value, digits: value.abs() >= 1 ? 3 : 6);
+
+/// Grows and fades [child] in, and folds it away when it becomes null, so the
+/// content below slides instead of jumping.
+class const _Reveal({final Widget? child}) extends StatelessWidget {
+  static const _duration = Duration(milliseconds: 260);
+
+  @override
+  Widget build(BuildContext context) => AnimatedSize(
+    duration: _duration,
+    curve: Curves.easeOutCubic,
+    alignment: Alignment.topCenter,
+    child: AnimatedSwitcher(
+      duration: _duration,
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeIn,
+      layoutBuilder: (current, previous) => Stack(
+        alignment: Alignment.topCenter,
+        children: [...previous, ?current],
+      ),
+      child: child ?? const SizedBox(width: double.infinity),
+    ),
+  );
+}
+
+/// The least new cash that reaches every target without a single sale.
+class const _MinimumCashSuggestion({
+  required final double amount,
+  required final String currency,
+  required final bool applied,
+  required final VoidCallback onUse,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final l = context.ledger;
+    return Container(
+      key: const ValueKey('minimum-cash'),
+      padding: const EdgeInsets.fromLTRB(18, 12, 12, 14),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: l.hairline)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(color: l.sunken, shape: BoxShape.circle),
+            child: Icon(Icons.auto_awesome_rounded, size: 17, color: l.ink),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 2,
+              children: [
+                Text(
+                  context.l10n.autoFillBuyOnly,
+                  style: Theme.of(context).textTheme.bodySmall
+                      ?.copyWith(color: l.muted),
+                ),
+                Text(
+                  money(context, currency, amount),
+                  style: figures(15, weight: FontWeight.w600, color: l.ink),
                 ),
               ],
             ),
           ),
-          Text(
-            isHold
-                ? '✓ ${context.l10n.hold}'
-                : '${isBuy ? "↑ +" : "↓ "}${money(context, currency, delta)}'
-                      '${units == null ? "" : "\n${formatQuantity(context, units!, digits: 6)}×"}',
-            style: TextStyle(
-              fontFamily: 'Fira Sans',
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: isHold
-                  ? Theme.of(context).colorScheme.onSurfaceVariant
-                  : (isBuy ? greenColor : redColor),
-            ),
+          const SizedBox(width: 8),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 180),
+            child: applied
+                ? Padding(
+                    key: const ValueKey('applied'),
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    child: Icon(Icons.check_rounded, color: l.buy, size: 22),
+                  )
+                : FilledButton(
+                    key: const ValueKey('use'),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(0, 38),
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                      backgroundColor: l.sunken,
+                      foregroundColor: l.ink,
+                    ),
+                    onPressed: onUse,
+                    child: Text(context.l10n.useAmount),
+                  ),
           ),
         ],
       ),
