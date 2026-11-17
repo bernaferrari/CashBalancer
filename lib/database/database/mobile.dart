@@ -39,7 +39,6 @@ Future<void> copyLegacyDatabase(File legacy, File destination) async {
         .select("SELECT name FROM sqlite_master WHERE type = 'table'")
         .map((row) => row['name'])
         .toSet();
-    // The repository also ships an empty, pre-1.0 db.sqlite template.
     if (!tables.containsAll(['users', 'wallets', 'items'])) return;
     final staging = await destination.parent.createTemp(
       '.cash-balancer-migration-',
