@@ -211,7 +211,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'This also deletes everything it contains.';
 
   @override
-  String get deleted => 'Deleted';
+  String deleted(String name) {
+    return 'Deleted $name';
+  }
 
   @override
   String get undo => 'Undo';

@@ -213,7 +213,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get confirmDeleteContents => 'También se eliminará todo su contenido.';
 
   @override
-  String get deleted => 'Eliminado';
+  String deleted(String name) {
+    return 'Se eliminó $name';
+  }
 
   @override
   String get undo => 'Deshacer';

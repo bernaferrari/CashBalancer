@@ -231,7 +231,7 @@ class _PortfoliosDialogState extends State<PortfoliosDialog> {
                       await cubit.switchPortfolio(result.nextId);
                     }
                     if (context.mounted) {
-                      showDeleted(context, result.undo);
+                      showDeleted(context, name, result.undo);
                       Navigator.of(context).pop();
                     }
                   } catch (_) {

@@ -150,90 +150,7 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
             ),
           ),
           const SizedBox(height: 14),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 10,
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: moneyEditingController,
-                  onFieldSubmitted: onSubmit,
-                  onChanged: onChanged,
-                  autofocus: widget.previousItem != null,
-                  focusNode: valueFocusNode,
-                  style: figures(16, weight: FontWeight.w600),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return context.l10n.mainDialogValidator;
-                    }
-                    final num = double.tryParse(value);
-                    if (num == null || !num.isFinite) {
-                      return context.l10n.invalidValue;
-                    }
-                    if (num < 0) {
-                      return context.l10n.valueMustBePositive;
-                    }
-                    return null;
-                  },
-                  inputFormatters: const <TextInputFormatter>[
-                    DecimalTextInputFormatter(decimalRange: 324),
-                  ],
-                  textAlign: TextAlign.right,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: _isBalance
-                        ? context.l10n.balance
-                        : context.l10n.unitPrice,
-                    hintText: '0.00',
-                    prefixText: '${widget.currency} ',
-                  ),
-                ),
-              ),
-              if (!_isBalance)
-                Expanded(
-                  child: TextFormField(
-                    controller: quantityEditingController,
-                    onFieldSubmitted: onSubmit,
-                    onChanged: onChanged,
-                    style: figures(16, weight: FontWeight.w600),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) return null;
-                      final quantity = double.tryParse(value);
-                      return quantity != null &&
-                              quantity.isFinite &&
-                              quantity >= 0 &&
-                              (quantity *
-                                      (double.tryParse(
-                                            moneyEditingController.text,
-                                          ) ??
-                                          0))
-                                  .isFinite
-                          ? null
-                          : context.l10n.invalidValue;
-                    },
-                    textAlign: TextAlign.right,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    inputFormatters: const <TextInputFormatter>[
-                      DecimalTextInputFormatter(decimalRange: 324),
-                    ],
-                    decoration: InputDecoration(
-                      labelText: context.l10n.quantity,
-                      hintText: '1',
-                      prefixText: '× ',
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          if (!_isBalance)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: _subtotal(context),
-            ),
+          _amountFields(context),
           const SizedBox(height: 16),
           LedgerCard(
             child: SwitchListTile(
@@ -268,6 +185,136 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _amountFields(BuildContext context) {
+    const gap = 10.0;
+    final duration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : const Duration(milliseconds: 260);
+    final price = TextFormField(
+      controller: moneyEditingController,
+      onFieldSubmitted: onSubmit,
+      onChanged: onChanged,
+      autofocus: widget.previousItem != null,
+      focusNode: valueFocusNode,
+      style: figures(16, weight: FontWeight.w600),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return context.l10n.mainDialogValidator;
+        }
+        final num = double.tryParse(value);
+        if (num == null || !num.isFinite) {
+          return context.l10n.invalidValue;
+        }
+        if (num < 0) {
+          return context.l10n.valueMustBePositive;
+        }
+        return null;
+      },
+      inputFormatters: const <TextInputFormatter>[
+        DecimalTextInputFormatter(decimalRange: 324),
+      ],
+      textAlign: TextAlign.right,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      decoration: InputDecoration(
+        labelText: _isBalance ? context.l10n.balance : context.l10n.unitPrice,
+        hintText: '0.00',
+        prefixText: '${widget.currency} ',
+      ),
+    );
+    final quantity = ExcludeFocus(
+      excluding: _isBalance,
+      child: IgnorePointer(
+        ignoring: _isBalance,
+        child: ExcludeSemantics(
+          excluding: _isBalance,
+          child: TextFormField(
+            controller: quantityEditingController,
+            onFieldSubmitted: onSubmit,
+            onChanged: onChanged,
+            style: figures(16, weight: FontWeight.w600),
+            validator: (value) {
+              if (_isBalance || value == null || value.isEmpty) return null;
+              final quantity = double.tryParse(value);
+              return quantity != null &&
+                      quantity.isFinite &&
+                      quantity >= 0 &&
+                      (quantity *
+                              (double.tryParse(moneyEditingController.text) ??
+                                  0))
+                          .isFinite
+                  ? null
+                  : context.l10n.invalidValue;
+            },
+            textAlign: TextAlign.right,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: const <TextInputFormatter>[
+              DecimalTextInputFormatter(decimalRange: 324),
+            ],
+            decoration: InputDecoration(
+              labelText: context.l10n.quantity,
+              hintText: '1',
+              prefixText: '× ',
+            ),
+          ),
+        ),
+      ),
+    );
+    final subtotal = ExcludeSemantics(
+      excluding: _isBalance,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+        child: _subtotal(context),
+      ),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final quantityWidth = (constraints.maxWidth - gap) / 2;
+        return TweenAnimationBuilder<double>(
+          tween: Tween(end: _isBalance ? 0 : 1),
+          duration: duration,
+          curve: Curves.easeInOutCubic,
+          builder: (context, units, _) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: price),
+                  if (units > 0) ...[
+                    SizedBox(width: gap * units),
+                    ClipRect(
+                      child: Align(
+                        alignment: AlignmentDirectional.topEnd,
+                        widthFactor: units,
+                        // Keep the field laid out at its resting width as it fades.
+                        child: Opacity(
+                          opacity: units,
+                          child: SizedBox(
+                            width: quantityWidth,
+                            child: quantity,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              if (units > 0)
+                ClipRect(
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    heightFactor: units,
+                    child: Opacity(opacity: units, child: subtotal),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -403,9 +450,11 @@ class _CRUDItemPageState extends State<CRUDItemPage> {
     final db = context.read<DataCubit>().db;
     if (_saving) return;
     setState(() => _saving = true);
+    final item = widget.previousItem!;
     final deleted = await deleteAndClose(
       context,
-      () => db.deleteItem(widget.previousItem!),
+      item.name,
+      () => db.deleteItem(item),
     );
     if (mounted && !deleted) setState(() => _saving = false);
   }

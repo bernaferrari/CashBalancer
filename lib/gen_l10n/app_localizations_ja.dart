@@ -115,7 +115,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get targetMustBeBetween => '目標は0〜100の間で入力してください';
 
   @override
-  String get designedDeveloped => 'Designed & developed by Bernardo Ferrari.';
+  String get designedDeveloped => 'Bernardo Ferrari がデザイン・開発しました。';
 
   @override
   String get buyOnlyRebalance => '買い増しのみのリバランス';
@@ -205,7 +205,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get confirmDeleteContents => '中身もすべて削除されます。';
 
   @override
-  String get deleted => '削除しました';
+  String deleted(String name) {
+    return '$nameを削除しました';
+  }
 
   @override
   String get undo => '元に戻す';
@@ -312,7 +314,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get noTarget => 'なし';
 
   @override
-  String get balanceOnlySubtitle => '貯金や現金向け：数量なしの残高のみ。';
+  String get balanceOnlySubtitle => '貯蓄や現金の管理に。数量を使わず、残高だけを記録します。';
 
   @override
   String get currentWallet => '現在';

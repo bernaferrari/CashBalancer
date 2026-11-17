@@ -215,7 +215,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Tout son contenu sera également supprimé.';
 
   @override
-  String get deleted => 'Supprimé';
+  String deleted(String name) {
+    return '$name a été supprimé';
+  }
 
   @override
   String get undo => 'Annuler';
@@ -275,7 +277,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Laissez vide pour rééquilibrer ce que vous avez déjà.';
 
   @override
-  String get balanceOnly => 'Suivre comme solde en espèces';
+  String get balanceOnly => 'Suivre le solde en liquidités';
 
   @override
   String get balance => 'Solde';
@@ -325,7 +327,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get balanceOnlySubtitle =>
-      'Pour l\'épargne ou les liquidités : un seul solde, sans unités.';
+      'Pour l’épargne ou les espèces. Seul le solde est nécessaire.';
 
   @override
   String get currentWallet => 'Actuel';

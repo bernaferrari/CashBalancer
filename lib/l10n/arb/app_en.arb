@@ -73,7 +73,15 @@
   "additionalCash": "Additional cash needed",
   "tradeRequiresPrice": "Set a positive unit price before applying these trades.",
   "confirmDeleteContents": "This also deletes everything it contains.",
-  "deleted": "Deleted",
+  "deleted": "Deleted {name}",
+  "@deleted": {
+    "description": "Confirms deletion of an asset, wallet, or portfolio by name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "undo": "Undo",
   "edit": "Edit",
   "pageNotFound": "Page not found",

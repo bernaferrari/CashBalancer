@@ -215,7 +215,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der gesamte Inhalt wird ebenfalls gelöscht.';
 
   @override
-  String get deleted => 'Gelöscht';
+  String deleted(String name) {
+    return '$name wurde gelöscht';
+  }
 
   @override
   String get undo => 'Rückgängig';

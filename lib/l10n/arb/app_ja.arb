@@ -34,7 +34,7 @@
   "invalidValue": "数値の形式が正しくありません",
   "valueMustBePositive": "正の数値を入力してください",
   "targetMustBeBetween": "目標は0〜100の間で入力してください",
-  "designedDeveloped": "Designed & developed by Bernardo Ferrari.",
+  "designedDeveloped": "Bernardo Ferrari がデザイン・開発しました。",
   "buyOnlyRebalance": "買い増しのみのリバランス",
   "buyOnlyRebalanceSubtitle": "資産を売却せず、追加資金の購入のみでリバランスを計算します。",
   "rebalanceCalculator": "投資・リバランス計算",
@@ -64,7 +64,7 @@
   "additionalCash": "追加で必要な資金",
   "tradeRequiresPrice": "取引を適用するには正の単価を設定してください。",
   "confirmDeleteContents": "中身もすべて削除されます。",
-  "deleted": "削除しました",
+  "deleted": "{name}を削除しました",
   "undo": "元に戻す",
   "edit": "編集",
   "pageNotFound": "ページが見つかりません",
@@ -98,6 +98,6 @@
   "targetAssigned": "100% のうち {percent} を割り当て済み",
   "useAmount": "使う",
   "noTarget": "なし",
-  "balanceOnlySubtitle": "貯金や現金向け：数量なしの残高のみ。",
+  "balanceOnlySubtitle": "貯蓄や現金の管理に。数量を使わず、残高だけを記録します。",
   "currentWallet": "現在"
 }

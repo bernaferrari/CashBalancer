@@ -204,7 +204,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmDeleteContents => '其中所有内容也会被删除。';
 
   @override
-  String get deleted => '已删除';
+  String deleted(String name) {
+    return '已删除 $name';
+  }
 
   @override
   String get undo => '撤销';

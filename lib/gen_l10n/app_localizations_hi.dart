@@ -212,7 +212,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get confirmDeleteContents => 'इसकी सारी सामग्री भी हट जाएगी।';
 
   @override
-  String get deleted => 'हटा दिया गया';
+  String deleted(String name) {
+    return '$name हटा दिया गया';
+  }
 
   @override
   String get undo => 'पहले जैसा करें';

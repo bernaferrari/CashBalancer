@@ -115,7 +115,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get targetMustBeBetween => '목표 비중은 0에서 100 사이여야 합니다';
 
   @override
-  String get designedDeveloped => 'Designed & developed by Bernardo Ferrari.';
+  String get designedDeveloped => 'Bernardo Ferrari가 디자인하고 개발했습니다.';
 
   @override
   String get buyOnlyRebalance => '매수 전용 리밸런싱';
@@ -206,7 +206,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get confirmDeleteContents => '들어 있는 항목도 모두 삭제됩니다.';
 
   @override
-  String get deleted => '삭제됨';
+  String deleted(String name) {
+    return '$name 삭제 완료';
+  }
 
   @override
   String get undo => '실행 취소';

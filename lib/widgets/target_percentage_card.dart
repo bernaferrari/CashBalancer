@@ -33,19 +33,21 @@ class const TargetPercentageCard({
         ? editableNumber(double.parse(remaining.toStringAsFixed(1)))
         : null;
 
-    Widget chip(String label, String? value, {IconData? icon}) => Expanded(
-      child: PresetChip(
-        label: label,
-        icon: icon,
-        selected: value == null
-            ? controller.text.isEmpty
-            : currentTarget == double.parse(value),
-        onPressed: () {
-          controller.text = value ?? '';
-          onChanged();
-        },
-      ),
-    );
+    Widget chip(String label, String? value, {IconData? icon}) =>
+        ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 44),
+          child: PresetChip(
+            label: label,
+            icon: icon,
+            selected: value == null
+                ? controller.text.isEmpty
+                : currentTarget == double.parse(value),
+            onPressed: () {
+              controller.text = value ?? '';
+              onChanged();
+            },
+          ),
+        );
 
     return LedgerCard(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
@@ -104,20 +106,23 @@ class const TargetPercentageCard({
             ],
           ),
           const SizedBox(height: 14),
-          Row(
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
             spacing: 6,
+            runSpacing: 6,
             children: [
               chip(context.l10n.noTarget, null),
               for (final preset in _presets)
-                if (preset != rest) chip('$preset%', preset),
+                if (preset != rest)
+                  chip(formatPercent(double.parse(preset), locale), preset),
               if (rest != null)
                 chip(
-                  '${formatPercent(remaining, locale)}%',
+                  formatPercent(remaining, locale),
                   rest,
                   icon: Icons.pie_chart_outline_rounded,
                 )
               else
-                chip('100%', '100'),
+                chip(formatPercent(100, locale), '100'),
             ],
           ),
           const SizedBox(height: 16),
@@ -139,7 +144,7 @@ class const TargetPercentageCard({
               Expanded(
                 child: Text(
                   context.l10n.targetAssigned(
-                    '${formatPercent(totalTarget, locale)}%',
+                    formatPercent(totalTarget, locale),
                   ),
                   style: figures(
                     12,
@@ -154,7 +159,7 @@ class const TargetPercentageCard({
                     children: [
                       TextSpan(text: '${context.l10n.now.toUpperCase()}  '),
                       TextSpan(
-                        text: '${formatPercent(currentPercent!, locale)}%',
+                        text: formatPercent(currentPercent!, locale),
                         style: TextStyle(color: l.ink),
                       ),
                     ],

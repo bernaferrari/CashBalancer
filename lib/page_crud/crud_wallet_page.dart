@@ -181,6 +181,7 @@ class _CRUDWalletPageState extends State<CRUDWalletPage> {
     if (await confirmDelete(context, wallet.name) && mounted) {
       final deleted = await deleteAndClose(
         context,
+        wallet.name,
         () => db.deleteWallet(wallet.id),
       );
       if (deleted) return;

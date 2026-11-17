@@ -64,7 +64,7 @@
   "additionalCash": "还需资金",
   "tradeRequiresPrice": "应用交易前，请设置大于零的单价。",
   "confirmDeleteContents": "其中所有内容也会被删除。",
-  "deleted": "已删除",
+  "deleted": "已删除 {name}",
   "undo": "撤销",
   "edit": "编辑",
   "pageNotFound": "找不到页面",

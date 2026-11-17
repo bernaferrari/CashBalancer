@@ -24,13 +24,22 @@ Future<bool> confirmDelete(BuildContext context, String name) async =>
     ) ==
     true;
 
-void showDeleted(BuildContext context, Future<void> Function() undo) {
+void showDeleted(
+  BuildContext context,
+  String name,
+  Future<void> Function() undo,
+) {
   final messenger = ScaffoldMessenger.of(context);
   final strings = context.l10n;
   var restoring = false;
   messenger.showSnackBar(
     SnackBar(
-      content: Text(strings.deleted),
+      content: Text(
+        strings.deleted(name),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+      persist: MediaQuery.accessibleNavigationOf(context),
       action: SnackBarAction(
         label: strings.undo,
         onPressed: () async {
@@ -58,6 +67,7 @@ bool isDeletingRoute(ModalRoute<dynamic> route) =>
 
 Future<bool> deleteAndClose(
   BuildContext context,
+  String name,
   Future<Future<void> Function()> Function() delete,
 ) async {
   final route = ModalRoute.of(context);
@@ -74,7 +84,7 @@ Future<bool> deleteAndClose(
   }
 
   if (context.mounted) {
-    showDeleted(context, undo);
+    showDeleted(context, name, undo);
     if (route?.isCurrent == true) {
       Beamer.of(context).beamToReplacementNamed('/');
     }

@@ -248,7 +248,7 @@ class const HomeHero(final FullData data, {super.key}) extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      '${(w.totalValue / total).toPercent(locale)}%',
+                      (w.totalValue / total).toPercent(locale),
                       style: figures(12, color: l.muted),
                     ),
                   ],

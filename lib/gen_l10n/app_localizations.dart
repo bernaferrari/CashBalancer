@@ -502,11 +502,11 @@ abstract class AppLocalizations {
   /// **'This also deletes everything it contains.'**
   String get confirmDeleteContents;
 
-  /// No description provided for @deleted.
+  /// Confirms deletion of an asset, wallet, or portfolio by name.
   ///
   /// In en, this message translates to:
-  /// **'Deleted'**
-  String get deleted;
+  /// **'Deleted {name}'**
+  String deleted(String name);
 
   /// No description provided for @undo.
   ///

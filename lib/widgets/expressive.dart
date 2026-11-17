@@ -105,6 +105,7 @@ class const PresetChip({
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     spacing: 4,
                     children: [

@@ -212,7 +212,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get confirmDeleteContents => 'Isso também exclui todo o conteúdo.';
 
   @override
-  String get deleted => 'Excluído';
+  String deleted(String name) {
+    return 'Você excluiu $name';
+  }
 
   @override
   String get undo => 'Desfazer';
@@ -272,7 +274,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Deixe vazio para rebalancear o que você já tem.';
 
   @override
-  String get balanceOnly => 'Controlar como saldo em dinheiro';
+  String get balanceOnly => 'Registrar como saldo em dinheiro';
 
   @override
   String get balance => 'Saldo';
@@ -322,7 +324,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get balanceOnlySubtitle =>
-      'Para poupança ou dinheiro: um saldo único, sem unidades.';
+      'Para dinheiro ou poupança. Informe apenas o saldo.';
 
   @override
   String get currentWallet => 'Atual';

@@ -138,12 +138,16 @@ class const AllocationBar(
   super.key,
 }) extends StatelessWidget {
   static const double _gap = 2;
+  static const _duration = Duration(milliseconds: 520);
 
   @override
   Widget build(BuildContext context) => SizedBox(
     height: height,
     child: LayoutBuilder(
       builder: (context, constraints) {
+        final duration = MediaQuery.disableAnimationsOf(context)
+            ? Duration.zero
+            : _duration;
         final visible = [
           for (final s in segments)
             if (s.value > 0) s,
@@ -153,35 +157,33 @@ class const AllocationBar(
         final usable =
             constraints.maxWidth - _gap * (visible.length - 1).clamp(0, 999);
         double left = 0;
+        // Keep zero-width segments so their existing positions can animate.
+        final children = <Widget>[];
+        for (final s in segments) {
+          final width = s.value > 0 && basis > 0
+              ? usable * s.value / basis
+              : 0.0;
+          children.add(
+            AnimatedPositioned(
+              key: ValueKey(s.id),
+              duration: duration,
+              curve: Curves.easeOutCubic,
+              left: left,
+              width: width,
+              top: 0,
+              bottom: 0,
+              child: AnimatedContainer(duration: duration, color: s.color),
+            ),
+          );
+          if (s.value > 0) left += width + _gap;
+        }
         return Container(
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             color: context.ledger.sunken,
             borderRadius: BorderRadius.circular(height / 2),
           ),
-          child: Stack(
-            children: [
-              for (final s in visible)
-                () {
-                  final width = basis <= 0 ? 0.0 : usable * s.value / basis;
-                  final child = AnimatedPositioned(
-                    key: ValueKey(s.id),
-                    duration: const Duration(milliseconds: 520),
-                    curve: Curves.easeOutCubic,
-                    left: left,
-                    width: width,
-                    top: 0,
-                    bottom: 0,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 520),
-                      color: s.color,
-                    ),
-                  );
-                  left += width + _gap;
-                  return child;
-                }(),
-            ],
-          ),
+          child: Stack(children: children),
         );
       },
     ),
@@ -384,7 +386,7 @@ class const ShareText({
   Widget build(BuildContext context) {
     final locale = Localizations.localeOf(context).toString();
     final l = context.ledger;
-    final now = '${share.toPercent(locale)}%';
+    final now = share.toPercent(locale);
     return Text.rich(
       TextSpan(
         children: [
@@ -392,7 +394,7 @@ class const ShareText({
           if (targetPercent != null && targetPercent! >= 0) ...[
             towards(l),
             TextSpan(
-              text: '${formatPercent(targetPercent!, locale)}%',
+              text: formatPercent(targetPercent!, locale),
               style: TextStyle(color: l.ink, fontWeight: FontWeight.w600),
             ),
           ],

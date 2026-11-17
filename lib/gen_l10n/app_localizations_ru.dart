@@ -212,7 +212,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get confirmDeleteContents => 'Всё содержимое также будет удалено.';
 
   @override
-  String get deleted => 'Удалено';
+  String deleted(String name) {
+    return 'Удалено «$name»';
+  }
 
   @override
   String get undo => 'Отменить';

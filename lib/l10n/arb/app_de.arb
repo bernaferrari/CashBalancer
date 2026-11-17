@@ -64,7 +64,7 @@
   "additionalCash": "Zusätzliches Guthaben erforderlich",
   "tradeRequiresPrice": "Vor dem Anwenden einen positiven Stückpreis eingeben.",
   "confirmDeleteContents": "Der gesamte Inhalt wird ebenfalls gelöscht.",
-  "deleted": "Gelöscht",
+  "deleted": "{name} wurde gelöscht",
   "undo": "Rückgängig",
   "edit": "Bearbeiten",
   "pageNotFound": "Seite nicht gefunden",

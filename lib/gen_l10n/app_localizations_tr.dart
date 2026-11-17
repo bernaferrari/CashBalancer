@@ -212,7 +212,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get confirmDeleteContents => 'İçindeki her şey de silinecek.';
 
   @override
-  String get deleted => 'Silindi';
+  String deleted(String name) {
+    return '$name silindi';
+  }
 
   @override
   String get undo => 'Geri al';

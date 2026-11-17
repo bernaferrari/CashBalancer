@@ -64,7 +64,7 @@
   "additionalCash": "Gereken ek nakit",
   "tradeRequiresPrice": "İşlemleri uygulamadan önce pozitif birim fiyat girin.",
   "confirmDeleteContents": "İçindeki her şey de silinecek.",
-  "deleted": "Silindi",
+  "deleted": "{name} silindi",
   "undo": "Geri al",
   "edit": "Düzenle",
   "pageNotFound": "Sayfa bulunamadı",

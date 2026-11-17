@@ -33,8 +33,11 @@ String money(
   decimalDigits: decimalDigits,
 );
 
-String formatPercent(double value, [String? locale]) =>
-    NumberFormat('0.#', locale).format(value.isFinite ? value : 0);
+String formatPercent(double value, [String? locale]) {
+  final formatter = NumberFormat.percentPattern(locale)
+    ..maximumFractionDigits = 1;
+  return formatter.format(value.isFinite ? value / 100 : 0);
+}
 
 extension Percent on double {
   String toPercent([String? locale]) => formatPercent(this * 100, locale);

@@ -64,7 +64,7 @@
   "additionalCash": "Liquidità aggiuntiva necessaria",
   "tradeRequiresPrice": "Imposta un prezzo unitario positivo prima di applicare le operazioni.",
   "confirmDeleteContents": "Verrà eliminato anche tutto il contenuto.",
-  "deleted": "Eliminato",
+  "deleted": "{name} è stato eliminato",
   "undo": "Annulla",
   "edit": "Modifica",
   "pageNotFound": "Pagina non trovata",

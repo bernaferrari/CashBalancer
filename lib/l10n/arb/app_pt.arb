@@ -73,7 +73,7 @@
   "additionalCash": "Saldo adicional necessário",
   "tradeRequiresPrice": "Defina um preço unitário positivo antes de aplicar as operações.",
   "confirmDeleteContents": "Isso também exclui todo o conteúdo.",
-  "deleted": "Excluído",
+  "deleted": "Você excluiu {name}",
   "undo": "Desfazer",
   "edit": "Editar",
   "pageNotFound": "Página não encontrada",
@@ -92,7 +92,7 @@
   "quickPrice": "Atualizar preço",
   "walletsLabel": "Carteiras",
   "enterAmountToApply": "Deixe vazio para rebalancear o que você já tem.",
-  "balanceOnly": "Controlar como saldo em dinheiro",
+  "balanceOnly": "Registrar como saldo em dinheiro",
   "balance": "Saldo",
   "updateBalance": "Atualizar saldo",
   "mergePreview": "Mesclar adiciona {added} registros e mantém {kept} existentes. Seus valores atuais são mantidos quando os registros coincidem. Backups antigos usam os nomes de cada portfólio e carteira.",
@@ -107,6 +107,6 @@
   "targetAssigned": "{percent} de 100% definidos",
   "useAmount": "Usar",
   "noTarget": "Nenhum",
-  "balanceOnlySubtitle": "Para poupança ou dinheiro: um saldo único, sem unidades.",
+  "balanceOnlySubtitle": "Para dinheiro ou poupança. Informe apenas o saldo.",
   "currentWallet": "Atual"
 }

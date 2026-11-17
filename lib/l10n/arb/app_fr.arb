@@ -64,7 +64,7 @@
   "additionalCash": "Liquidités supplémentaires nécessaires",
   "tradeRequiresPrice": "Saisissez un prix unitaire positif avant d’appliquer ces opérations.",
   "confirmDeleteContents": "Tout son contenu sera également supprimé.",
-  "deleted": "Supprimé",
+  "deleted": "{name} a été supprimé",
   "undo": "Annuler",
   "edit": "Modifier",
   "pageNotFound": "Page introuvable",
@@ -83,7 +83,7 @@
   "quickPrice": "Mettre à jour le prix",
   "walletsLabel": "Portefeuilles",
   "enterAmountToApply": "Laissez vide pour rééquilibrer ce que vous avez déjà.",
-  "balanceOnly": "Suivre comme solde en espèces",
+  "balanceOnly": "Suivre le solde en liquidités",
   "balance": "Solde",
   "updateBalance": "Mettre à jour le solde",
   "mergePreview": "La fusion ajoute {added} enregistrements et en conserve {kept}. Les valeurs actuelles des entrées correspondantes sont conservées. Les anciennes sauvegardes utilisent les noms dans chaque portefeuille.",
@@ -98,6 +98,6 @@
   "targetAssigned": "{percent} sur 100 % attribués",
   "useAmount": "Utiliser",
   "noTarget": "Aucun",
-  "balanceOnlySubtitle": "Pour l'épargne ou les liquidités : un seul solde, sans unités.",
+  "balanceOnlySubtitle": "Pour l’épargne ou les espèces. Seul le solde est nécessaire.",
   "currentWallet": "Actuel"
 }
